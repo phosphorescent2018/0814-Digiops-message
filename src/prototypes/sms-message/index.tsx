@@ -6,15 +6,17 @@ import Layout from './components/Layout';
 import TemplatePage from './pages/TemplatePage';
 import RecordPage from './pages/RecordPage';
 import ReportPage from './pages/ReportPage';
-import { MessageSquareText, MessageCircle, BarChart3 } from 'lucide-react';
+import ResendCenter from './pages/ResendCenter';
+import { MessageSquareText, MessageCircle, BarChart3, Send } from 'lucide-react';
 import './style.css';
 
-type TabKey = 'template' | 'record' | 'report';
+type TabKey = 'template' | 'record' | 'report' | 'resend';
 
 const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'template', label: '模版', icon: MessageSquareText },
     { key: 'record', label: '发送记录', icon: MessageCircle },
     { key: 'report', label: '报表', icon: BarChart3 },
+    { key: 'resend', label: '补发中心', icon: Send },
 ];
 
 export default function SmsMessage() {
@@ -39,6 +41,7 @@ export default function SmsMessage() {
             {activeTab === 'record' && <RecordPage />}
             {activeTab === 'template' && <TemplatePage />}
             {activeTab === 'report' && <ReportPage />}
+            {activeTab === 'resend' && <ResendCenter />}
         </Layout>
     );
 }
