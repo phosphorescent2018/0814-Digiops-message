@@ -13,9 +13,11 @@ import {
     ArrowRight,
 } from 'lucide-react';
 import { recordRows, contentTypeOptions, statusOptions } from '../mockData';
+import type { RecordFilter } from './resend/BatchDetail';
 
 interface RecordPageProps {
     activeKey?: string;
+    filter?: RecordFilter;
 }
 
 const PAGE_SIZE = 10;
@@ -32,7 +34,7 @@ function DeliveryTooltip({ text, children }: { text: string; children: React.Rea
     );
 }
 
-function SearchForm() {
+function SearchForm({ filter }: { filter?: RecordFilter }) {
     const [collapsed, setCollapsed] = useState(false);
 
     const renderSelect = (placeholder = PLACEHOLDER_SELECT, options?: string[], defaultValue?: string) => (
@@ -60,19 +62,25 @@ function SearchForm() {
                 <div className="sms-form-control">
                     <div className="sms-date-range">
                         <span>
-                            <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
-                            起始日期
+                            {filter?.sendTimeStart ? (
+                                filter.sendTimeStart
+                            ) : (
+                                <>
+                                    <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
+                                    起始日期
+                                </>
+                            )}
                         </span>
                         <span className="arrow">
                             <ArrowRight size={12} />
                         </span>
-                        <span>结束日期</span>
+                        <span>{filter?.sendTimeEnd ?? '结束日期'}</span>
                     </div>
                 </div>
             </div>
             <div className="sms-form-item">
                 <label className="sms-form-label">BusinessID</label>
-                <div className="sms-form-control">{renderSelect('', undefined)}</div>
+                <div className="sms-form-control">{renderSelect('', undefined, filter?.businessId)}</div>
             </div>
             <div className="sms-form-item">
                 <label className="sms-form-label">计划名称</label>
@@ -107,7 +115,10 @@ function SearchForm() {
                     <div className="sms-form-item">
                         <label className="sms-form-label">送达状态</label>
                         <div className="sms-form-control">
-                            <select className="sms-select placeholder">
+                            <select
+                                className={`sms-select${filter?.deliveryStatus ? '' : ' placeholder'}`}
+                                defaultValue={filter?.deliveryStatus ?? ''}
+                            >
                                 <option value="">请选择</option>
                                 <option value="回执中">回执中</option>
                                 <option value="已送达">已送达</option>
@@ -313,12 +324,12 @@ function RecordTable({ onExport }: { onExport: () => void }) {
     );
 }
 
-export default function RecordPage({ activeKey }: RecordPageProps) {
+export default function RecordPage({ activeKey, filter }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
 
     return (
         <div>
-            <SearchForm />
+            <SearchForm filter={filter} />
             <RecordTable onExport={() => setExportVisible(true)} />
 
             {exportVisible && (

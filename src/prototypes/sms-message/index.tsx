@@ -7,6 +7,7 @@ import TemplatePage from './pages/TemplatePage';
 import RecordPage from './pages/RecordPage';
 import ReportPage from './pages/ReportPage';
 import ResendCenter from './pages/ResendCenter';
+import type { RecordFilter } from './pages/resend/BatchDetail';
 import { MessageSquareText, MessageCircle, BarChart3, Send } from 'lucide-react';
 import './style.css';
 import { AnnotationViewer, type AnnotationSourceDocument } from '@axhub/annotation';
@@ -24,6 +25,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
 export default function SmsMessage() {
     // 与 UAT 一致：默认激活「发送记录」
     const [activeTab, setActiveTab] = useState<TabKey>('record');
+    const [recordFilter, setRecordFilter] = useState<RecordFilter | null>(null);
 
     return (
         <>
@@ -34,17 +36,27 @@ export default function SmsMessage() {
                               <div
                                   key={tab.key}
                                   className={`sms-tab${activeTab === tab.key ? ' active' : ''}`}
-                                  onClick={() => setActiveTab(tab.key)}
+                                  onClick={() => {
+                                      setRecordFilter(null);
+                                      setActiveTab(tab.key);
+                                  }}
                               >
                                   <tab.icon className="sms-tab-icon" size={20} strokeWidth={1.6} />
                                   {tab.label}
                               </div>
                           ))}
                       </div>
-                      {activeTab === 'record' && <RecordPage />}
+                      {activeTab === 'record' && <RecordPage filter={recordFilter ?? undefined} />}
                       {activeTab === 'template' && <TemplatePage />}
                       {activeTab === 'report' && <ReportPage />}
-                      {activeTab === 'resend' && <ResendCenter />}
+                      {activeTab === 'resend' && (
+                          <ResendCenter
+                              onSwitchTab={(tab, filter) => {
+                                  setRecordFilter(filter ?? null);
+                                  setActiveTab(tab);
+                              }}
+                          />
+                      )}
                   </Layout>
           <AnnotationViewer
             source={annotationSourceDocument as unknown as AnnotationSourceDocument}

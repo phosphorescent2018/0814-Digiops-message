@@ -3,6 +3,12 @@
  */
 import React, { useState } from 'react';
 import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar } from 'lucide-react';
+import BatchDetail from './BatchDetail';
+import type { RecordFilter } from './BatchDetail';
+
+interface ManualResendProps {
+    onSwitchTab?: (tab: 'record', filter?: RecordFilter) => void;
+}
 
 const FIELD_LABELS = [
     '发送时间',
@@ -17,7 +23,7 @@ const FIELD_LABELS = [
     '路径标记',
 ];
 
-interface BatchRow {
+export interface BatchRow {
     id: string;
     scheduledTime: string;
     endTime: string;
@@ -112,7 +118,7 @@ const BATCHES: BatchRow[] = [
     },
 ];
 
-const STATUS_CLASS: Record<string, string> = {
+export const STATUS_CLASS: Record<string, string> = {
     待执行: 'sms-status-pending',
     执行中: 'sms-status-delivering',
     已完成: 'sms-status-success',
@@ -127,7 +133,7 @@ const nowStr = () => {
 };
 
 /** 按计划时间与当前时间动态计算批次状态 */
-const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' => {
+export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' => {
     if (b.isTerminated) return '已终止';
     if (b.isFailed) return '失败';
     if (b.mode === '定时补发' && b.scheduledTime > nowStr()) return '待执行';
@@ -138,7 +144,7 @@ const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '
 type ModalType = 'immediate' | 'scheduled' | null;
 type IgnoreBlacklist = 'yes' | 'no';
 
-export default function ManualResend() {
+export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
@@ -155,6 +161,7 @@ export default function ManualResend() {
     const [terminateTarget, setTerminateTarget] = useState<BatchRow | null>(null);
     const [terminating, setTerminating] = useState(false);
     const [batches, setBatches] = useState<BatchRow[]>(BATCHES);
+    const [detailBatch, setDetailBatch] = useState<BatchRow | null>(null);
 
     const showToast = (text: string) => {
         setToast(text);
@@ -241,6 +248,10 @@ export default function ManualResend() {
                 prev.map((b) =>
                     b.id === terminateTarget.id ? { ...b, isTerminated: true, endTime: nowStr() } : b
                 )
+            );
+            // 同步更新抽屉中的批次快照
+            setDetailBatch((prev) =>
+                prev && prev.id === terminateTarget.id ? { ...prev, isTerminated: true, endTime: nowStr() } : prev
             );
             setTerminating(false);
             setTerminateTarget(null);
@@ -436,7 +447,7 @@ export default function ManualResend() {
                                             <button
                                                 type="button"
                                                 className="sms-action-link"
-                                                onClick={() => showToast(`批次 B${b.id} 详情页待设计`)}
+                                                onClick={() => setDetailBatch(b)}
                                             >
                                                 <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
                                                 详情
@@ -594,7 +605,7 @@ export default function ManualResend() {
 
             {/* ============ 终止二次确认弹窗 ============ */}
             {terminateTarget && (
-                <div className="sms-mask" onClick={() => setTerminateTarget(null)}>
+                <div className="sms-mask resend-modal-top" onClick={() => setTerminateTarget(null)}>
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">终止补发</div>
                         <div className="sms-modal-body">
@@ -620,6 +631,19 @@ export default function ManualResend() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* ============ 批次详情抽屉 ============ */}
+            {detailBatch && (
+                <BatchDetail
+                    batch={detailBatch}
+                    onClose={() => setDetailBatch(null)}
+                    onTerminate={(b) => setTerminateTarget(b)}
+                    onViewRecords={(filter) => {
+                        setDetailBatch(null);
+                        onSwitchTab?.('record', filter);
+                    }}
+                />
             )}
 
             {/* 轻提示 */}
