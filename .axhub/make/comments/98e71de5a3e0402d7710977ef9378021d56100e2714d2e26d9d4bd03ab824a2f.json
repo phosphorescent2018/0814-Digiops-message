@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 3,
+  "kind": "prototype-edit-comments",
+  "resource": {
+    "id": "express-homepage",
+    "targetPath": "prototypes/express-homepage",
+    "filePath": ".axhub/make/comments/98e71de5a3e0402d7710977ef9378021d56100e2714d2e26d9d4bd03ab824a2f.json"
+  },
+  "comments": [
+    {
+      "label": "h1(\"随时随地，轻松寄件\")",
+      "locator": {
+        "selectors": [
+          ".express-hero-title",
+          "body > div > div > section:nth-of-type(1) > div:nth-of-type(1) > h1",
+          "#root div > section:nth-of-type(1) > div:nth-of-type(1) > h1"
+        ],
+        "fingerprint": "h1|class=express-hero-title|text=随时随地，轻松寄件",
+        "path": [
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
+      },
+      "marker": {
+        "clientX": 124.2109375,
+        "clientY": 265.12890625,
+        "documentX": 124.2109375,
+        "documentY": 265.12890625,
+        "xPercent": 10.282362375827816,
+        "y": 265.12890625,
+        "isFixed": false,
+        "offsetX": 88.2109375,
+        "offsetY": 50.12890625,
+        "dirtySince": 1785477058603
+      },
+      "id": "8050282d-7f8f-4c81-8c51-297c30f73824",
+      "state": "editing",
+      "comment": "我需要把轻松寄件修改为快速寄件",
+      "pageScope": "/prototypes/express-homepage",
+      "provider": "codex",
+      "requestId": "annotation-ms8ixvnt-rqjkyy",
+      "sessionId": "annotation-ms8ixvnt-rqjkyy",
+      "updatedAt": 1785477058720,
+      "message": "AI 编辑中",
+      "code": null
+    },
+    {
+      "label": "a(\"速达快递\")",
+      "locator": {
+        "selectors": [
+          ".express-nav-brand",
+          "body > div > div > nav > a",
+          "#root div > nav > a"
+        ],
+        "fingerprint": "a|class=express-nav-brand|text=速达快递",
+        "path": [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "marker": {
+        "clientX": 109.9765625,
+        "clientY": 41.9765625,
+        "documentX": 109.9765625,
+        "documentY": 41.9765625,
+        "xPercent": 19.294133771929825,
+        "y": 41.9765625,
+        "isFixed": true,
+        "offsetX": 93.9765625,
+        "offsetY": 27.9765625,
+        "dirtySince": 1785477212923
+      },
+      "id": "2e1b96ba-2506-4915-b580-77d081128ed2",
+      "state": "editing",
+      "comment": "改为超速快递",
+      "pageScope": "/prototypes/express-homepage",
+      "provider": "codex",
+      "requestId": "annotation-ms8j16qk-wpum2a",
+      "sessionId": "annotation-ms8j16qk-wpum2a",
+      "updatedAt": 1785477213031,
+      "message": "AI 编辑中",
+      "code": null
+    }
+  ],
+  "images": []
+}

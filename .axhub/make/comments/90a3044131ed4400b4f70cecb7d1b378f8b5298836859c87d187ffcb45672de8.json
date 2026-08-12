@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 3,
+  "kind": "document-edit-comments",
+  "resource": {
+    "id": "90a3044131ed4400b4f70cecb7d1b378f8b5298836859c87d187ffcb45672de8",
+    "targetPath": "src/prototypes/sms-message/.spec/spec.html",
+    "filePath": ".axhub/make/comments/90a3044131ed4400b4f70cecb7d1b378f8b5298836859c87d187ffcb45672de8.json"
+  },
+  "comments": [],
+  "images": [],
+  "documentPath": "src/prototypes/sms-message/.spec/spec.html"
+}

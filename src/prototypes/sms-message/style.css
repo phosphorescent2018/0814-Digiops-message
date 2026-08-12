@@ -1,0 +1,1053 @@
+/* ================================================================
+   短信管理页面原型样式
+   还原自 Digiops UAT：messageManage/noteMessage
+   ================================================================ */
+
+:root {
+    --primary: #1890ff;
+    --primary-active: #5095ff;
+    --text-main: #333333;
+    --text-secondary: #666666;
+    --text-muted: #74798c;
+    --border: #d9d9d9;
+    --border-soft: rgba(203, 208, 219, 0.6);
+    --bg-page: #f0f2f5;
+    --bg-header: #f5f6fa;
+    --sidebar-width: 226px;
+    --header-height: 64px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--text-main);
+    background: var(--bg-page);
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* ================================================================
+   整体布局
+   ================================================================ */
+
+.sms-app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sms-main {
+    flex: 1;
+    min-width: 0;
+    margin-left: var(--sidebar-width);
+}
+
+/* ================================================================
+   左侧导航
+   ================================================================ */
+
+.sms-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: #ffffff;
+    border-right: 1px solid #eef0f5;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+}
+
+.sms-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    border-bottom: 1px solid #f0f2f7;
+    gap: 10px;
+}
+
+.sms-logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0a3d8f, #1890ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.sms-logo-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #031938;
+    letter-spacing: 0.2px;
+}
+
+.sms-menu {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.sms-menu-item {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 20px;
+    color: #666666;
+    font-size: 14px;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sms-menu-item:hover {
+    background: #f9fbff;
+}
+
+.sms-menu-item.active {
+    background: #e6f0ff;
+    color: #031938;
+    font-weight: 500;
+}
+
+.sms-menu-item .sms-menu-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #98a1b8;
+}
+
+.sms-menu-item .sms-menu-chevron {
+    margin-left: auto;
+    color: #98a1b8;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.sms-menu-item.expanded .sms-menu-chevron {
+    transform: rotate(180deg);
+}
+
+.sms-menu-item.active .sms-menu-icon {
+    color: var(--primary);
+}
+
+.sms-menu-sub {
+    background: #fafbfd;
+    border-left: 2px solid transparent;
+}
+
+.sms-menu-sub .sms-menu-item {
+    padding-left: 48px;
+    height: 40px;
+}
+
+.sms-menu-sub .sms-menu-item.active {
+    background: #e6f0ff;
+    border-left-color: var(--primary);
+    font-weight: 600;
+}
+
+.sms-menu-sub .sms-menu-item.sms-menu-sub-sms.active {
+    background: #ede7f6;
+}
+
+.sms-menu-group-label {
+    padding: 12px 20px 4px;
+    font-size: 12px;
+    color: #98a1b8;
+}
+
+/* ================================================================
+   顶部栏
+   ================================================================ */
+
+.sms-header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--header-height);
+    background: #ffffff;
+    border-bottom: 1px solid #eef0f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 40;
+}
+
+.sms-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #98a1b8;
+    font-size: 14px;
+}
+
+.sms-breadcrumb a {
+    color: #031938;
+    text-decoration: none;
+}
+
+.sms-breadcrumb .sep {
+    color: #cbd0db;
+}
+
+.sms-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #031938;
+    font-size: 14px;
+}
+
+.sms-header-time {
+    color: #98a1b8;
+    font-size: 13px;
+}
+
+.sms-lang {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.sms-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sms-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1890ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* ================================================================
+   内容区与页面标题
+   ================================================================ */
+
+.sms-content {
+    padding: 24px 24px 40px;
+    margin-top: var(--header-height);
+}
+
+.sms-page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 16px;
+}
+
+/* ================================================================
+   Tabs
+   ================================================================ */
+
+.sms-tabs {
+    display: flex;
+    align-items: flex-end;
+    background: #ffffff;
+    border-radius: 8px 8px 0 0;
+    padding-left: 30px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.sms-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 64px;
+    padding: 0 16px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    margin-right: 44px;
+}
+
+.sms-tab:first-child {
+    margin-left: 0;
+}
+
+.sms-tab.active {
+    color: var(--primary-active);
+}
+
+.sms-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: var(--primary-active);
+    border-radius: 3px 3px 0 0;
+}
+
+.sms-tab-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ================================================================
+   卡片
+   ================================================================ */
+
+.sms-card {
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+/* ================================================================
+   搜索表单
+   ================================================================ */
+
+.sms-search {
+    padding: 20px 24px 8px;
+    border-radius: 0 0 8px 8px;
+}
+
+.sms-search-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 16px;
+    margin-bottom: 16px;
+}
+
+.sms-form-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sms-form-label {
+    width: 120px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 12px;
+    color: var(--text-main);
+    font-size: 14px;
+    line-height: 32px;
+    white-space: nowrap;
+}
+
+.sms-form-control {
+    flex: 1;
+    min-width: 0;
+}
+
+.sms-input,
+.sms-select,
+.sms-date-range {
+    width: 100%;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: #ffffff;
+    outline: none;
+}
+
+.sms-input::placeholder {
+    color: #cbd0db;
+}
+
+.sms-input:focus,
+.sms-select:focus,
+.sms-date-range:focus {
+    border-color: var(--primary);
+}
+
+.sms-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='64 64 896 896'%3E%3Cpath fill='%23cbd0db' d='M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+    color: #333;
+}
+
+.sms-select.placeholder {
+    color: #cbd0db;
+}
+
+.sms-date-range {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    color: #cbd0db;
+}
+
+.sms-date-range .arrow {
+    color: #cbd0db;
+    font-size: 12px;
+    margin: 0 6px;
+}
+
+.sms-search-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 16px;
+}
+
+/* ================================================================
+   按钮
+   ================================================================ */
+
+.sms-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.sms-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.sms-btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+.sms-btn-primary:hover {
+    background: #40a9ff;
+    border-color: #40a9ff;
+    color: #ffffff;
+}
+
+.sms-btn-link {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 0 6px;
+}
+
+.sms-btn-link:hover {
+    color: var(--primary);
+}
+
+.sms-btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================================================================
+   表格
+   ================================================================ */
+
+.sms-table-card {
+    margin-top: 16px;
+    padding: 16px 0 0;
+    overflow: hidden;
+}
+
+.sms-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 16px;
+}
+
+.sms-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sms-table-wrap {
+    overflow-x: auto;
+}
+
+.sms-table {
+    width: 1849px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.sms-table th {
+    background: var(--bg-header);
+    color: var(--text-main);
+    font-weight: 500;
+    text-align: left;
+    padding: 16px 8px 16px 16px;
+    border-top: 1px solid var(--border-soft);
+    border-bottom: 1px solid var(--border-soft);
+    white-space: nowrap;
+    position: relative;
+}
+
+.sms-table td {
+    padding: 12px 8px 12px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sms-table tbody tr:hover td {
+    background: #f5f6fa;
+}
+
+.sms-col-index {
+    width: 80px;
+    text-align: center;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+.sms-col-sendtime {
+    width: 229px;
+}
+
+.sms-col-business {
+    width: 120px;
+}
+
+.sms-col-plan {
+    width: 160px;
+}
+
+.sms-col-group {
+    width: 160px;
+}
+
+.sms-col-phone {
+    width: 180px;
+}
+
+.sms-col-type {
+    width: 120px;
+}
+
+.sms-col-content {
+    width: 300px;
+}
+
+.sms-col-sender {
+    width: 180px;
+}
+
+.sms-col-status {
+    width: 140px;
+}
+
+.sms-col-sol {
+    width: 180px;
+}
+
+/* 发送记录表：自适应列宽、收窄列间距，避免产生横向滚动 */
+.sms-record-card .sms-table-wrap {
+    overflow-x: hidden;
+}
+
+.sms-table.sms-record-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.sms-record-table th,
+.sms-record-table td {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.sms-record-table th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sms-record-table .sms-col-index {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-sendtime {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-business {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-plan {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-group {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-phone {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-type {
+    width: 9%;
+}
+
+.sms-record-table .sms-record-col-content {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-sender {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-status {
+    width: 9%;
+}
+
+.sms-record-table .sms-col-sol {
+    width: 9%;
+}
+
+.sms-cell {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.sms-dash {
+    color: #98a1b8;
+}
+
+/* 状态标签 */
+.sms-status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.sms-status-success {
+    background: #f0f9eb;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+}
+
+.sms-status-fail {
+    background: #fff1f0;
+    color: #f5222d;
+    border: 1px solid #ffa39e;
+}
+
+.sms-status-unknown {
+    background: #f5f5f5;
+    color: #98a1b8;
+    border: 1px solid #d9d9d9;
+}
+
+.sms-status-approve {
+    background: #f0f9eb;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+}
+
+/* ================================================================
+   分页
+   ================================================================ */
+
+.sms-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 16px 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.sms-pagination-total {
+    margin-right: 12px;
+}
+
+.sms-page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.sms-page-btn.active {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.sms-page-btn:disabled {
+    color: #cbd0db;
+    cursor: not-allowed;
+}
+
+.sms-page-size {
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0 6px;
+}
+
+.sms-jump {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sms-jump input {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* ================================================================
+   模版页
+   ================================================================ */
+
+.sms-template-card .sms-table-wrap {
+    overflow-x: hidden;
+}
+
+.sms-template-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.sms-template-table th,
+.sms-template-table td {
+    padding-left: 12px;
+    padding-right: 8px;
+}
+
+.sms-template-table th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sms-template-table .sms-col-index {
+    width: 4%;
+}
+
+.sms-template-table .sms-col-sendtime {
+    width: 10%;
+}
+
+.sms-template-table .sms-col-business {
+    width: 8%;
+}
+
+.sms-template-table .sms-col-plan {
+    width: 10%;
+}
+
+.sms-template-table .sms-col-type {
+    width: 6%;
+}
+
+.sms-template-table .sms-template-col-content {
+    width: 12%;
+}
+
+.sms-template-table .sms-col-operator {
+    width: 7%;
+}
+
+.sms-template-table .sms-col-status {
+    width: 5%;
+}
+
+.sms-template-table .sms-col-action {
+    width: 6%;
+}
+
+.sms-col-operator {
+    width: 120px;
+}
+
+.sms-col-status {
+    width: 180px;
+}
+
+.sms-col-action {
+    width: 140px;
+}
+
+.sms-action-link {
+    color: var(--primary);
+    background: none;
+    border: none;
+    padding: 0 8px;
+    font-size: 14px;
+}
+
+.sms-action-link:hover {
+    color: #40a9ff;
+}
+
+/* ================================================================
+   报表页
+   ================================================================ */
+
+.sms-report-card {
+    padding: 20px 24px;
+    margin-top: 16px;
+}
+
+.sms-quick-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.sms-range-btn {
+    height: 32px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 4px;
+    color: var(--text-main);
+}
+
+.sms-range-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+.sms-report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.sms-report-block {
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.sms-report-block h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.sms-report-stat {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.sms-report-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #031938;
+}
+
+.sms-report-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* 折线图 */
+.sms-line-chart {
+    width: 100%;
+    height: 180px;
+}
+
+/* 环形图 */
+.sms-donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.sms-donut {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    flex-shrink: 0;
+}
+
+.sms-donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.sms-donut-center strong {
+    font-size: 22px;
+    color: #031938;
+}
+
+.sms-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.sms-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sms-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.sms-cost-empty {
+    padding: 40px 0;
+    text-align: center;
+    color: #98a1b8;
+    font-size: 14px;
+}
+
+.sms-report-table {
+    width: 100%;
+}
+
+/* ================================================================
+   弹窗
+   ================================================================ */
+
+.sms-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sms-modal {
+    width: 440px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.sms-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.sms-modal-body {
+    padding: 24px;
+}
+
+.sms-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 24px 24px;
+}
+
+.sms-modal .sms-form-item {
+    margin-bottom: 20px;
+}
+
+/* ================================================================
+   响应式（移动端：筛选单列）
+   ================================================================ */
+
+@media (max-width: 768px) {
+    .sms-sidebar {
+        width: 64px;
+    }
+
+    .sms-logo-text,
+    .sms-menu-item span {
+        display: none;
+    }
+
+    .sms-menu-item .sms-menu-chevron {
+        display: none;
+    }
+
+    .sms-main {
+        margin-left: 64px;
+    }
+
+    .sms-header {
+        left: 64px;
+    }
+
+    .sms-search-grid {
+        grid-template-columns: 1fr;
+    }
+}
