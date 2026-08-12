@@ -105,6 +105,20 @@ function SearchForm() {
                         </div>
                     </div>
                     <div className="sms-form-item">
+                        <label className="sms-form-label">送达状态</label>
+                        <div className="sms-form-control">
+                            <select className="sms-select placeholder">
+                                <option value="">请选择</option>
+                                <option value="回执中">回执中</option>
+                                <option value="已送达">已送达</option>
+                                <option value="未送达">未送达</option>
+                                <option value="回执超时">回执超时</option>
+                                <option value="未知">未知</option>
+                                <option value="--">--（无回执）</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
                         <label className="sms-form-label">路径标记</label>
                         <div className="sms-form-control">
                             <input className="sms-input" placeholder="请输入" />
