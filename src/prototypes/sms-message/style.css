@@ -606,47 +606,60 @@ button {
 }
 
 .sms-record-table .sms-col-index {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-sendtime {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-business {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-plan {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-group {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-phone {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-type {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-record-col-content {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-sender {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-record-table .sms-col-status {
-    width: 9%;
+    width: 8%;
+}
+
+.sms-record-table .sms-record-col-delivery {
+    width: 8%;
+}
+
+.sms-record-table td.sms-record-col-delivery {
+    overflow: visible;
+}
+
+.sms-record-table td.sms-record-col-delivery .sms-tooltip-wrap {
+    display: flex;
+    width: 100%;
 }
 
 .sms-record-table .sms-col-sol {
-    width: 9%;
+    width: 8%;
 }
 
 .sms-cell {
@@ -694,6 +707,63 @@ button {
     background: #f0f9eb;
     color: #52c41a;
     border: 1px solid #b7eb8f;
+}
+
+/* 送达状态：回执中（蓝） / 回执超时（橙） */
+.sms-status-delivering {
+    background: #e6f4ff;
+    color: #1677ff;
+    border: 1px solid #91caff;
+}
+
+.sms-status-timeout {
+    background: #fff7e6;
+    color: #fa8c16;
+    border: 1px solid #ffd591;
+}
+
+/* 送达状态 hover 气泡提示 */
+.sms-tooltip-wrap {
+    position: relative;
+    display: inline-flex;
+    cursor: default;
+}
+
+.sms-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    max-width: 260px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.15s ease,
+        visibility 0.15s ease;
+}
+
+.sms-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.75);
+}
+
+.sms-tooltip-wrap:hover .sms-tooltip {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* ================================================================

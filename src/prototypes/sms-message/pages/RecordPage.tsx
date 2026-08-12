@@ -22,6 +22,16 @@ const PAGE_SIZE = 10;
 
 const PLACEHOLDER_SELECT = '请选择';
 
+/** 送达状态 hover 气泡提示 */
+function DeliveryTooltip({ text, children }: { text: string; children: React.ReactNode }) {
+    return (
+        <span className="sms-tooltip-wrap">
+            {children}
+            <span className="sms-tooltip">{text}</span>
+        </span>
+    );
+}
+
 function SearchForm() {
     const [collapsed, setCollapsed] = useState(false);
 
@@ -141,6 +151,43 @@ function RecordTable({ onExport }: { onExport: () => void }) {
         return <span className={`sms-status ${item?.className ?? 'sms-status-unknown'}`}>{item?.text ?? '-'}</span>;
     };
 
+    // 送达状态：历史短信一律 --；失败 --；暂无数据 未知；成功按回执状态展示
+    const renderDelivery = (row: (typeof recordRows)[number]) => {
+        if (row.isHistory || row.notifyStatus === '1') {
+            const tip = row.isHistory ? '历史数据，不计算回执' : '发送失败，无回执';
+            return (
+                <DeliveryTooltip text={tip}>
+                    <span className="sms-dash">--</span>
+                </DeliveryTooltip>
+            );
+        }
+        if (row.notifyStatus === '0') {
+            return (
+                <DeliveryTooltip text="发送状态未确认">
+                    <span className="sms-status sms-status-unknown">未知</span>
+                </DeliveryTooltip>
+            );
+        }
+        const classMap: Record<string, string> = {
+            回执中: 'sms-status-delivering',
+            已送达: 'sms-status-success',
+            未送达: 'sms-status-fail',
+            回执超时: 'sms-status-timeout',
+        };
+        const tipMap: Record<string, string> = {
+            回执中: '正在等待运营商回执',
+            已送达: '短信投递成功',
+            未送达: '短信投递失败',
+            回执超时: '24 小时内无明确回执',
+        };
+        const className = classMap[row.deliveryStatus] ?? 'sms-status-unknown';
+        return (
+            <DeliveryTooltip text={tipMap[row.deliveryStatus] ?? row.deliveryStatus}>
+                <span className={`sms-status ${className}`}>{row.deliveryStatus}</span>
+            </DeliveryTooltip>
+        );
+    };
+
     return (
         <div className="sms-card sms-table-card sms-record-card">
             <div className="sms-toolbar">
@@ -171,6 +218,7 @@ function RecordTable({ onExport }: { onExport: () => void }) {
                             <th className="sms-record-col-content">内容</th>
                             <th className="sms-col-sender">发送名称</th>
                             <th className="sms-col-status">发送状态</th>
+                            <th className="sms-record-col-delivery">送达状态</th>
                             <th className="sms-col-sol">路径标记</th>
                         </tr>
                     </thead>
@@ -199,6 +247,7 @@ function RecordTable({ onExport }: { onExport: () => void }) {
                                 </td>
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
+                                <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
                                 <td>
                                     <span className="sms-cell sms-dash">{row.solId}</span>
                                 </td>

@@ -14,6 +14,10 @@ export interface RecordRow {
     content: string;
     sender: string;
     notifyStatus: '0' | '1' | '2';
+    /** 送达状态：回执中 / 已送达 / 未送达 / 回执超时 / -- / 未知 */
+    deliveryStatus: string;
+    /** 是否历史短信（历史短信送达状态一律展示 --） */
+    isHistory: boolean;
     solId: string;
 }
 
@@ -29,7 +33,9 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '2',
+        deliveryStatus: '回执中',
+        isHistory: false,
         solId: '-',
     },
     {
@@ -43,7 +49,9 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '2',
+        deliveryStatus: '已送达',
+        isHistory: false,
         solId: '-',
     },
     {
@@ -57,7 +65,9 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '2',
+        deliveryStatus: '未送达',
+        isHistory: false,
         solId: '-',
     },
     {
@@ -71,21 +81,25 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '2',
+        deliveryStatus: '回执超时',
+        isHistory: false,
         solId: '-',
     },
     {
         index: 5,
-        sendTime: '2026-08-06 13:28:14',
+        sendTime: '2026-07-20 10:00:00',
         businessId: 'MTN_UG_Account_id',
         planName: '-',
         groupName: '-',
-        phone: 'tUAH5d+eIqihMk6w7bfD7w==',
+        phone: 'qO3Vx8yC2sTpR9wLk5eHuA==',
         contentType: '营销类',
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '2',
+        deliveryStatus: '--',
+        isHistory: true,
         solId: '-',
     },
     {
@@ -99,12 +113,14 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        notifyStatus: '0',
+        deliveryStatus: '未知',
+        isHistory: false,
         solId: '-',
     },
     {
         index: 7,
-        sendTime: '2026-08-06 13:27:47',
+        sendTime: '2026-08-06 13:28:14',
         businessId: 'MTN_UG_Account_id',
         planName: '-',
         groupName: '-',
@@ -114,48 +130,8 @@ export const recordRows: RecordRow[] = [
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
         notifyStatus: '1',
-        solId: '-',
-    },
-    {
-        index: 8,
-        sendTime: '2026-08-06 13:26:52',
-        businessId: 'MTN_UG_Account_id',
-        planName: '-',
-        groupName: '-',
-        phone: 'Wb+OvlfeXjTvpR+XIFDcUg==',
-        contentType: '营销类',
-        content:
-            'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
-        sender: 'MOMOADVANCE',
-        notifyStatus: '1',
-        solId: '-',
-    },
-    {
-        index: 9,
-        sendTime: '2026-08-06 05:59:42',
-        businessId: 'MTN_UG_Account_id',
-        planName: '-',
-        groupName: '-',
-        phone: 'fMlMy9u5342709lpj03DYA==',
-        contentType: '营销类',
-        content:
-            'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
-        sender: 'MOMOADVANCE',
-        notifyStatus: '1',
-        solId: '-',
-    },
-    {
-        index: 10,
-        sendTime: '2026-08-06 05:55:57',
-        businessId: 'MTN_UG_Account_id',
-        planName: '-',
-        groupName: '-',
-        phone: 'ISeQoDpJ7hmFgwSrN84srw==',
-        contentType: '营销类',
-        content:
-            "Y'ello! Your MoMo Advance has been successfully activated. Continue actively transacting on MoMo to grow your limit.",
-        sender: 'MOMOADVANCE',
-        notifyStatus: '1',
+        deliveryStatus: '--',
+        isHistory: false,
         solId: '-',
     },
 ];
