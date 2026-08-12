@@ -1,0 +1,13 @@
+{
+  "documentVersion": 1,
+  "format": "axhub-annotation-source",
+  "data": {
+    "version": 2,
+    "prototypeName": "sms-message",
+    "pageId": "sms-message",
+    "nodes": [],
+    "updatedAt": 1786522359864
+  },
+  "markdownMap": {},
+  "assetMap": {}
+}

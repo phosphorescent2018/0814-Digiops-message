@@ -457,6 +457,12 @@ button {
     color: #ffffff;
 }
 
+.sms-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .sms-btn-link {
     border: none;
     background: transparent;
@@ -701,6 +707,12 @@ button {
     background: #f5f5f5;
     color: #98a1b8;
     border: 1px solid #d9d9d9;
+}
+
+.sms-status-pending {
+    background: #f0f5ff;
+    color: #2f54eb;
+    border: 1px solid #adc6ff;
 }
 
 .sms-status-approve {
@@ -1228,49 +1240,26 @@ button {
     animation: resend-fade-in 0.2s ease-out;
 }
 
-.resend-hit-summary {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.resend-hit-summary-label {
+.resend-hit-summary-text {
     color: var(--text-secondary);
     font-size: 13px;
-}
-
-.resend-hit-summary-num {
-    font-size: 18px;
-    font-weight: 700;
-    color: #031938;
-    line-height: 1;
-}
-
-.resend-hit-summary-unit {
-    color: var(--text-secondary);
-    font-size: 13px;
-}
-
-.resend-hit-breakdown {
-    display: inline-flex;
-    align-items: center;
-    gap: 24px;
+    line-height: 1.6;
     flex: 1;
-    padding-left: 24px;
-    border-left: 1px solid var(--border-soft);
-    color: var(--text-secondary);
-    font-size: 13px;
 }
 
-.resend-hit-breakdown-item b {
-    margin-left: 4px;
-    color: #031938;
+.resend-hit-text-main {
+    color: var(--text-main);
     font-size: 14px;
 }
 
-.resend-hit-breakdown-item .resend-breakdown-danger {
-    color: #f5222d;
+.resend-hit-summary-text b {
+    color: #031938;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.resend-hit-summary-text .resend-hit-text-accent {
+    color: var(--primary);
 }
 
 .resend-hit-actions {
@@ -1278,6 +1267,19 @@ button {
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
+}
+
+/* 命中为空 */
+.resend-hit-empty {
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px dashed var(--border-soft);
+    border-radius: 6px;
+    background: #fafbfc;
+    color: #f5222d;
+    font-size: 14px;
+    text-align: center;
+    animation: resend-fade-in 0.2s ease-out;
 }
 
 @keyframes resend-fade-in {
@@ -1306,6 +1308,12 @@ button {
     font-family: 'SF Mono', Menlo, Consolas, monospace;
     color: #031938;
     font-weight: 500;
+}
+
+/* 为表头向上弹出的气泡预留空间，负 margin 抵消视觉偏移 */
+.resend-batch-wrap {
+    padding-top: 40px;
+    margin-top: -40px;
 }
 
 .resend-terminate {
@@ -1342,7 +1350,9 @@ button {
 }
 
 .resend-confirm-label {
-    width: 110px;
+    min-width: 130px;
+    white-space: nowrap;
+    margin-right: 16px;
     color: var(--text-secondary);
     font-size: 14px;
 }
@@ -1351,6 +1361,33 @@ button {
     color: var(--text-main);
     font-size: 14px;
     font-weight: 500;
+}
+
+.resend-count-strong {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 16px;
+}
+
+/* 定时补发：可编辑时间 */
+.resend-time-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resend-time-input {
+    width: 220px;
+    height: 30px;
+}
+
+.resend-time-input.error {
+    border-color: #f5222d;
+}
+
+.resend-time-error {
+    color: #f5222d;
+    font-size: 12px;
 }
 
 .resend-terminate-tip {
@@ -1362,6 +1399,70 @@ button {
 .resend-terminate-sub {
     margin: 0;
     color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* 定时补发：忽略黑名单单选 */
+.resend-radio-group {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.resend-radio-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.resend-radio-item.checked {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f0f7ff;
+}
+
+.resend-radio-item input {
+    accent-color: var(--primary);
+}
+
+/* 定时补发：数量 + 校验按钮 */
+.resend-verify-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resend-verify-wrap .sms-btn {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f0f7ff;
+}
+
+.resend-verify-wrap .sms-btn:hover:not(:disabled) {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.resend-verify-wrap .sms-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 黑名单提醒 */
+.resend-blacklist-tip {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: #fff7e6;
+    color: #fa8c16;
     font-size: 13px;
 }
 

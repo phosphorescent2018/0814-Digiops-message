@@ -19,61 +19,138 @@ const FIELD_LABELS = [
 
 interface BatchRow {
     id: string;
-    startTime: string;
+    scheduledTime: string;
     endTime: string;
     mode: '立即补发' | '定时补发';
-    status: '执行中' | '已完成' | '已终止';
-    count: number;
+    isTerminated: boolean;
+    isFailed: boolean;
+    /** 执行校验数量：提交时用户校验的补发数量 */
+    userVerifiedCount: number;
+    /** 系统校验数量：执行开始时系统校验的数量；待执行时为 null */
+    systemVerifiedCount: number | null;
+    /** 实际执行数量：实际做了发送动作的条数（不看发送状态）；未执行/进行中可更新 */
+    executedCount: number | null;
 }
 
 const BATCHES: BatchRow[] = [
     {
         id: '20260812003',
-        startTime: '2026-08-12 14:35:12',
+        scheduledTime: '2026-08-12 14:35:12',
         endTime: '—',
         mode: '立即补发',
-        status: '执行中',
-        count: 1284,
+        isTerminated: false,
+        isFailed: false,
+        userVerifiedCount: 1284,
+        systemVerifiedCount: 1284,
+        executedCount: 620,
     },
     {
         id: '20260812002',
-        startTime: '2026-08-12 13:00:00',
+        scheduledTime: '2026-08-12 13:00:00',
         endTime: '2026-08-12 13:04:52',
         mode: '定时补发',
-        status: '已完成',
-        count: 860,
+        isTerminated: false,
+        isFailed: false,
+        userVerifiedCount: 860,
+        systemVerifiedCount: 842,
+        executedCount: 842,
     },
     {
         id: '20260812001',
-        startTime: '2026-08-12 09:26:33',
+        scheduledTime: '2026-08-12 09:26:33',
         endTime: '2026-08-12 09:31:18',
         mode: '立即补发',
-        status: '已终止',
-        count: 512,
+        isTerminated: true,
+        isFailed: false,
+        userVerifiedCount: 512,
+        systemVerifiedCount: 480,
+        executedCount: 352,
     },
     {
         id: '20260811007',
-        startTime: '2026-08-11 20:15:40',
+        scheduledTime: '2026-08-11 20:15:40',
         endTime: '2026-08-11 20:22:03',
         mode: '定时补发',
-        status: '已完成',
-        count: 2035,
+        isTerminated: false,
+        isFailed: false,
+        userVerifiedCount: 2035,
+        systemVerifiedCount: 2018,
+        executedCount: 2018,
+    },
+    {
+        id: '20260823001',
+        scheduledTime: '2026-08-23 18:00:00',
+        endTime: '—',
+        mode: '定时补发',
+        isTerminated: false,
+        isFailed: false,
+        userVerifiedCount: 968,
+        systemVerifiedCount: null,
+        executedCount: null,
+    },
+    {
+        id: '20260812004',
+        scheduledTime: '2026-08-12 15:01:00',
+        endTime: '2026-08-12 15:01:20',
+        mode: '立即补发',
+        isTerminated: false,
+        isFailed: true,
+        userVerifiedCount: 300,
+        systemVerifiedCount: 300,
+        executedCount: 0,
+    },
+    {
+        id: '20260812005',
+        scheduledTime: '2026-08-12 15:30:00',
+        endTime: '2026-08-12 15:31:12',
+        mode: '立即补发',
+        isTerminated: false,
+        isFailed: true,
+        userVerifiedCount: 1500,
+        systemVerifiedCount: 1500,
+        executedCount: 620,
     },
 ];
 
 const STATUS_CLASS: Record<string, string> = {
+    待执行: 'sms-status-pending',
     执行中: 'sms-status-delivering',
     已完成: 'sms-status-success',
     已终止: 'sms-status-unknown',
+    失败: 'sms-status-fail',
+};
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const nowStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+/** 按计划时间与当前时间动态计算批次状态 */
+const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' => {
+    if (b.isTerminated) return '已终止';
+    if (b.isFailed) return '失败';
+    if (b.mode === '定时补发' && b.scheduledTime > nowStr()) return '待执行';
+    if (b.endTime !== '—') return '已完成';
+    return '执行中';
 };
 
 type ModalType = 'immediate' | 'scheduled' | null;
+type IgnoreBlacklist = 'yes' | 'no';
 
 export default function ManualResend() {
+    const formRef = React.useRef<HTMLFormElement>(null);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
     const [hitVisible, setHitVisible] = useState(false);
+    const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
+    const [step, setStep] = useState<'form' | 'confirm'>('form');
+    const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('no');
+    const [scheduledTime, setScheduledTime] = useState('2026-08-23 18:00:00');
+    const [validating, setValidating] = useState(false);
+    const [validated, setValidated] = useState(false);
+    const [verifiedCount, setVerifiedCount] = useState<number | null>(null);
     const [toast, setToast] = useState('');
     const [terminateTarget, setTerminateTarget] = useState<BatchRow | null>(null);
     const [terminating, setTerminating] = useState(false);
@@ -89,30 +166,70 @@ export default function ManualResend() {
         setQuerying(true);
         setTimeout(() => {
             setQuerying(false);
-            const count = Math.floor(800 + Math.random() * 800);
+            // 每两次查询触发一次 0 命中，便于演示空状态
+            const next = queryCount + 1;
+            const count = next % 2 === 0 ? 0 : Math.floor(800 + Math.random() * 800);
+            setQueryCount(next);
             setHitCount(count);
             setHitVisible(true);
-            showToast('查询完成，已更新命中数量');
+            showToast(count === 0 ? '查询完成，当前条件筛选下无命中' : '查询完成，已更新命中数量');
         }, 700);
     };
 
     const reset = () => {
+        formRef.current?.reset();
         setHitVisible(false);
         showToast('筛选条件已重置');
     };
 
-    const confirmModal = () => {
+    const actualHit = hitCount - Math.round(hitCount * 0.036);
+    const timeFormatValid = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(scheduledTime);
+    const scheduledTimeValid = timeFormatValid && scheduledTime > nowStr();
+
+    const closeModal = () => {
+        setModal(null);
+        setStep('form');
+    };
+
+    // 立即/定时补发共用：第一步表单 → 第二步校验确认
+    const openConfirmStep = () => {
+        setStep('confirm');
+        setValidated(false);
+        setVerifiedCount(null);
+    };
+
+    const verifyCount = () => {
+        if (validating) return;
+        setValidating(true);
+        setTimeout(() => {
+            setValidating(false);
+            // 模拟后端校验后的最新数量（略低于实际可补）
+            setVerifiedCount(Math.max(actualHit - Math.round(actualHit * 0.02), 1));
+            setValidated(true);
+            showToast('校验完成，已获取最新补发数量');
+        }, 800);
+    };
+
+    const confirmFinal = () => {
+        if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
         setModal(null);
+        setStep('form');
         const newBatch: BatchRow = {
             id: `20260812${String(100 + batches.length + 1).slice(-3)}`,
-            startTime: isImmediate ? '2026-08-12 15:02:00' : '2026-08-12 18:00:00',
+            scheduledTime: isImmediate ? nowStr() : scheduledTime,
             endTime: '—',
             mode: isImmediate ? '立即补发' : '定时补发',
-            status: '执行中',
-            count: hitCount,
+            isTerminated: false,
+            isFailed: false,
+            userVerifiedCount: verifiedCount,
+            systemVerifiedCount: isImmediate ? verifiedCount : null,
+            executedCount: null,
         };
         setBatches((prev) => [newBatch, ...prev]);
+        // 提交后清空筛选条件、隐藏命中面板，回到初始状态
+        formRef.current?.reset();
+        setHitVisible(false);
         showToast(`${isImmediate ? '立即补发' : '定时补发'}任务已创建（批次 ${newBatch.id}）`);
     };
 
@@ -122,7 +239,7 @@ export default function ManualResend() {
         setTimeout(() => {
             setBatches((prev) =>
                 prev.map((b) =>
-                    b.id === terminateTarget.id ? { ...b, status: '已终止' as const, endTime: '2026-08-12 15:05:00' } : b
+                    b.id === terminateTarget.id ? { ...b, isTerminated: true, endTime: nowStr() } : b
                 )
             );
             setTerminating(false);
@@ -138,92 +255,91 @@ export default function ManualResend() {
                 <div className="resend-section-title">
                     <span>条件筛选</span>
                 </div>
-                <div className="resend-filter-grid">
-                    {FIELD_LABELS.slice(0, 9).map((label) => (
-                        <div className="sms-form-item" key={label}>
-                            <label className="sms-form-label">{label}</label>
+                <form ref={formRef}>
+                    <div className="resend-filter-grid">
+                        {FIELD_LABELS.slice(0, 9).map((label) => (
+                            <div className="sms-form-item" key={label}>
+                                <label className="sms-form-label">{label}</label>
+                                <div className="sms-form-control">
+                                    {label === '发送时间' ? (
+                                        <div className="sms-date-range">
+                                            <span>
+                                                <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
+                                                起始日期
+                                            </span>
+                                            <span className="arrow">→</span>
+                                            <span>结束日期</span>
+                                        </div>
+                                    ) : label === '手机号码' || label === '路径标记' ? (
+                                        <input className="sms-input" placeholder="请输入" />
+                                    ) : (
+                                        <select className="sms-select placeholder">
+                                            <option value="">请选择</option>
+                                            {label === 'BusinessID' && <option value="MTN_UG_Account_id">MTN_UG_Account_id</option>}
+                                            {label === '发送状态' && (
+                                                <>
+                                                    <option value="2">成功</option>
+                                                    <option value="1">失败</option>
+                                                    <option value="0">暂无数据</option>
+                                                </>
+                                            )}
+                                            {label === '送达状态' && (
+                                                <>
+                                                    <option value="回执中">回执中</option>
+                                                    <option value="已送达">已送达</option>
+                                                    <option value="未送达">未送达</option>
+                                                    <option value="回执超时">回执超时</option>
+                                                    <option value="未知">未知</option>
+                                                    <option value="--">--（无回执）</option>
+                                                </>
+                                            )}
+                                            {label === '内容类型' && (
+                                                <>
+                                                    <option value="营销类">营销类</option>
+                                                    <option value="通知类">通知类</option>
+                                                </>
+                                            )}
+                                        </select>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="resend-filter-last-row">
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">路径标记</label>
                             <div className="sms-form-control">
-                                {label === '发送时间' ? (
-                                    <div className="sms-date-range">
-                                        <span>
-                                            <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
-                                            起始日期
-                                        </span>
-                                        <span className="arrow">→</span>
-                                        <span>结束日期</span>
-                                    </div>
-                                ) : label === '手机号码' || label === '路径标记' ? (
-                                    <input className="sms-input" placeholder="请输入" />
-                                ) : (
-                                    <select className="sms-select placeholder">
-                                        <option value="">请选择</option>
-                                        {label === 'BusinessID' && <option value="MTN_UG_Account_id">MTN_UG_Account_id</option>}
-                                        {label === '发送状态' && (
-                                            <>
-                                                <option value="2">成功</option>
-                                                <option value="1">失败</option>
-                                                <option value="0">暂无数据</option>
-                                            </>
-                                        )}
-                                        {label === '送达状态' && (
-                                            <>
-                                                <option value="回执中">回执中</option>
-                                                <option value="已送达">已送达</option>
-                                                <option value="未送达">未送达</option>
-                                                <option value="回执超时">回执超时</option>
-                                                <option value="未知">未知</option>
-                                                <option value="--">--（无回执）</option>
-                                            </>
-                                        )}
-                                        {label === '内容类型' && (
-                                            <>
-                                                <option value="营销类">营销类</option>
-                                                <option value="通知类">通知类</option>
-                                            </>
-                                        )}
-                                    </select>
-                                )}
+                                <input className="sms-input" placeholder="请输入" />
                             </div>
                         </div>
-                    ))}
-                </div>
-                <div className="resend-filter-last-row">
-                    <div className="sms-form-item">
-                        <label className="sms-form-label">路径标记</label>
-                        <div className="sms-form-control">
-                            <input className="sms-input" placeholder="请输入" />
+                        <div className="resend-filter-actions">
+                            <button type="button" className="sms-btn" onClick={reset}>
+                                <RotateCcw size={14} />
+                                重置
+                            </button>
+                            <button type="button" className="sms-btn sms-btn-primary" onClick={query} disabled={querying}>
+                                {querying ? '查询中…' : (
+                                    <>
+                                        <Search size={14} />
+                                        查询
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
-                    <div className="resend-filter-actions">
-                        <button type="button" className="sms-btn" onClick={reset}>
-                            <RotateCcw size={14} />
-                            重置
-                        </button>
-                        <button type="button" className="sms-btn sms-btn-primary" onClick={query} disabled={querying}>
-                            {querying ? '查询中…' : (
-                                <>
-                                    <Search size={14} />
-                                    查询
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
+                </form>
 
                 {/* 查询后展开：命中信息（与条件筛选同一卡片） */}
-                {hitVisible && (
+                {hitVisible && hitCount > 0 && (
                     <div className="resend-hit-panel">
-                        <div className="resend-hit-summary">
-                            <span className="resend-hit-summary-label">当前命中</span>
-                            <span className="resend-hit-summary-num">{hitCount.toLocaleString()}</span>
-                            <span className="resend-hit-summary-unit">条</span>
-                        </div>
-                        <div className="resend-hit-breakdown">
-                            <span className="resend-hit-breakdown-item">
-                                回执超时 / 未送达 <b>{Math.round(hitCount * 0.27).toLocaleString()}</b>
-                            </span>
-                            <span className="resend-hit-breakdown-item">
-                                发送失败 <b className="resend-breakdown-danger">{Math.round(hitCount * 0.1).toLocaleString()}</b>
+                        <div className="resend-hit-summary-text">
+                            <span className="resend-hit-text-main">
+                                当前命中 <b>{hitCount.toLocaleString()}</b> 条，黑名单命中{' '}
+                                <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条 · 实际可补{' '}
+                                <b className="resend-hit-text-accent">
+                                    {(hitCount - Math.round(hitCount * 0.036)).toLocaleString()}
+                                </b>{' '}
+                                条，任务执行时将重新校验
                             </span>
                         </div>
                         <div className="resend-hit-actions">
@@ -231,26 +347,44 @@ export default function ManualResend() {
                                 <Download size={14} />
                                 导出 Excel
                             </button>
-                            <button type="button" className="sms-btn" onClick={() => setModal('scheduled')}>
+                            <button
+                                type="button"
+                                className="sms-btn"
+                                onClick={() => {
+                                    setModal('scheduled');
+                                    setStep('form');
+                                    setScheduledTime('2026-08-23 18:00:00');
+                                }}
+                            >
                                 <Clock size={14} />
                                 定时补发
                             </button>
-                            <button type="button" className="sms-btn sms-btn-primary" onClick={() => setModal('immediate')}>
+                            <button
+                                type="button"
+                                className="sms-btn sms-btn-primary"
+                                onClick={() => {
+                                    setModal('immediate');
+                                    setStep('form');
+                                }}
+                            >
                                 <Send size={14} />
                                 立即补发
                             </button>
                         </div>
                     </div>
                 )}
+                {hitVisible && hitCount === 0 && (
+                    <div className="resend-hit-empty">当前条件筛选下无命中</div>
+                )}
             </div>
 
             {/* ============ 板块二：批次补发记录 ============ */}
             <div className="sms-card resend-section">
                 <div className="resend-section-title">
-                    <span>补发记录（按批次）</span>
+                    <span>人工补发记录</span>
                     <span className="resend-section-sub">共 {batches.length} 个批次</span>
                 </div>
-                <div className="sms-table-wrap">
+                <div className="sms-table-wrap resend-batch-wrap">
                     <table className="sms-table resend-table resend-batch-table">
                         <thead>
                             <tr>
@@ -258,55 +392,78 @@ export default function ManualResend() {
                                 <th>补发开始时间</th>
                                 <th>补发结束时间</th>
                                 <th>补发方式</th>
-                                <th>命中数量</th>
+                                <th className="resend-th-tooltip">
+                                    <span className="sms-tooltip-wrap">
+                                        执行校验数量
+                                        <span className="sms-tooltip">提交前用户校验的补发数量</span>
+                                    </span>
+                                </th>
+                                <th className="resend-th-tooltip">
+                                    <span className="sms-tooltip-wrap">
+                                        系统校验数量
+                                        <span className="sms-tooltip">执行开始时系统校验的数量</span>
+                                    </span>
+                                </th>
+                                <th className="resend-th-tooltip">
+                                    <span className="sms-tooltip-wrap">
+                                        实际执行数量
+                                        <span className="sms-tooltip">实际做了发送动作的条数，与发送状态无关</span>
+                                    </span>
+                                </th>
                                 <th>补发状态</th>
                                 <th style={{ width: 160 }}>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {batches.map((b) => (
-                                <tr key={b.id}>
-                                    <td>
-                                        <span className="resend-batch-id">B{b.id}</span>
-                                    </td>
-                                    <td>{b.startTime}</td>
-                                    <td>{b.endTime}</td>
-                                    <td>{b.mode}</td>
-                                    <td>{b.count.toLocaleString()}</td>
-                                    <td>
-                                        <span className={`sms-status ${STATUS_CLASS[b.status]}`}>{b.status}</span>
-                                    </td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className="sms-action-link"
-                                            onClick={() => showToast(`批次 B${b.id} 详情页待设计`)}
-                                        >
-                                            <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                            详情
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="sms-action-link resend-terminate"
-                                            disabled={b.status !== '执行中'}
-                                            onClick={() => setTerminateTarget(b)}
-                                        >
-                                            <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                            终止
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {batches.map((b) => {
+                                const status = computeStatus(b);
+                                const canTerminate = status === '待执行' || status === '执行中';
+                                return (
+                                    <tr key={b.id}>
+                                        <td>
+                                            <span className="resend-batch-id">B{b.id}</span>
+                                        </td>
+                                        <td>{b.scheduledTime}</td>
+                                        <td>{b.endTime}</td>
+                                        <td>{b.mode}</td>
+                                        <td>{b.userVerifiedCount.toLocaleString()}</td>
+                                        <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
+                                        <td>{b.executedCount === null ? '—' : b.executedCount.toLocaleString()}</td>
+                                        <td>
+                                            <span className={`sms-status ${STATUS_CLASS[status]}`}>{status}</span>
+                                        </td>
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="sms-action-link"
+                                                onClick={() => showToast(`批次 B${b.id} 详情页待设计`)}
+                                            >
+                                                <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                详情
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="sms-action-link resend-terminate"
+                                                disabled={!canTerminate}
+                                                onClick={() => setTerminateTarget(b)}
+                                            >
+                                                <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                终止
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* ============ 补发确认弹窗（立即/定时） ============ */}
-            {modal && (
-                <div className="sms-mask" onClick={() => setModal(null)}>
+            {/* ============ 补发弹窗①（立即/定时共用）：方式/时间/黑名单 ============ */}
+            {modal !== null && step === 'form' && (
+                <div className="sms-mask" onClick={closeModal}>
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="sms-modal-header">补发确认</div>
+                        <div className="sms-modal-header">{modal === 'immediate' ? '立即补发' : '定时补发'}</div>
                         <div className="sms-modal-body">
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发方式</span>
@@ -316,21 +473,119 @@ export default function ManualResend() {
                             </div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">预计补发时间</span>
+                                {modal === 'immediate' ? (
+                                    <span className="resend-confirm-value">立即执行</span>
+                                ) : (
+                                    <div className="resend-time-field">
+                                        <input
+                                            type="datetime-local"
+                                            className={`sms-input resend-time-input${scheduledTimeValid ? '' : ' error'}`}
+                                            value={scheduledTime.slice(0, 16)}
+                                            min={nowStr().slice(0, 16)}
+                                            onChange={(e) => {
+                                                const v = e.target.value;
+                                                setScheduledTime(v ? `${v.slice(0, 10)} ${v.slice(11)}:00` : '');
+                                            }}
+                                        />
+                                        {!scheduledTimeValid && (
+                                            <span className="resend-time-error">补发时间需晚于当前时间（格式：YYYY-MM-DD HH:mm:ss）</span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="resend-confirm-row">
+                                <span className="resend-confirm-label">黑名单用户是否发送</span>
+                                <div className="resend-radio-group">
+                                    <label className={`resend-radio-item${ignoreBlacklist === 'no' ? ' checked' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="ignoreBlacklist"
+                                            checked={ignoreBlacklist === 'no'}
+                                            onChange={() => setIgnoreBlacklist('no')}
+                                        />
+                                        否
+                                    </label>
+                                    <label className={`resend-radio-item${ignoreBlacklist === 'yes' ? ' checked' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="ignoreBlacklist"
+                                            checked={ignoreBlacklist === 'yes'}
+                                            onChange={() => setIgnoreBlacklist('yes')}
+                                        />
+                                        是
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sms-modal-actions">
+                            <button type="button" className="sms-btn" onClick={closeModal}>
+                                取消
+                            </button>
+                            <button
+                                type="button"
+                                className="sms-btn sms-btn-primary"
+                                disabled={modal === 'scheduled' && !scheduledTimeValid}
+                                onClick={openConfirmStep}
+                            >
+                                下一步
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ============ 补发弹窗②（立即/定时共用）：校验确认 ============ */}
+            {modal !== null && step === 'confirm' && (
+                <div className="sms-mask" onClick={closeModal}>
+                    <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="sms-modal-header">补发确认</div>
+                        <div className="sms-modal-body">
+                            <div className={`resend-blacklist-tip${ignoreBlacklist === 'yes' ? ' warn' : ''}`}>
+                                {ignoreBlacklist === 'yes'
+                                    ? '所补发用户将含有黑名单用户'
+                                    : '所补发用户将不含有黑名单用户'}
+                            </div>
+                            <div className="resend-confirm-row">
+                                <span className="resend-confirm-label">预计补发时间</span>
                                 <span className="resend-confirm-value">
-                                    {modal === 'immediate' ? '立即（马上执行）' : '2026-08-12 18:00:00'}
+                                    {modal === 'immediate' ? '立即执行' : scheduledTime}
                                 </span>
                             </div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发数量</span>
-                                <span className="resend-confirm-value">{hitCount.toLocaleString()} 条</span>
+                                <div className="resend-verify-wrap">
+                                    {validated && verifiedCount !== null ? (
+                                        <span className="resend-confirm-value resend-count-strong">
+                                            {verifiedCount.toLocaleString()} 条
+                                        </span>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="sms-btn"
+                                            onClick={verifyCount}
+                                            disabled={validating}
+                                        >
+                                            {validating ? '校验中…' : '点击校验'}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className="sms-modal-actions">
-                            <button type="button" className="sms-btn" onClick={() => setModal(null)}>
-                                取消
+                            <button
+                                type="button"
+                                className="sms-btn"
+                                onClick={() => setStep('form')}
+                            >
+                                上一步
                             </button>
-                            <button type="button" className="sms-btn sms-btn-primary" onClick={confirmModal}>
-                                确认{modal === 'immediate' ? '补发' : '定时'}
+                            <button
+                                type="button"
+                                className="sms-btn sms-btn-primary"
+                                disabled={!validated}
+                                onClick={confirmFinal}
+                            >
+                                确认补发
                             </button>
                         </div>
                     </div>
