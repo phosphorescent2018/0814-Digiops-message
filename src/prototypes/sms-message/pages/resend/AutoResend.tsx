@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Zap, Save, Check, RefreshCw } from 'lucide-react';
 
 const STATS = [
-    { label: '今日触发', value: 128, tone: '' },
+    { label: '今日补发', value: 128, tone: '' },
     { label: '补发成功', value: 96, tone: 'success' },
     { label: '补发失败', value: 21, tone: 'danger' },
     { label: '队列中', value: 11, tone: 'warn' },
