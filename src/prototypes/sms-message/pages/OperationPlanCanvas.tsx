@@ -2,7 +2,7 @@
  * 运营计划画布配置页：操作列「详情」进入
  * 高精度还原 UAT 流程定制画布：顶部工具栏 + 左侧节点面板 + 可拖拽画布
  * 支持：左侧组件拖入画布、画布内拖动移动、节点间拖线连接、选中删除
- * 定制组件（前置校验 / 补发控制）点击节点可打开配置面板，保存后展示配置摘要
+ * 判断节点支持配置为前置校验 / 补发控制，保存后展示配置摘要
  */
 import React, { useRef, useState } from 'react';
 import {
@@ -26,8 +26,6 @@ import {
     Bell,
     PhoneCall,
     Ticket,
-    ShieldCheck,
-    RefreshCw,
     X,
     LayoutGrid,
     SquarePlus,
@@ -63,12 +61,10 @@ const NODE_GROUPS: NodeGroup[] = [
     {
         title: '动作',
         nodes: [
-            { id: 'touch-precheck', label: '前置校验', color: '#1890ff', icon: ShieldCheck },
-            { id: 'resend-control', label: '补发控制', color: '#fa8c16', icon: RefreshCw },
+            { id: 'judge', label: '判断', color: '#1890ff', shape: 'diamond', icon: Diamond },
             { id: 'end', label: '结束节点', color: '#98a1b8', shape: 'circle', text: 'END' },
             { id: 'delay', label: '延时器', color: '#98a1b8', shape: 'circle', icon: ClockIcon },
             { id: 'ab-test', label: 'A/B测试', color: '#98a1b8', icon: GitBranch },
-            { id: 'judge', label: '判断', color: '#98a1b8', shape: 'diamond', icon: Diamond },
             { id: 'action-judge', label: '动作判断', color: '#98a1b8', shape: 'diamond', icon: MousePointerClick },
             { id: 'group-filter', label: '群组过滤', color: '#98a1b8', shape: 'diamond', icon: Filter },
         ],
@@ -157,320 +153,6 @@ interface CanvasEdge {
     to: string;
     fromPort: PortDir;
     toPort: PortDir;
-}
-
-/* ================= 摘要 ================= */
-
-function PrecheckSummary({ config }: { config: PrecheckConfig }) {
-    const parts: string[] = [];
-    if (config.checks.includes('blacklist')) {
-        parts.push('黑名单校验');
-    }
-    if (config.checks.includes('timeWindow')) {
-        const times = config.windows.map((w) => `${w.start}-${w.end}`).join('、');
-        parts.push(`时段 ${times}`);
-    }
-    if (config.checks.includes('timeWindow') && config.strategy === 'wait') {
-        parts.push('非时段等待');
-    }
-    return <span className="plan-canvas-item-summary">{parts.length ? parts.join(' · ') : '未配置'}</span>;
-}
-
-function ResendControlSummary({ config }: { config: ResendControlConfig }) {
-    const parts: string[] = [];
-    if (config.triggers.includes('submitFail')) {
-        parts.push('提交失败');
-    }
-    if (config.triggers.includes('receiptTimeout')) {
-        parts.push(`回执超时${config.maxWaitHours}h`);
-    }
-    parts.push(`最多${config.maxResend}次`, `间隔${config.interval}分钟`);
-    return <span className="plan-canvas-item-summary">{parts.length ? parts.join(' · ') : '未配置'}</span>;
-}
-
-/* ================= 前置校验配置面板 ================= */
-
-interface PrecheckModalProps {
-    initial: PrecheckConfig;
-    onClose: () => void;
-    onSave: (config: PrecheckConfig) => void;
-}
-
-function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
-    const [draft, setDraft] = useState<PrecheckConfig>(() => ({
-        checks: [...initial.checks],
-        windows: initial.windows.map((w) => ({ ...w })),
-        strategy: initial.strategy,
-    }));
-
-    const toggleCheck = (key: string) => {
-        setDraft((prev) => {
-            const has = prev.checks.includes(key);
-            const checks = has ? prev.checks.filter((c) => c !== key) : [...prev.checks, key];
-            return { ...prev, checks };
-        });
-    };
-
-    const updateWindow = (index: number, key: 'start' | 'end', value: string) => {
-        setDraft((prev) => ({
-            ...prev,
-            windows: prev.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w)),
-        }));
-    };
-
-    return (
-        <div className="sms-mask" onClick={onClose}>
-            <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="sms-modal-header">前置校验</div>
-                <div className="sms-modal-body">
-                    <div className="plan-canvas-config-group">
-                        <div className="sms-form-item">
-                            <label className="sms-form-label">校验能力</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-checks">
-                                    <div className="plan-canvas-check-row">
-                                        <label className="resend-cond-option">
-                                            <input
-                                                type="checkbox"
-                                                checked={draft.checks.includes('blacklist')}
-                                                onChange={() => toggleCheck('blacklist')}
-                                            />
-                                            <span className="resend-cond-option-text">黑名单校验</span>
-                                        </label>
-                                        <a
-                                            href="#"
-                                            className="plan-canvas-link"
-                                            onClick={(e) => e.preventDefault()}
-                                            title="暂未开放，后续再设计"
-                                        >
-                                            查看黑名单
-                                        </a>
-                                    </div>
-                                    <label className="resend-cond-option">
-                                        <input
-                                            type="checkbox"
-                                            checked={draft.checks.includes('timeWindow')}
-                                            onChange={() => toggleCheck('timeWindow')}
-                                        />
-                                        <span className="resend-cond-option-text">发送时段校验</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        {draft.checks.includes('timeWindow') && (
-                            <>
-                                <div className="sms-form-item plan-canvas-time-item">
-                                    <label className="sms-form-label">允许发送时段</label>
-                                    <div className="sms-form-control">
-                                        {draft.windows.map((w, index) => (
-                                            <div className="plan-canvas-time-row" key={index}>
-                                                <input
-                                                    type="time"
-                                                    className="plan-canvas-time-input"
-                                                    value={w.start}
-                                                    onChange={(e) => updateWindow(index, 'start', e.target.value)}
-                                                />
-                                                <span className="plan-canvas-time-sep">-</span>
-                                                <input
-                                                    type="time"
-                                                    className="plan-canvas-time-input"
-                                                    value={w.end}
-                                                    onChange={(e) => updateWindow(index, 'end', e.target.value)}
-                                                />
-                                                {draft.windows.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        className="plan-canvas-time-del"
-                                                        title="删除该时段"
-                                                        onClick={() =>
-                                                            setDraft((prev) => ({
-                                                                ...prev,
-                                                                windows: prev.windows.filter((_, i) => i !== index),
-                                                            }))
-                                                        }
-                                                    >
-                                                        ×
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                        {draft.windows.length < 3 && (
-                                            <button
-                                                type="button"
-                                                className="plan-canvas-time-add"
-                                                onClick={() =>
-                                                    setDraft((prev) => ({
-                                                        ...prev,
-                                                        windows: [...prev.windows, { start: '09:00', end: '18:00' }],
-                                                    }))
-                                                }
-                                            >
-                                                + 新增时段（最多 3 段）
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="sms-form-item">
-                                    <label className="sms-form-label">非时段处理策略</label>
-                                    <div className="sms-form-control">
-                                        <label className="resend-cond-option">
-                                            <input
-                                                type="radio"
-                                                name="precheck-strategy"
-                                                checked={draft.strategy === 'wait'}
-                                                onChange={() => setDraft((prev) => ({ ...prev, strategy: 'wait' }))}
-                                            />
-                                            <span className="resend-cond-option-text">等到下一允许时段再继续</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-                <div className="sms-modal-actions">
-                    <button type="button" className="sms-btn" onClick={onClose}>
-                        取 消
-                    </button>
-                    <button type="button" className="sms-btn sms-btn-primary" onClick={() => onSave(draft)}>
-                        保 存
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-/* ================= 补发控制配置面板 ================= */
-
-interface ResendControlModalProps {
-    initial: ResendControlConfig;
-    onClose: () => void;
-    onSave: (config: ResendControlConfig) => void;
-}
-
-function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProps) {
-    const [draft, setDraft] = useState<ResendControlConfig>(() => ({
-        triggers: [...initial.triggers],
-        maxWaitHours: initial.maxWaitHours,
-        maxResend: initial.maxResend,
-        interval: initial.interval,
-    }));
-
-    const toggleTrigger = (key: string) => {
-        setDraft((prev) => {
-            const has = prev.triggers.includes(key);
-            const triggers = has ? prev.triggers.filter((t) => t !== key) : [...prev.triggers, key];
-            return { ...prev, triggers };
-        });
-    };
-
-    return (
-        <div className="sms-mask" onClick={onClose}>
-            <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="sms-modal-header">补发控制</div>
-                <div className="sms-modal-body">
-                    <div className="plan-canvas-config-group">
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">触发条件</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-checks">
-                                    <label className="resend-cond-option">
-                                        <input
-                                            type="checkbox"
-                                            checked={draft.triggers.includes('submitFail')}
-                                            onChange={() => toggleTrigger('submitFail')}
-                                        />
-                                        <span className="resend-cond-option-text">提交失败</span>
-                                    </label>
-                                    <div className="plan-canvas-check-row">
-                                        <label className="resend-cond-option">
-                                            <input
-                                                type="checkbox"
-                                                checked={draft.triggers.includes('receiptTimeout')}
-                                                onChange={() => toggleTrigger('receiptTimeout')}
-                                            />
-                                            <span className="resend-cond-option-text">回执超时</span>
-                                        </label>
-                                        <span className="plan-canvas-inline-tip">最长等待</span>
-                                        <select
-                                            className="plan-canvas-inline-select"
-                                            value={draft.maxWaitHours}
-                                            onChange={(e) => setDraft((prev) => ({ ...prev, maxWaitHours: e.target.value }))}
-                                        >
-                                            <option value="6">6</option>
-                                            <option value="12">12</option>
-                                            <option value="24">24</option>
-                                            <option value="48">48</option>
-                                        </select>
-                                        <span className="plan-canvas-inline-tip">小时后无明确回执</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item">
-                            <label className="sms-form-label">最大补发次数</label>
-                            <div className="sms-form-control">
-                                <select
-                                    className="sms-select plan-canvas-inline-select"
-                                    value={draft.maxResend}
-                                    onChange={(e) => setDraft((prev) => ({ ...prev, maxResend: e.target.value }))}
-                                >
-                                    <option value="1">1 次</option>
-                                    <option value="2">2 次</option>
-                                    <option value="3">3 次</option>
-                                    <option value="5">5 次</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item">
-                            <label className="sms-form-label">补发间隔</label>
-                            <div className="sms-form-control">
-                                <select
-                                    className="sms-select plan-canvas-inline-select"
-                                    value={draft.interval}
-                                    onChange={(e) => setDraft((prev) => ({ ...prev, interval: e.target.value }))}
-                                >
-                                    <option value="10">10 分钟</option>
-                                    <option value="30">30 分钟</option>
-                                    <option value="60">60 分钟</option>
-                                    <option value="120">120 分钟</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">补发前校验</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-fixed-tip">
-                                    必须重新经过前置校验（黑名单 + 发送时段），不提供绕过开关
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">达到上限后</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-fixed-tip">流向结束节点</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="sms-modal-actions">
-                    <button type="button" className="sms-btn" onClick={onClose}>
-                        取 消
-                    </button>
-                    <button type="button" className="sms-btn sms-btn-primary" onClick={() => onSave(draft)}>
-                        保 存
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
 }
 
 /* ================= 判断节点配置面板 ================= */
@@ -626,17 +308,6 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
 
                         {draft.gateWayType === 'PRECHECK' && (
                             <>
-                                <div className="plan-canvas-wiring-tip">
-                                    <div className="plan-canvas-wiring-title">连线方式（前置校验 · 恰好 2 条出线）</div>
-                                    <div className="plan-canvas-wiring-line">
-                                        <span className="plan-canvas-wiring-dot green" />
-                                        <span className="plan-canvas-wiring-text">出线 1 · 校验通过 → 短信节点</span>
-                                    </div>
-                                    <div className="plan-canvas-wiring-line">
-                                        <span className="plan-canvas-wiring-dot red" />
-                                        <span className="plan-canvas-wiring-text">出线 2 · 命中黑名单 / 非时段 → 结束节点</span>
-                                    </div>
-                                </div>
                                 <div className="sms-form-item">
                                     <label className="sms-form-label">校验能力</label>
                                     <div className="sms-form-control">
@@ -757,22 +428,6 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
 
                         {draft.gateWayType === 'RESEND_CONTROL' && (
                             <>
-                                <div className="plan-canvas-wiring-tip">
-                                    <div className="plan-canvas-wiring-title">连线方式（放置于短信节点之后 · 恰好 2 条出线）</div>
-                                    <div className="plan-canvas-wiring-line">
-                                        <span className="plan-canvas-wiring-dot blue" />
-                                        <span className="plan-canvas-wiring-text">入线 · 短信节点 → 补发控制（短信仅 1 条出线）</span>
-                                    </div>
-                                    <div className="plan-canvas-wiring-line">
-                                        <span className="plan-canvas-wiring-dot green" />
-                                        <span className="plan-canvas-wiring-text">出线 1 · 不再补发（成功 / 达上限）→ 后续节点或结束</span>
-                                    </div>
-                                    <div className="plan-canvas-wiring-line">
-                                        <span className="plan-canvas-wiring-dot orange" />
-                                        <span className="plan-canvas-wiring-text">出线 2 · 进入补发队列（失败 / 超时未达上限）→ 结束节点</span>
-                                    </div>
-                                    <div className="plan-canvas-wiring-note">补发在后台按间隔自动执行，画布不回流，避免逻辑环路</div>
-                                </div>
                                 <div className="sms-form-item plan-canvas-time-item">
                                     <label className="sms-form-label">触发条件</label>
                                     <div className="sms-form-control">
@@ -947,14 +602,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             def,
             x: rect ? Math.max(8, Math.min(x, rect.width - NODE_W - 8)) : x,
             y: rect ? Math.max(8, Math.min(y, rect.height - NODE_H - 8)) : y,
-            config:
-                def.id === 'touch-precheck'
-                    ? { ...DEFAULT_PRECHECK }
-                    : def.id === 'resend-control'
-                      ? { ...DEFAULT_RESEND_CONTROL }
-                      : def.id === 'judge'
-                        ? { ...DEFAULT_JUDGE }
-                        : null,
+            config: def.id === 'judge' ? { ...DEFAULT_JUDGE } : null,
         };
         setNodes((prev) => [...prev, node]);
         setSelectedId(id);
@@ -1281,11 +929,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                 </span>
                                 <span className="plan-canvas-item-label">{node.def.label}</span>
                                 {node.config ? (
-                                    node.def.id === 'touch-precheck' ? (
-                                        <PrecheckSummary config={node.config as PrecheckConfig} />
-                                    ) : node.def.id === 'resend-control' ? (
-                                        <ResendControlSummary config={node.config as ResendControlConfig} />
-                                    ) : node.def.id === 'judge' ? (
+                                    node.def.id === 'judge' ? (
                                         <JudgeSummary config={node.config as JudgeConfig} />
                                     ) : null
                                 ) : null}
@@ -1331,32 +975,10 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
 
             {savedTip && <div className="plan-canvas-toast">已保存，可继续编辑</div>}
 
-            {editingNode?.def.id === 'touch-precheck' && (
-                <PrecheckConfigModal
-                    key={editingNode.id}
-                    initial={editingNode.config as PrecheckConfig}
-                    onClose={() => setEditingId(null)}
-                    onSave={(config) => {
-                        setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
-                        setEditingId(null);
-                    }}
-                />
-            )}
             {editingNode?.def.id === 'judge' && (
                 <JudgeConfigModal
                     key={editingNode.id}
                     initial={editingNode.config as JudgeConfig}
-                    onClose={() => setEditingId(null)}
-                    onSave={(config) => {
-                        setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
-                        setEditingId(null);
-                    }}
-                />
-            )}
-            {editingNode?.def.id === 'resend-control' && (
-                <ResendControlModal
-                    key={editingNode.id}
-                    initial={editingNode.config as ResendControlConfig}
                     onClose={() => setEditingId(null)}
                     onSave={(config) => {
                         setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));

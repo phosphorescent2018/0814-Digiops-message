@@ -1820,68 +1820,6 @@ button {
     line-height: 1.5;
 }
 
-.plan-canvas-wiring-tip {
-    margin-bottom: 14px;
-    padding: 10px 12px;
-    background: #f0f6ff;
-    border: 1px solid #d6e6ff;
-    border-radius: 6px;
-}
-
-.plan-canvas-wiring-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: #3b5b9b;
-    margin-bottom: 8px;
-}
-
-.plan-canvas-wiring-line {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 2px 0;
-}
-
-.plan-canvas-wiring-dot {
-    flex-shrink: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-top: 5px;
-}
-
-.plan-canvas-wiring-dot.green {
-    background: #52c41a;
-}
-
-.plan-canvas-wiring-dot.red {
-    background: #ff4d4f;
-}
-
-.plan-canvas-wiring-dot.blue {
-    background: #1890ff;
-}
-
-.plan-canvas-wiring-dot.orange {
-    background: #fa8c16;
-}
-
-.plan-canvas-wiring-text {
-    font-size: 12px;
-    color: #44506d;
-    line-height: 1.5;
-}
-
-.plan-canvas-wiring-note {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px dashed #c9d9f5;
-    font-size: 12px;
-    color: #7a87a6;
-    line-height: 1.5;
-}
-
-
 
 .sms-resend-center {
     min-height: 420px;
@@ -3359,4 +3297,359 @@ button {
     .sms-search-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ================================================================
+   黑名单
+   ================================================================ */
+
+.blacklist-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border: 1px solid #d6e4ff;
+    border-radius: 6px;
+    background: #f0f5ff;
+    color: #2f54eb;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.blacklist-tip svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+.blacklist-stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.resend-stat-num.resend-stat-unknown {
+    color: #98a1b8;
+}
+
+.blacklist-section {
+    margin-top: 16px;
+}
+
+.blacklist-search .sms-search-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.blacklist-search-divider {
+    width: 1px;
+    height: 20px;
+    margin: 0 4px;
+    background: var(--border-soft);
+}
+
+.blacklist-card {
+    margin-top: 16px;
+}
+
+.blacklist-table-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.blacklist-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.blacklist-table th,
+.blacklist-table td {
+    height: 48px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--border-soft);
+    text-align: left;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.blacklist-table th {
+    background: #fafafa;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.blacklist-col-index {
+    width: 64px;
+}
+
+.blacklist-col-phone {
+    width: 150px;
+}
+
+.blacklist-col-source {
+    width: 110px;
+}
+
+.blacklist-col-time {
+    width: 170px;
+}
+
+.blacklist-col-status {
+    width: 100px;
+}
+
+.blacklist-col-remark {
+    width: auto;
+}
+
+.blacklist-col-actions {
+    width: 120px;
+}
+
+.blacklist-phone {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    color: var(--text-main);
+}
+
+.blacklist-source {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 3px;
+    background: #f5f5f5;
+    color: #595959;
+    font-size: 12px;
+}
+
+.blacklist-remark {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #595959;
+}
+
+.sms-action-link {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-right: 12px;
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.sms-action-link:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+}
+
+.sms-action-link.sms-action-danger {
+    color: #f5222d;
+}
+
+.sms-action-link.sms-action-danger:hover {
+    color: #ff4d4f;
+    text-decoration: underline;
+}
+
+.blacklist-modal {
+    width: 520px;
+}
+
+.blacklist-textarea {
+    width: 100%;
+    min-height: 88px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-main);
+    background: #ffffff;
+    outline: none;
+    resize: vertical;
+    line-height: 1.6;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.blacklist-textarea:focus {
+    border-color: var(--primary);
+}
+
+.blacklist-textarea::placeholder {
+    color: #cbd0db;
+}
+
+.blacklist-radio-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 32px;
+    flex-wrap: wrap;
+}
+
+.blacklist-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-main);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.blacklist-radio input {
+    margin: 0;
+    accent-color: var(--primary);
+}
+
+.blacklist-expire-inline {
+    display: inline-flex;
+    align-items: center;
+}
+
+.blacklist-expire-date {
+    display: inline-flex;
+    align-items: center;
+    width: 160px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: #cbd0db;
+    font-size: 13px;
+    background: #ffffff;
+    white-space: nowrap;
+}
+
+.blacklist-file-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 16px;
+    border: 1px dashed #b7c5d9;
+    border-radius: 6px;
+    background: #fafbfc;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.blacklist-file-drop svg {
+    color: #98a1b8;
+}
+
+.blacklist-file-hint {
+    color: #98a1b8;
+    font-size: 12px;
+}
+
+.blacklist-import-tip {
+    margin-top: 14px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    color: #ad6800;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.blacklist-remove-tip {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    color: #cf1322;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.blacklist-detail-modal {
+    width: 560px;
+}
+
+.blacklist-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+}
+
+.blacklist-detail-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.blacklist-detail-grid > .blacklist-detail-full {
+    grid-column: 1 / -1;
+}
+
+.blacklist-detail-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.blacklist-detail-value {
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.blacklist-hit-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.blacklist-hit-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.blacklist-hit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    background: #ffffff;
+    font-size: 13px;
+}
+
+.blacklist-hit-item:last-child {
+    border-bottom: none;
+}
+
+.blacklist-hit-time {
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.blacklist-hit-source {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-main);
+}
+
+.blacklist-hit-item .sms-status {
+    flex-shrink: 0;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
