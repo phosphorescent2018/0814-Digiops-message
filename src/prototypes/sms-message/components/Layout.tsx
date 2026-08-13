@@ -109,11 +109,12 @@ function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?:
                                     const childLabel = typeof child === 'string' ? child : child.label;
                                     const childPage = typeof child === 'object' ? child.page : undefined;
                                     const childActive = childPage ? activePage === childPage : false;
+                                    const purple = childPage === 'sms' || childPage === 'plan';
                                     return (
                                         <div
                                             key={childLabel}
                                             className={`sms-menu-item${childActive ? ' active' : ''}${
-                                                childLabel === '短信' ? ' sms-menu-sub-sms' : ''
+                                                purple ? ' sms-menu-sub-purple' : ''
                                             }`}
                                             onClick={childPage ? () => onNavigate?.(childPage) : undefined}
                                         >
