@@ -16,9 +16,7 @@ import {
     Eye,
     Copy,
     MoreHorizontal,
-    Info,
 } from 'lucide-react';
-import ColumnSettings, { type ColumnDef } from '../components/ColumnSettings';
 
 interface PlanRow {
     id: string;
@@ -52,22 +50,6 @@ const PLAN_ROWS: PlanRow[] = [
 const TOTAL = 90;
 const PAGE_SIZE = 10;
 
-const PLAN_COLUMNS: ColumnDef[] = [
-    { key: 'createdAt', label: '创建时间' },
-    { key: 'updatedAt', label: '更新时间' },
-    { key: 'businessId', label: 'BusinessID' },
-    { key: 'id', label: 'ID' },
-    { key: 'name', label: '计划名称' },
-    { key: 'status', label: '状态' },
-    { key: 'executeStatus', label: '执行状态' },
-    { key: 'executeCycle', label: '执行周期' },
-    { key: 'channel', label: '使用渠道' },
-    { key: 'hasDelay', label: '存在延时器' },
-    { key: 'operator', label: '操作人' },
-    { key: 'tag', label: '计划标签' },
-    { key: 'action', label: '操作', fixed: true },
-];
-
 /** 分页页码：页数较多时中间折叠为 …，风格与 UAT 一致 */
 function buildPages(current: number, total: number): (number | 'ellipsis')[] {
     if (total <= 9) {
@@ -88,28 +70,6 @@ export default function OperationPlanPage() {
     const [tab, setTab] = useState<'manage' | 'summary'>('manage');
     const [collapsed, setCollapsed] = useState(true);
     const [page, setPage] = useState(1);
-    const [selected, setSelected] = useState<Set<string>>(new Set());
-    const [visibleCols, setVisibleCols] = useState<string[]>(PLAN_COLUMNS.map((c) => c.key));
-
-    const toggleCol = (key: string, checked: boolean) => {
-        setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
-    };
-
-    const allChecked = PLAN_ROWS.every((r) => selected.has(r.id));
-    const toggleRow = (id: string) => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            return next;
-        });
-    };
-    const toggleAll = () => {
-        setSelected(allChecked ? new Set() : new Set(PLAN_ROWS.map((r) => r.id)));
-    };
 
     const renderSelect = (placeholder = '请选择', options?: string[]) => (
         <select className="sms-select placeholder" defaultValue="">
@@ -225,7 +185,7 @@ export default function OperationPlanPage() {
                                     <Plus size={14} />
                                     新建计划
                                 </button>
-                                <button type="button" className="sms-btn" disabled={selected.size === 0}>
+                                <button type="button" className="sms-btn" disabled>
                                     <Trash2 size={14} />
                                     批量删除
                                 </button>
@@ -237,7 +197,6 @@ export default function OperationPlanPage() {
                                 <button type="button" className="sms-btn sms-btn-icon" title="视图切换">
                                     <LayoutGrid size={15} />
                                 </button>
-                                <ColumnSettings columns={PLAN_COLUMNS} visible={visibleCols} onChange={toggleCol} />
                             </div>
                         </div>
 
@@ -245,81 +204,28 @@ export default function OperationPlanPage() {
                             <table className="sms-table plan-table">
                                 <thead>
                                     <tr>
-                                        <th className="plan-col-check">
-                                            <input type="checkbox" checked={allChecked} onChange={toggleAll} />
-                                        </th>
-                                        {visibleCols.includes('createdAt') && <th className="plan-col-time">创建时间</th>}
-                                        {visibleCols.includes('updatedAt') && <th className="plan-col-time">更新时间</th>}
-                                        {visibleCols.includes('businessId') && <th className="plan-col-biz">BusinessID</th>}
-                                        {visibleCols.includes('id') && <th className="plan-col-id">ID</th>}
-                                        {visibleCols.includes('name') && <th className="plan-col-name">计划名称</th>}
-                                        {visibleCols.includes('status') && <th className="plan-col-status">状态</th>}
-                                        {visibleCols.includes('executeStatus') && (
-                                            <th className="plan-col-exec">
-                                                <span className="plan-th-exec">
-                                                    执行状态
-                                                    <Info size={13} style={{ verticalAlign: '-2px', marginLeft: 4 }} />
-                                                </span>
-                                            </th>
-                                        )}
-                                        {visibleCols.includes('executeCycle') && <th className="plan-col-cycle">执行周期</th>}
-                                        {visibleCols.includes('channel') && <th className="plan-col-channel">使用渠道</th>}
-                                        {visibleCols.includes('hasDelay') && <th className="plan-col-delay">存在延时器</th>}
-                                        {visibleCols.includes('operator') && <th className="plan-col-operator">操作人</th>}
-                                        {visibleCols.includes('tag') && <th className="plan-col-tag">计划标签</th>}
-                                        {visibleCols.includes('action') && <th className="plan-col-action">操作</th>}
+                                        <th className="plan-col-action">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {PLAN_ROWS.map((r) => (
                                         <tr key={r.id}>
-                                            <td className="plan-col-check">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selected.has(r.id)}
-                                                    onChange={() => toggleRow(r.id)}
-                                                />
+                                            <td className="plan-col-action">
+                                                <span className="plan-action-group">
+                                                    <button type="button" className="sms-btn sms-btn-icon" title="详情">
+                                                        <Eye size={15} />
+                                                    </button>
+                                                    <button type="button" className="sms-btn sms-btn-icon" title="复制">
+                                                        <Copy size={15} />
+                                                    </button>
+                                                    <button type="button" className="sms-btn sms-btn-icon" title="删除">
+                                                        <Trash2 size={15} />
+                                                    </button>
+                                                    <button type="button" className="sms-btn sms-btn-icon" title="更多">
+                                                        <MoreHorizontal size={15} />
+                                                    </button>
+                                                </span>
                                             </td>
-                                            {visibleCols.includes('createdAt') && <td className="plan-col-time">{r.createdAt}</td>}
-                                            {visibleCols.includes('updatedAt') && <td className="plan-col-time">{r.updatedAt}</td>}
-                                            {visibleCols.includes('businessId') && <td className="plan-col-biz">{r.businessId}</td>}
-                                            {visibleCols.includes('id') && <td className="plan-col-id">{r.planId}</td>}
-                                            {visibleCols.includes('name') && (
-                                                <td className="plan-col-name">
-                                                    <span className="sms-cell" title={r.name}>
-                                                        {r.name}
-                                                    </span>
-                                                </td>
-                                            )}
-                                            {visibleCols.includes('status') && (
-                                                <td className="plan-col-status">
-                                                    <span className="sms-status sms-status-unknown">{r.status}</span>
-                                                </td>
-                                            )}
-                                            {visibleCols.includes('executeStatus') && <td className="plan-col-exec">{r.executeStatus}</td>}
-                                            {visibleCols.includes('executeCycle') && <td className="plan-col-cycle">{r.executeCycle}</td>}
-                                            {visibleCols.includes('channel') && <td className="plan-col-channel">{r.channel}</td>}
-                                            {visibleCols.includes('hasDelay') && <td className="plan-col-delay">{r.hasDelay}</td>}
-                                            {visibleCols.includes('operator') && <td className="plan-col-operator">{r.operator}</td>}
-                                            {visibleCols.includes('tag') && <td className="plan-col-tag">{r.tag}</td>}
-                                            {visibleCols.includes('action') && (
-                                                <td className="plan-col-action">
-                                                    <span className="plan-action-group">
-                                                        <button type="button" className="sms-btn sms-btn-icon" title="详情">
-                                                            <Eye size={15} />
-                                                        </button>
-                                                        <button type="button" className="sms-btn sms-btn-icon" title="复制">
-                                                            <Copy size={15} />
-                                                        </button>
-                                                        <button type="button" className="sms-btn sms-btn-icon" title="删除">
-                                                            <Trash2 size={15} />
-                                                        </button>
-                                                        <button type="button" className="sms-btn sms-btn-icon" title="更多">
-                                                            <MoreHorizontal size={15} />
-                                                        </button>
-                                                    </span>
-                                                </td>
-                                            )}
                                         </tr>
                                     ))}
                                 </tbody>
