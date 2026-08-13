@@ -23,7 +23,7 @@ export default function AutoResend() {
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
     const [saveModal, setSaveModal] = useState(false);
-    const [scheduleType, setScheduleType] = useState<'all' | 'window'>('all');
+    const [scheduleEnabled, setScheduleEnabled] = useState(false);
     const [windowStart, setWindowStart] = useState('08:00');
     const [windowEnd, setWindowEnd] = useState('22:00');
     const [batchThreshold, setBatchThreshold] = useState(1000);
@@ -179,33 +179,6 @@ export default function AutoResend() {
                             </div>
                         </div>
                         <div className="sms-form-item">
-                            <label className="sms-form-label">生效时段</label>
-                            <div className="sms-form-control">
-                                <div className="resend-schedule">
-                                    <select className="sms-select" value={scheduleType} onChange={(e) => setScheduleType(e.target.value as 'all' | 'window')}>
-                                        <option value="all">全天</option>
-                                        <option value="window">指定时段</option>
-                                    </select>
-                                    {scheduleType === 'window' && (
-                                        <div className="resend-time-range">
-                                            <input
-                                                type="time"
-                                                className="resend-time-input"
-                                                value={windowStart}
-                                                onChange={(e) => setWindowStart(e.target.value)}
-                                            />
-                                            <input
-                                                type="time"
-                                                className="resend-time-input"
-                                                value={windowEnd}
-                                                onChange={(e) => setWindowEnd(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
                                     累计阈值
@@ -241,6 +214,43 @@ export default function AutoResend() {
                                     <option value={30}>30 分钟</option>
                                     <option value={60}>60 分钟</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="resend-schedule-row">
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">生效时段</label>
+                            <div className="sms-form-control">
+                                <div className="resend-schedule-inline">
+                                    <label className="resend-switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={scheduleEnabled}
+                                            onChange={(e) => setScheduleEnabled(e.target.checked)}
+                                        />
+                                        <span className="resend-switch-slider" />
+                                        <span className="resend-switch-text">{scheduleEnabled ? '指定时段' : '全天'}</span>
+                                    </label>
+                                    {scheduleEnabled ? (
+                                        <div className="resend-time-range">
+                                            <input
+                                                type="time"
+                                                className="resend-time-input"
+                                                value={windowStart}
+                                                onChange={(e) => setWindowStart(e.target.value)}
+                                            />
+                                            <span className="resend-time-sep">-</span>
+                                            <input
+                                                type="time"
+                                                className="resend-time-input"
+                                                value={windowEnd}
+                                                onChange={(e) => setWindowEnd(e.target.value)}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <span className="resend-schedule-all">不限制发送时段</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
