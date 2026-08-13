@@ -561,22 +561,6 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                                 </select>
                             </div>
                         </div>
-
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">补发前校验</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-fixed-tip">
-                                    必须重新经过前置校验（黑名单 + 发送时段），不提供绕过开关
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">达到上限后</label>
-                            <div className="sms-form-control">
-                                <div className="plan-canvas-fixed-tip">流向结束节点</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div className="sms-modal-actions">
