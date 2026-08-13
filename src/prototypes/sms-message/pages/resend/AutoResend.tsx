@@ -64,9 +64,11 @@ export default function AutoResend() {
             <div className="resend-stat-row">
                 {stats.map((s) => (
                     <div className="resend-stat-card" key={s.label}>
-                        <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
-                        <div className="resend-stat-label">{s.label}</div>
-                        {s.sub && <div className="resend-stat-sub">{s.sub}</div>}
+                        <div className="resend-stat-main">
+                            <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
+                            <div className="resend-stat-label">{s.label}</div>
+                        </div>
+                        <div className="resend-stat-sub">{s.sub ?? ''}</div>
                     </div>
                 ))}
             </div>
@@ -192,7 +194,6 @@ export default function AutoResend() {
                                                 value={windowStart}
                                                 onChange={(e) => setWindowStart(e.target.value)}
                                             />
-                                            <span className="resend-time-sep">-</span>
                                             <input
                                                 type="time"
                                                 className="resend-time-input"
