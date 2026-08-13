@@ -58,9 +58,10 @@ export default function AutoResend() {
                             <Zap size={16} />
                             自动补发规则
                         </span>
-                        <span className="resend-rule-tip">
-                            2026.8.24 日前的历史短信不参与自动补发 · 本规则为全局默认规则，全局生效；运营计划若配置了自动补发组件，以计划配置为准
-                        </span>
+                        <div className="resend-rule-tip">
+                            <span>2026.8.24 日前的历史短信不参与自动补发</span>
+                            <span>本规则默认全局生效，但配置了自动补发组件的运营计划除外</span>
+                        </div>
                     </div>
                     <label className="resend-switch">
                         <input type="checkbox" checked={enabled} onChange={() => setEnabled(!enabled)} />
@@ -74,44 +75,44 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">触发条件</label>
                             <div className="sms-form-control">
-                                <div className="resend-cond-group">
-                                    <div className="resend-cond-head">
-                                        <span className="resend-cond-title">提交失败时</span>
-                                        <span className="resend-cond-desc">无需等待回执</span>
-                                    </div>
-                                    <div className="resend-cond-items">
-                                        <label className={`resend-check-item${conditions.includes('发送失败') ? ' checked' : ''}`}>
+                                <div className="resend-cond-list">
+                                    <div className="resend-cond-card">
+                                        <div className="resend-cond-card-head">
+                                            <span className="resend-cond-card-title">提交失败时</span>
+                                            <span className="resend-cond-card-desc">无需等待回执</span>
+                                        </div>
+                                        <label className="resend-cond-option">
                                             <input
                                                 type="checkbox"
                                                 checked={conditions.includes('发送失败')}
                                                 onChange={() => toggleCondition('发送失败')}
                                             />
-                                            发送失败
+                                            <span>发送失败</span>
                                         </label>
                                     </div>
-                                </div>
-                                <div className="resend-cond-group">
-                                    <div className="resend-cond-head">
-                                        <span className="resend-cond-title">回执判定后</span>
-                                        <span className="resend-cond-desc">未送达或 24 小时内无明确回执</span>
-                                    </div>
-                                    <div className="resend-cond-items">
-                                        <label className={`resend-check-item${conditions.includes('未送达') ? ' checked' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={conditions.includes('未送达')}
-                                                onChange={() => toggleCondition('未送达')}
-                                            />
-                                            未送达
-                                        </label>
-                                        <label className={`resend-check-item${conditions.includes('回执超时') ? ' checked' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={conditions.includes('回执超时')}
-                                                onChange={() => toggleCondition('回执超时')}
-                                            />
-                                            回执超时
-                                        </label>
+                                    <div className="resend-cond-card">
+                                        <div className="resend-cond-card-head">
+                                            <span className="resend-cond-card-title">回执判定后</span>
+                                            <span className="resend-cond-card-desc">未送达或 24 小时内无明确回执</span>
+                                        </div>
+                                        <div className="resend-cond-options">
+                                            <label className="resend-cond-option">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={conditions.includes('未送达')}
+                                                    onChange={() => toggleCondition('未送达')}
+                                                />
+                                                <span>未送达</span>
+                                            </label>
+                                            <label className="resend-cond-option">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={conditions.includes('回执超时')}
+                                                    onChange={() => toggleCondition('回执超时')}
+                                                />
+                                                <span>回执超时</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

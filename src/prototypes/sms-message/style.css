@@ -1848,69 +1848,61 @@ button {
     gap: 0 24px;
 }
 
-.resend-check-group {
-    display: flex;
-    gap: 8px;
-    height: 32px;
-    align-items: center;
-}
-
-.resend-cond-group {
+.resend-cond-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
-.resend-cond-head {
+.resend-cond-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid rgba(203, 208, 219, 0.45);
+    border-radius: 6px;
+}
+
+.resend-cond-card-head {
     display: flex;
     align-items: baseline;
     gap: 8px;
 }
 
-.resend-cond-group + .resend-cond-group {
-    margin-top: 10px;
+.resend-cond-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
 }
 
-.resend-cond-title {
+.resend-cond-card-desc {
     font-size: 12px;
     color: var(--text-muted);
 }
 
-.resend-cond-desc {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.resend-cond-items {
+.resend-cond-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 16px;
     align-items: center;
 }
 
-.resend-check-item {
+.resend-cond-option {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    min-height: 28px;
-    padding: 4px 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text-secondary);
     font-size: 13px;
-    line-height: 1.4;
+    color: var(--text-secondary);
     cursor: pointer;
     user-select: none;
 }
 
-.resend-check-item.checked {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: #f0f7ff;
-}
-
-.resend-check-item input {
+.resend-cond-option input {
     accent-color: var(--primary);
+    width: 14px;
+    height: 14px;
+    margin: 0;
 }
 
 .resend-rule-footer {
@@ -1923,6 +1915,9 @@ button {
 }
 
 .resend-rule-tip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     color: var(--text-muted);
     font-size: 13px;
 }
