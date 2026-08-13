@@ -62,7 +62,10 @@ export default function OperationPlanPage() {
     const [tab, setTab] = useState<'manage' | 'summary'>('manage');
     const [collapsed, setCollapsed] = useState(true);
     const [page, setPage] = useState(1);
-    const [view, setView] = useState<'list' | 'canvas'>('list');
+    const [planRows, setPlanRows] = useState<PlanRow[]>(PLAN_ROWS);
+    const [canvasCtx, setCanvasCtx] = useState<{ mode: 'new' | 'edit'; planId: string | null; name: string } | null>(
+        null,
+    );
 
     const renderSelect = (placeholder = '请选择', options?: string[]) => (
         <select className="sms-select placeholder" defaultValue="">
@@ -75,9 +78,39 @@ export default function OperationPlanPage() {
         </select>
     );
 
-    if (view === 'canvas') {
+    if (canvasCtx) {
         return (
-            <OperationPlanCanvas planName="BL_RolloverPeriod_d16-30" onBack={() => setView('list')} />
+            <OperationPlanCanvas
+                planName={canvasCtx.name}
+                onBack={() => setCanvasCtx(null)}
+                onSaved={(savedName) => {
+                    if (canvasCtx.mode === 'new') {
+                        const now = new Date();
+                        const pad = (n: number) => String(n).padStart(2, '0');
+                        const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+                        const finalName = `新建计划_${ts}`;
+                        const row: PlanRow = {
+                            id: `p${Date.now()}`,
+                            createdAt: '2026-08-13 10:00:00',
+                            updatedAt: '2026-08-13 10:00:00',
+                            businessId: 'MTN_UG_Phone',
+                            planId: `p${Date.now()}`,
+                            name: finalName,
+                            status: '关闭',
+                            executeStatus: '-',
+                            executeCycle: '-',
+                            channel: '-',
+                            hasDelay: '否',
+                            operator: 'Swart Guan',
+                            tag: '-',
+                        };
+                        setPlanRows((prev) => [row, ...prev]);
+                        setCanvasCtx({ mode: 'edit', planId: row.id, name: finalName });
+                    } else {
+                        setPlanRows((prev) => prev.map((r) => (r.id === canvasCtx.planId ? { ...r, name: savedName } : r)));
+                    }
+                }}
+            />
         );
     }
 
@@ -180,7 +213,11 @@ export default function OperationPlanPage() {
                     <div className="sms-card plan-list-card">
                         <div className="plan-toolbar">
                             <div className="plan-toolbar-left">
-                                <button type="button" className="sms-btn sms-btn-primary">
+                                <button
+                                    type="button"
+                                    className="sms-btn sms-btn-primary"
+                                    onClick={() => setCanvasCtx({ mode: 'new', planId: null, name: '未命名计划' })}
+                                >
                                     <Plus size={14} />
                                     新建计划
                                 </button>
@@ -203,19 +240,23 @@ export default function OperationPlanPage() {
                             <table className="sms-table plan-table">
                                 <thead>
                                     <tr>
+                                        <th className="plan-col-name">运营计划名称</th>
                                         <th className="plan-col-action">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {PLAN_ROWS.map((r) => (
+                                    {planRows.map((r) => (
                                         <tr key={r.id}>
+                                            <td className="plan-col-name">
+                                                <span className="sms-cell">{r.name}</span>
+                                            </td>
                                             <td className="plan-col-action">
                                                 <span className="plan-action-group">
                                                     <button
                                                         type="button"
                                                         className="sms-btn sms-btn-icon"
                                                         title="详情"
-                                                        onClick={() => setView('canvas')}
+                                                        onClick={() => setCanvasCtx({ mode: 'edit', planId: r.id, name: r.name })}
                                                     >
                                                         <Eye size={15} />
                                                     </button>

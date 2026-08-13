@@ -521,9 +521,10 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
 interface OperationPlanCanvasProps {
     planName: string;
     onBack: () => void;
+    onSaved?: (name: string) => void;
 }
 
-export default function OperationPlanCanvas({ planName, onBack }: OperationPlanCanvasProps) {
+export default function OperationPlanCanvas({ planName, onBack, onSaved }: OperationPlanCanvasProps) {
     const [nodes, setNodes] = useState<CanvasNode[]>([]);
     const [edges, setEdges] = useState<CanvasEdge[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -702,6 +703,7 @@ export default function OperationPlanCanvas({ planName, onBack }: OperationPlanC
                                 window.clearTimeout(savedTipTimer.current);
                             }
                             savedTipTimer.current = window.setTimeout(() => setSavedTip(false), 2600);
+                            onSaved?.(planName);
                         }}
                     >
                         保 存
