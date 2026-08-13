@@ -1315,13 +1315,13 @@ button {
 }
 
 .plan-canvas-publish {
-    background: #0958d9;
-    border-color: #0958d9;
+    background: #1890ff;
+    border-color: #1890ff;
 }
 
 .plan-canvas-publish:hover {
-    background: #0f67ee;
-    border-color: #0f67ee;
+    background: #40a9ff;
+    border-color: #40a9ff;
     color: #ffffff;
 }
 
