@@ -1968,6 +1968,9 @@ button {
 }
 
 .resend-switch-tip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     margin: 0;
     font-size: 14px;
     line-height: 1.7;

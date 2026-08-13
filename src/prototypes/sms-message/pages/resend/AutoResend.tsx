@@ -189,11 +189,19 @@ export default function AutoResend() {
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">{switchModal === 'open' ? '开启自动补发' : '关闭自动补发'}</div>
                         <div className="sms-modal-body">
-                            <p className="resend-switch-tip">
-                                {switchModal === 'open'
-                                    ? '开启后，满足触发条件的失败短信将由系统自动补发，请确认规则已配置正确。'
-                                    : '关闭后，系统将不再自动补发失败短信，已在补发队列中的批次不受影响。'}
-                            </p>
+                            <div className="resend-switch-tip">
+                                {switchModal === 'open' ? (
+                                    <>
+                                        <span>开启后，满足触发条件的失败短信将由系统自动补发</span>
+                                        <span>请确认规则已配置正确</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>关闭后，系统将不再自动补发失败短信</span>
+                                        <span>已在补发队列中的批次不受影响</span>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className="sms-modal-actions">
                             <button type="button" className="sms-btn" onClick={() => setSwitchModal(null)}>
