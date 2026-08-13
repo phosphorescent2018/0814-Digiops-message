@@ -37,15 +37,6 @@ interface PlanRow {
 
 const PLAN_ROWS: PlanRow[] = [
     { id: '3059', createdAt: '2026-08-07 03:43:40', updatedAt: '2026-08-07 03:43:40', businessId: 'MTN_UG_Phone', planId: '3059', name: 'July2_Acquisition_A_1_8_260810', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Swart Guan', tag: '-' },
-    { id: '3058', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:42:09', businessId: 'MTN_UG_Account_id', planId: '3058', name: 'BL_SevereDelinquency_d90plus', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3057', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:41:30', businessId: 'MTN_UG_Account_id', planId: '3057', name: 'BL_SevereDelinquency_d76-90', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3056', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:40:47', businessId: 'MTN_UG_Account_id', planId: '3056', name: 'BL_SevereDelinquency_d63-75', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3055', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:39:37', businessId: 'MTN_UG_Account_id', planId: '3055', name: 'BL_RolloverPeriod_d31-62', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3054', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:38:30', businessId: 'MTN_UG_Account_id', planId: '3054', name: 'BL_CRBAwareness_d3-180', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3053', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-23 08:37:21', businessId: 'MTN_UG_Account_id', planId: '3053', name: 'BL_RolloverPeriod_d16-30', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3052', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-17 08:32:59', businessId: 'MTN_UG_Account_id', planId: '3052', name: 'BL_RolloverPeriod_d3-7', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3051', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-17 08:32:10', businessId: 'MTN_UG_Account_id', planId: '3051', name: 'BL_GracePeriod_d2', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
-    { id: '3050', createdAt: '2026-07-17 08:23:40', updatedAt: '2026-07-17 08:31:42', businessId: 'MTN_UG_Account_id', planId: '3050', name: 'BL_GracePeriod_d1', status: '关闭', executeStatus: '-', executeCycle: '-', channel: '-', hasDelay: '否', operator: 'Anne Wei', tag: '-' },
 ];
 
 const TOTAL = 90;

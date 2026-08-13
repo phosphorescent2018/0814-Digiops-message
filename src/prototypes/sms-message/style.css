@@ -1128,7 +1128,13 @@ button {
 }
 
 .plan-table {
+    width: 100%;
     table-layout: auto;
+}
+
+.plan-table th,
+.plan-table td {
+    text-align: center;
 }
 
 .plan-table th,
