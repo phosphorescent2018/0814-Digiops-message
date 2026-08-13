@@ -1607,8 +1607,12 @@ button {
     border-color: var(--primary);
 }
 
-.plan-canvas-config-modal {
-    width: 520px;
+.sms-modal.plan-canvas-config-modal {
+    width: 560px;
+}
+
+.sms-modal.plan-canvas-config-modal .sms-form-label {
+    width: 136px;
 }
 
 .plan-canvas-switch-row {
@@ -1643,6 +1647,10 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.plan-canvas-check-row .resend-cond-option-text {
+    white-space: nowrap;
 }
 
 .plan-canvas-link {
