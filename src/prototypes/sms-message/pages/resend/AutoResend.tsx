@@ -34,7 +34,7 @@ export default function AutoResend() {
     const toastTimer = useRef<number | null>(null);
 
     const thresholdNum = typeof batchThreshold === 'number' ? batchThreshold : 0;
-    const configReady = conditions.length > 0 && !!maxResend && !!interval && thresholdNum > 0 && !!maxWait;
+    const configReady = conditions.length > 0 && !!maxResend && (maxResend === '1' || !!interval) && thresholdNum > 0 && !!maxWait;
 
     const showToast = (text: string) => {
         setToast(text);
