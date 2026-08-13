@@ -134,7 +134,7 @@ export default function AutoResend() {
                     </div>
                     <div className="resend-rule-footer">
                         <span className="resend-rule-tip">
-                            自动补发仅针对新短信生效，历史短信不参与自动补发
+                            2026.8.24 日前的历史短信不参与自动补发
                         </span>
                         <button type="button" className="sms-btn sms-btn-primary" onClick={save} disabled={!enabled}>
                             {saved ? (
