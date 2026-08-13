@@ -2,7 +2,7 @@
  * 运营计划画布配置页：操作列「详情」进入
  * 高精度还原 UAT 流程定制画布：顶部工具栏 + 左侧节点面板 + 可拖拽画布
  * 支持：左侧组件拖入画布、画布内拖动移动、节点间拖线连接、选中删除
- * 定制组件（触达前置校验 / 补发控制）点击节点可打开配置面板，保存后展示配置摘要
+ * 定制组件（前置校验 / 补发控制）点击节点可打开配置面板，保存后展示配置摘要
  */
 import React, { useRef, useState } from 'react';
 import {
@@ -63,7 +63,7 @@ const NODE_GROUPS: NodeGroup[] = [
     {
         title: '动作',
         nodes: [
-            { id: 'touch-precheck', label: '触达前置校验', color: '#1890ff', icon: ShieldCheck },
+            { id: 'touch-precheck', label: '前置校验', color: '#1890ff', icon: ShieldCheck },
             { id: 'resend-control', label: '补发控制', color: '#fa8c16', icon: RefreshCw },
             { id: 'end', label: '结束节点', color: '#98a1b8', shape: 'circle', text: 'END' },
             { id: 'delay', label: '延时器', color: '#98a1b8', shape: 'circle', icon: ClockIcon },
@@ -96,7 +96,7 @@ const CANVAS_TOOLS = [LayoutGrid, SquarePlus, Copy, Trash2, Undo2, Redo2, Locate
 const NODE_W = 128;
 const NODE_H = 92;
 
-/** 触达前置校验配置 */
+/** 前置校验配置 */
 interface PrecheckConfig {
     enabled: boolean;
     checks: string[];
@@ -177,7 +177,7 @@ function ResendControlSummary({ config }: { config: ResendControlConfig }) {
     return <span className="plan-canvas-item-summary">{parts.join(' · ')}</span>;
 }
 
-/* ================= 触达前置校验配置面板 ================= */
+/* ================= 前置校验配置面板 ================= */
 
 interface PrecheckModalProps {
     initial: PrecheckConfig;
@@ -211,7 +211,7 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
     return (
         <div className="sms-mask" onClick={onClose}>
             <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="sms-modal-header">触达前置校验</div>
+                <div className="sms-modal-header">前置校验</div>
                 <div className="sms-modal-body">
                     <div className="sms-form-item">
                         <label className="sms-form-label">启用自定义规则</label>
