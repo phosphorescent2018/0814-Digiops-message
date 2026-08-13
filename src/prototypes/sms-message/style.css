@@ -1587,9 +1587,11 @@ button {
     max-width: 116px;
     font-size: 10px;
     color: var(--text-muted);
-    white-space: nowrap;
+    line-height: 1.4;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .plan-canvas-item-del {

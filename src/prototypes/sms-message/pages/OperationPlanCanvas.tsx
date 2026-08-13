@@ -26,6 +26,7 @@ import {
     Bell,
     PhoneCall,
     Ticket,
+    RefreshCw,
     X,
     LayoutGrid,
     SquarePlus,
@@ -62,6 +63,7 @@ const NODE_GROUPS: NodeGroup[] = [
         title: '动作',
         nodes: [
             { id: 'judge', label: '判断', color: '#1890ff', shape: 'diamond', icon: Diamond },
+            { id: 'resend-control', label: '补发控制', color: '#fa8c16', icon: RefreshCw },
             { id: 'end', label: '结束节点', color: '#98a1b8', shape: 'circle', text: 'END' },
             { id: 'delay', label: '延时器', color: '#98a1b8', shape: 'circle', icon: ClockIcon },
             { id: 'ab-test', label: 'A/B测试', color: '#98a1b8', icon: GitBranch },
@@ -118,11 +120,10 @@ const DEFAULT_RESEND_CONTROL: ResendControlConfig = {
     interval: '30',
 };
 
-/** 判断节点配置：事件类型下拉，支持复用为前置校验 / 补发控制 */
+/** 判断节点配置：事件类型下拉，支持复用为前置校验 */
 interface JudgeConfig {
-    gateWayType: 'EVENT' | 'BUSINESS' | 'GROUP' | 'PRECHECK' | 'RESEND_CONTROL';
+    gateWayType: 'EVENT' | 'BUSINESS' | 'GROUP' | 'PRECHECK';
     precheck: PrecheckConfig;
-    resend: ResendControlConfig;
     eventChannel: string;
     recentDay: string;
 }
@@ -130,7 +131,6 @@ interface JudgeConfig {
 const DEFAULT_JUDGE: JudgeConfig = {
     gateWayType: 'EVENT',
     precheck: { checks: [], windows: [{ start: '09:00', end: '18:00' }], strategy: 'wait' },
-    resend: { triggers: [], maxResend: '3', interval: '30' },
     eventChannel: '短信',
     recentDay: '30',
 };
@@ -172,27 +172,27 @@ function JudgeSummary({ config }: { config: JudgeConfig }) {
         }
         return <span className="plan-canvas-item-summary">前置校验 · {parts.length ? parts.join(' · ') : '未配置'}</span>;
     }
-    if (config.gateWayType === 'RESEND_CONTROL') {
-        const r = config.resend;
-        const parts: string[] = [];
-        if (r.triggers.includes('submitFail')) {
-            parts.push('发送失败');
-        }
-        if (r.triggers.includes('notDelivered')) {
-            parts.push('未送达');
-        }
-        if (r.triggers.includes('receiptTimeout')) {
-            parts.push('回执超时');
-        }
-        parts.push(`最多${r.maxResend}次`);
-        return <span className="plan-canvas-item-summary">补发控制 · {parts.join(' · ')}</span>;
-    }
     const names: Record<string, string> = {
         EVENT: '事件发生',
         BUSINESS: '业务属性',
         GROUP: '群组人数',
     };
     return <span className="plan-canvas-item-summary">判断 · {names[config.gateWayType] ?? config.gateWayType}</span>;
+}
+
+function ResendControlSummary({ config }: { config: ResendControlConfig }) {
+    const parts: string[] = [];
+    if (config.triggers.includes('submitFail')) {
+        parts.push('发送失败');
+    }
+    if (config.triggers.includes('notDelivered')) {
+        parts.push('未送达');
+    }
+    if (config.triggers.includes('receiptTimeout')) {
+        parts.push('回执超时');
+    }
+    parts.push(`最多${config.maxResend}次`);
+    return <span className="plan-canvas-item-summary">停留至补发完成 · {parts.length ? parts.join(' · ') : '未配置'}</span>;
 }
 
 interface JudgeModalProps {
@@ -209,7 +209,6 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
             checks: [...initial.precheck.checks],
             windows: initial.precheck.windows.map((w) => ({ ...w })),
         },
-        resend: { ...initial.resend, triggers: [...initial.resend.triggers] },
         eventChannel: initial.eventChannel,
         recentDay: initial.recentDay,
     }));
@@ -258,18 +257,6 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
         }));
     };
 
-    const toggleResendTrigger = (key: string) => {
-        setDraft((prev) => {
-            const r = prev.resend;
-            const has = r.triggers.includes(key);
-            return { ...prev, resend: { ...r, triggers: has ? r.triggers.filter((t) => t !== key) : [...r.triggers, key] } };
-        });
-    };
-
-    const updateResend = (patch: Partial<ResendControlConfig>) => {
-        setDraft((prev) => ({ ...prev, resend: { ...prev.resend, ...patch } }));
-    };
-
     return (
         <div className="sms-mask" onClick={onClose}>
             <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
@@ -289,8 +276,7 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                                     <option value="EVENT">事件发生</option>
                                     <option value="BUSINESS">业务属性</option>
                                     <option value="GROUP">群组人数</option>
-                                    <option value="PRECHECK">触达前置校验</option>
-                                    <option value="RESEND_CONTROL">补发控制</option>
+                                    <option value="PRECHECK">前置校验</option>
                                 </select>
                             </div>
                         </div>
@@ -341,7 +327,7 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                         {draft.gateWayType === 'PRECHECK' && (
                             <>
                                 <div className="sms-form-item">
-                                    <label className="sms-form-label">校验能力</label>
+                                    <label className="sms-form-label">校验项</label>
                                     <div className="sms-form-control">
                                         <div className="plan-canvas-checks">
                                             <div className="plan-canvas-check-row">
@@ -450,103 +436,147 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                             </>
                         )}
 
-                        {draft.gateWayType === 'RESEND_CONTROL' && (
-                            <>
-                                <div className="sms-form-item plan-canvas-time-item">
-                                    <label className="sms-form-label">触发条件</label>
-                                    <div className="sms-form-control">
-                                        <div className="resend-cond-groups">
-                                            <div className="resend-cond-group">
-                                                <div className="resend-cond-group-head">
-                                                    <span className="resend-cond-group-title">提交失败时</span>
-                                                    <span className="resend-cond-group-desc">无需等待回执</span>
-                                                </div>
-                                                <label className="resend-cond-option">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={draft.resend.triggers.includes('submitFail')}
-                                                        onChange={() => toggleResendTrigger('submitFail')}
-                                                    />
-                                                    <span className="resend-cond-option-text">发送失败</span>
-                                                </label>
-                                            </div>
-                                            <div className="resend-cond-group">
-                                                <div className="resend-cond-group-head">
-                                                    <span className="resend-cond-group-title">回执判定后</span>
-                                                    <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
-                                                </div>
-                                                <div className="resend-cond-options">
-                                                    <label className="resend-cond-option">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={draft.resend.triggers.includes('notDelivered')}
-                                                            onChange={() => toggleResendTrigger('notDelivered')}
-                                                        />
-                                                        <span className="resend-cond-option-text">未送达</span>
-                                                    </label>
-                                                    <label className="resend-cond-option">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={draft.resend.triggers.includes('receiptTimeout')}
-                                                            onChange={() => toggleResendTrigger('receiptTimeout')}
-                                                        />
-                                                        <span className="resend-cond-option-text">回执超时</span>
-                                                    </label>
-                                                </div>
-                                            </div>
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取 消
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={() => onSave(draft)}>
+                        保 存
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ================= 补发控制配置面板 ================= */
+
+interface ResendControlModalProps {
+    initial: ResendControlConfig;
+    onClose: () => void;
+    onSave: (config: ResendControlConfig) => void;
+}
+
+function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlModalProps) {
+    const [draft, setDraft] = useState<ResendControlConfig>(() => ({
+        triggers: [...initial.triggers],
+        maxResend: initial.maxResend,
+        interval: initial.interval,
+    }));
+
+    const toggleTrigger = (key: string) => {
+        setDraft((prev) => {
+            const has = prev.triggers.includes(key);
+            return { ...prev, triggers: has ? prev.triggers.filter((t) => t !== key) : [...prev.triggers, key] };
+        });
+    };
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">补发控制</div>
+                <div className="sms-modal-body">
+                    <div className="plan-canvas-config-group">
+                        <div className="plan-canvas-non-slot-tip">
+                            <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
+                            <span>流程将在此停留，直到补发完成（补发成功或达到上限）后继续</span>
+                        </div>
+
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">触发条件</label>
+                            <div className="sms-form-control">
+                                <div className="resend-cond-groups">
+                                    <div className="resend-cond-group">
+                                        <div className="resend-cond-group-head">
+                                            <span className="resend-cond-group-title">提交失败时</span>
+                                            <span className="resend-cond-group-desc">无需等待回执</span>
+                                        </div>
+                                        <label className="resend-cond-option">
+                                            <input
+                                                type="checkbox"
+                                                checked={draft.triggers.includes('submitFail')}
+                                                onChange={() => toggleTrigger('submitFail')}
+                                            />
+                                            <span className="resend-cond-option-text">发送失败</span>
+                                        </label>
+                                    </div>
+                                    <div className="resend-cond-group">
+                                        <div className="resend-cond-group-head">
+                                            <span className="resend-cond-group-title">回执判定后</span>
+                                            <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
+                                        </div>
+                                        <div className="resend-cond-options">
+                                            <label className="resend-cond-option">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={draft.triggers.includes('notDelivered')}
+                                                    onChange={() => toggleTrigger('notDelivered')}
+                                                />
+                                                <span className="resend-cond-option-text">未送达</span>
+                                            </label>
+                                            <label className="resend-cond-option">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={draft.triggers.includes('receiptTimeout')}
+                                                    onChange={() => toggleTrigger('receiptTimeout')}
+                                                />
+                                                <span className="resend-cond-option-text">回执超时</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div className="sms-form-item">
-                                    <label className="sms-form-label">最大补发次数</label>
-                                    <div className="sms-form-control">
-                                        <select
-                                            className="sms-select plan-canvas-inline-select"
-                                            value={draft.resend.maxResend}
-                                            onChange={(e) => updateResend({ maxResend: e.target.value })}
-                                        >
-                                            <option value="1">1 次</option>
-                                            <option value="2">2 次</option>
-                                            <option value="3">3 次</option>
-                                            <option value="5">5 次</option>
-                                        </select>
-                                    </div>
-                                </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">最大补发次数</label>
+                            <div className="sms-form-control">
+                                <select
+                                    className="sms-select plan-canvas-inline-select"
+                                    value={draft.maxResend}
+                                    onChange={(e) => setDraft((prev) => ({ ...prev, maxResend: e.target.value }))}
+                                >
+                                    <option value="1">1 次</option>
+                                    <option value="2">2 次</option>
+                                    <option value="3">3 次</option>
+                                    <option value="5">5 次</option>
+                                </select>
+                            </div>
+                        </div>
 
-                                <div className="sms-form-item">
-                                    <label className="sms-form-label">补发间隔</label>
-                                    <div className="sms-form-control">
-                                        <select
-                                            className="sms-select plan-canvas-inline-select"
-                                            value={draft.resend.interval}
-                                            onChange={(e) => updateResend({ interval: e.target.value })}
-                                        >
-                                            <option value="10">10 分钟</option>
-                                            <option value="30">30 分钟</option>
-                                            <option value="60">60 分钟</option>
-                                            <option value="120">120 分钟</option>
-                                        </select>
-                                    </div>
-                                </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发间隔</label>
+                            <div className="sms-form-control">
+                                <select
+                                    className="sms-select plan-canvas-inline-select"
+                                    value={draft.interval}
+                                    onChange={(e) => setDraft((prev) => ({ ...prev, interval: e.target.value }))}
+                                >
+                                    <option value="10">10 分钟</option>
+                                    <option value="30">30 分钟</option>
+                                    <option value="60">60 分钟</option>
+                                    <option value="120">120 分钟</option>
+                                </select>
+                            </div>
+                        </div>
 
-                                <div className="sms-form-item plan-canvas-time-item">
-                                    <label className="sms-form-label">补发前校验</label>
-                                    <div className="sms-form-control">
-                                        <div className="plan-canvas-fixed-tip">
-                                            必须重新经过前置校验（黑名单 + 发送时段），不提供绕过开关
-                                        </div>
-                                    </div>
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">补发前校验</label>
+                            <div className="sms-form-control">
+                                <div className="plan-canvas-fixed-tip">
+                                    必须重新经过前置校验（黑名单 + 发送时段），不提供绕过开关
                                 </div>
+                            </div>
+                        </div>
 
-                                <div className="sms-form-item plan-canvas-time-item">
-                                    <label className="sms-form-label">达到上限后</label>
-                                    <div className="sms-form-control">
-                                        <div className="plan-canvas-fixed-tip">流向结束节点</div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">达到上限后</label>
+                            <div className="sms-form-control">
+                                <div className="plan-canvas-fixed-tip">流向结束节点</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="sms-modal-actions">
@@ -636,7 +666,12 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             def,
             x: rect ? Math.max(8, Math.min(x, rect.width - NODE_W - 8)) : x,
             y: rect ? Math.max(8, Math.min(y, rect.height - NODE_H - 8)) : y,
-            config: def.id === 'judge' ? { ...DEFAULT_JUDGE } : null,
+            config:
+                def.id === 'judge'
+                    ? { ...DEFAULT_JUDGE }
+                    : def.id === 'resend-control'
+                      ? { ...DEFAULT_RESEND_CONTROL }
+                      : null,
         };
         setNodes((prev) => [...prev, node]);
         setSelectedId(id);
@@ -1006,6 +1041,8 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                 {node.config ? (
                                     node.def.id === 'judge' ? (
                                         <JudgeSummary config={node.config as JudgeConfig} />
+                                    ) : node.def.id === 'resend-control' ? (
+                                        <ResendControlSummary config={node.config as ResendControlConfig} />
                                     ) : null
                                 ) : null}
                                 {selected && (
@@ -1055,6 +1092,17 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                 <JudgeConfigModal
                     key={editingNode.id}
                     initial={editingNode.config as JudgeConfig}
+                    onClose={() => setEditingId(null)}
+                    onSave={(config) => {
+                        setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
+                        setEditingId(null);
+                    }}
+                />
+            )}
+            {editingNode?.def.id === 'resend-control' && (
+                <ResendControlConfigModal
+                    key={editingNode.id}
+                    initial={editingNode.config as ResendControlConfig}
                     onClose={() => setEditingId(null)}
                     onSave={(config) => {
                         setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
