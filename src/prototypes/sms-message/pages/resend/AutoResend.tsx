@@ -128,7 +128,12 @@ export default function AutoResend() {
                     </div>
                     <div className="resend-form-grid">
                         <div className="sms-form-item">
-                            <label className="sms-form-label">最多补发</label>
+                            <label className="sms-form-label">
+                                <span className="sms-tooltip-wrap">
+                                    最多补发
+                                    <span className="sms-tooltip">同一条短信的最多自动补发次数</span>
+                                </span>
+                            </label>
                             <div className="sms-form-control">
                                 <select className="sms-select">
                                     <option value="1">1 次</option>
@@ -144,7 +149,7 @@ export default function AutoResend() {
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
                                     补发间隔
-                                    <span className="sms-tooltip">同一条短信两次补发之间的最小间隔</span>
+                                    <span className="sms-tooltip">同一条短信两次自动补发之间的最小间隔</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
