@@ -212,6 +212,26 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
         eventChannel: initial.eventChannel,
         recentDay: initial.recentDay,
     }));
+    const [timeError, setTimeError] = useState<string | null>(null);
+
+    /** 两个时段是否重合（端点相接不算重合，如 09:00-12:00 与 12:00-14:00 允许） */
+    const timeOverlap = (a: { start: string; end: string }, b: { start: string; end: string }) =>
+        a.start < b.end && b.start < a.end;
+
+    const hasWindowConflict = (windows: { start: string; end: string }[], target: { start: string; end: string }, index: number) =>
+        windows.some((w, i) => i !== index && timeOverlap(w, target));
+
+    /** 新增时段默认接在最后一个时段之后（首尾相接不冲突） */
+    const nextWindowCandidate = (windows: { start: string; end: string }[]) => {
+        const last = windows[windows.length - 1];
+        const [h, m] = last.end.split(':').map(Number);
+        const endMin = h * 60 + m + 60;
+        if (endMin >= 24 * 60) {
+            return { start: '00:00', end: '01:00' };
+        }
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return { start: last.end, end: `${pad(Math.floor(endMin / 60))}:${pad(endMin % 60)}` };
+    };
 
     const togglePrecheckCheck = (key: string) => {
         setDraft((prev) => {
@@ -222,11 +242,17 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
     };
 
     const updatePrecheckWindow = (index: number, key: 'start' | 'end', value: string) => {
+        const nextWindows = draft.precheck.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w));
+        if (hasWindowConflict(nextWindows, nextWindows[index], index)) {
+            setTimeError('时段存在重合，请调整后再保存');
+            return;
+        }
+        setTimeError(null);
         setDraft((prev) => ({
             ...prev,
             precheck: {
                 ...prev.precheck,
-                windows: prev.precheck.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w)),
+                windows: nextWindows,
             },
         }));
     };
@@ -387,19 +413,26 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                                                         )}
                                                     </div>
                                                 ))}
+                                                {timeError && <div className="plan-canvas-time-error">{timeError}</div>}
                                                 {draft.precheck.windows.length < 3 && (
                                                     <button
                                                         type="button"
                                                         className="plan-canvas-time-add"
-                                                        onClick={() =>
+                                                        onClick={() => {
+                                                            const candidate = nextWindowCandidate(draft.precheck.windows);
+                                                            if (hasWindowConflict(draft.precheck.windows, candidate, -1)) {
+                                                                setTimeError('新增时段与已有时段重合，请先调整已有时段');
+                                                                return;
+                                                            }
+                                                            setTimeError(null);
                                                             setDraft((prev) => ({
                                                                 ...prev,
                                                                 precheck: {
                                                                     ...prev.precheck,
-                                                                    windows: [...prev.precheck.windows, { start: '09:00', end: '18:00' }],
+                                                                    windows: [...prev.precheck.windows, candidate],
                                                                 },
-                                                            }))
-                                                        }
+                                                            }));
+                                                        }}
                                                     >
                                                         + 新增时段（最多 3 段）
                                                     </button>

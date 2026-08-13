@@ -1805,6 +1805,12 @@ button {
     cursor: not-allowed;
 }
 
+.plan-canvas-time-error {
+    font-size: 12px;
+    color: #cf1322;
+    line-height: 1.4;
+}
+
 
 .plan-canvas-inline-tip {
     font-size: 12px;
