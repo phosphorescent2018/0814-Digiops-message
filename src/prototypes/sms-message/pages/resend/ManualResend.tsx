@@ -402,7 +402,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 <th className="resend-th-tooltip">
                                     <span className="sms-tooltip-wrap">
                                         实际发送数量
-                                        <span className="sms-tooltip">实际执行了发送动作的条数，含单条提交失败</span>
+                                        <span className="sms-tooltip">实际执行了发送动作的条数</span>
                                     </span>
                                 </th>
                                 <th>补发状态</th>

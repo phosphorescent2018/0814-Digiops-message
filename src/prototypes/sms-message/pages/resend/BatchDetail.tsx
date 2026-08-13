@@ -232,7 +232,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             <div className="resend-count-card">
                                 <span className="sms-tooltip-wrap">
                                     <span className="resend-count-label">实际发送数量</span>
-                                    <span className="sms-tooltip">实际执行了发送动作的条数，含单条提交失败</span>
+                                    <span className="sms-tooltip">实际执行了发送动作的条数</span>
                                 </span>
                                 <span className="resend-count-value">
                                     {batch.systemVerifiedCount === null ? '—' : batch.systemVerifiedCount.toLocaleString()}
