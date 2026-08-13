@@ -22,6 +22,7 @@ export default function AutoResend() {
     const [saved, setSaved] = useState(false);
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
+    const [saveModal, setSaveModal] = useState(false);
     const [scheduleType, setScheduleType] = useState<'all' | 'window'>('all');
     const [windowStart, setWindowStart] = useState('08:00');
     const [windowEnd, setWindowEnd] = useState('22:00');
@@ -33,6 +34,7 @@ export default function AutoResend() {
     };
 
     const save = () => {
+        setSaveModal(false);
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
     };
@@ -242,7 +244,7 @@ export default function AutoResend() {
                         </div>
                     </div>
                     <div className="resend-rule-footer">
-                        <button type="button" className="sms-btn sms-btn-primary" onClick={save} disabled={enabled}>
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setSaveModal(true)} disabled={enabled}>
                             {saved ? (
                                 <>
                                     <Check size={14} />
@@ -258,6 +260,26 @@ export default function AutoResend() {
                     </div>
                 </div>
             </div>
+
+            {/* 保存规则提醒弹窗 */}
+            {saveModal && (
+                <div className="sms-mask" onClick={() => setSaveModal(false)}>
+                    <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="sms-modal-header">保存规则</div>
+                        <div className="sms-modal-body">
+                            <div className="resend-switch-tip">
+                                <span>规则已保存</span>
+                                <span>自动补发当前处于关闭状态，保存的规则将在开启后生效。</span>
+                            </div>
+                        </div>
+                        <div className="sms-modal-actions">
+                            <button type="button" className="sms-btn sms-btn-primary" onClick={save}>
+                                知道了
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* 开关确认弹窗 */}
             {switchModal && (
