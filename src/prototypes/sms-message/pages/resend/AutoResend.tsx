@@ -268,8 +268,8 @@ export default function AutoResend() {
                         <div className="sms-modal-header">保存规则</div>
                         <div className="sms-modal-body">
                             <div className="resend-switch-tip">
-                                <span>规则已保存</span>
-                                <span>自动补发当前处于关闭状态，保存的规则将在开启后生效。</span>
+                                <span>规则即将保存</span>
+                                <span>自动补发当前处于关闭状态，保存的规则将在补发开关开启后生效。</span>
                             </div>
                         </div>
                         <div className="sms-modal-actions">
