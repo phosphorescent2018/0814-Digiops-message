@@ -1488,6 +1488,12 @@ button {
     pointer-events: none;
 }
 
+.plan-canvas-toast-warn {
+    background: #fff1f0;
+    border-color: #ffa39e;
+    color: #cf1322;
+}
+
 .plan-canvas-drop-hint {
     position: absolute;
     inset: 16px;

@@ -553,8 +553,10 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
     const [nameDraft, setNameDraft] = useState('');
     const [dragover, setDragover] = useState(false);
     const [savedTip, setSavedTip] = useState(false);
+    const [warnTip, setWarnTip] = useState<string | null>(null);
     const [linkPreview, setLinkPreview] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
     const savedTipTimer = useRef<number | null>(null);
+    const warnTipTimer = useRef<number | null>(null);
 
     const areaRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef<{
@@ -685,6 +687,19 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             const targetEl = el?.closest?.('[data-node-id]') as HTMLElement | null;
             const targetId = targetEl?.getAttribute('data-node-id') ?? null;
             if (fromId && targetId && targetEl && targetId !== fromId) {
+                const sourceNode = nodes.find((n) => n.id === fromId);
+                const isBranch = sourceNode ? BRANCH_NODE_IDS.includes(sourceNode.def.id) : false;
+                const outCount = edges.filter((e) => e.from === fromId).length;
+                if (isBranch && outCount >= 2) {
+                    if (warnTipTimer.current !== null) {
+                        window.clearTimeout(warnTipTimer.current);
+                    }
+                    setWarnTip(`${sourceNode?.def.label ?? '该节点'}最多允许 2 条出线`);
+                    warnTipTimer.current = window.setTimeout(() => setWarnTip(null), 2600);
+                    setLinkPreview(null);
+                    linkDragRef.current = null;
+                    return;
+                }
                 const r = targetEl.getBoundingClientRect();
                 const cx = r.left + r.width / 2;
                 const cy = r.top + r.height / 2;
@@ -696,8 +711,6 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                 ];
                 const toPort = candidates.reduce((best, c) => (c.dist < best.dist ? c : best)).port;
                 setEdges((prev) => {
-                    const sourceNode = nodes.find((n) => n.id === fromId);
-                    const isBranch = sourceNode ? BRANCH_NODE_IDS.includes(sourceNode.def.id) : false;
                     const hasYes = prev.some((e) => e.from === fromId && e.expect === 'YES');
                     const expect: 'YES' | 'NO' | undefined = isBranch ? (hasYes ? 'NO' : 'YES') : undefined;
                     return [
@@ -1009,6 +1022,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             </div>
 
             {savedTip && <div className="plan-canvas-toast">已保存，可继续编辑</div>}
+            {warnTip && <div className="plan-canvas-toast plan-canvas-toast-warn">{warnTip}</div>}
 
             {editingNode?.def.id === 'judge' && (
                 <JudgeConfigModal
