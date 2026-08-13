@@ -1922,6 +1922,10 @@ button {
     gap: 0 24px;
 }
 
+.resend-form-grid .sms-form-item:last-child {
+    margin-bottom: 0;
+}
+
 .resend-cond-row {
     margin-bottom: 18px;
 }
@@ -2032,8 +2036,8 @@ button {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-top: 16px;
-    margin-top: 8px;
+    padding-top: 12px;
+    margin-top: 4px;
     border-top: 1px solid var(--border-soft);
 }
 
