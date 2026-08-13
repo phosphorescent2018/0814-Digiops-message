@@ -1744,6 +1744,33 @@ button {
 }
 
 
+.plan-canvas-inline-tip {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.plan-canvas-inline-select {
+    width: 120px;
+    flex-shrink: 0;
+}
+
+.plan-canvas-check-row .plan-canvas-inline-select {
+    width: 64px;
+}
+
+.plan-canvas-fixed-tip {
+    padding: 8px 10px;
+    background: #f5f7fa;
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+
+
 .sms-resend-center {
     min-height: 420px;
 }
