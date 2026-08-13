@@ -2,11 +2,12 @@
  * @name 短信管理
  */
 import React, { useState } from 'react';
-import Layout from './components/Layout';
+import Layout, { type AppPage } from './components/Layout';
 import TemplatePage from './pages/TemplatePage';
 import RecordPage from './pages/RecordPage';
 import ReportPage from './pages/ReportPage';
 import ResendCenter from './pages/ResendCenter';
+import OperationPlanPage from './pages/OperationPlanPage';
 import type { RecordFilter } from './pages/resend/BatchDetail';
 import { MessageSquareText, MessageCircle, BarChart3, Send } from 'lucide-react';
 import './style.css';
@@ -25,11 +26,16 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
 export default function SmsMessage() {
     // 与 UAT 一致：默认激活「发送记录」
     const [activeTab, setActiveTab] = useState<TabKey>('record');
+    const [page, setPage] = useState<AppPage>('sms');
     const [recordFilter, setRecordFilter] = useState<RecordFilter | null>(null);
 
     return (
         <>
-          <Layout>
+          <Layout activePage={page} onNavigate={setPage}>
+              {page === 'plan' ? (
+                  <OperationPlanPage />
+              ) : (
+                  <>
                       <h1 className="sms-page-title">短信</h1>
                       <div className="sms-tabs">
                           {TABS.map((tab) => (
@@ -57,7 +63,9 @@ export default function SmsMessage() {
                               }}
                           />
                       )}
-                  </Layout>
+                  </>
+              )}
+          </Layout>
           <AnnotationViewer
             source={annotationSourceDocument as unknown as AnnotationSourceDocument}
             options={{

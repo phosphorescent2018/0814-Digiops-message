@@ -24,9 +24,25 @@ import {
 
 interface LayoutProps {
     children: React.ReactNode;
+    activePage?: AppPage;
+    onNavigate?: (page: AppPage) => void;
 }
 
-const MENU = [
+export type AppPage = 'sms' | 'plan';
+
+interface MenuChild {
+    label: string;
+    page?: AppPage;
+}
+
+interface MenuItem {
+    icon: React.ElementType;
+    label: string;
+    page?: AppPage;
+    children?: (string | MenuChild)[];
+}
+
+const MENU: MenuItem[] = [
     { icon: Home, label: '首页' },
     {
         icon: Users,
@@ -36,14 +52,15 @@ const MENU = [
     {
         icon: CalendarRange,
         label: '运营计划',
-        children: ['运营计划管理'],
+        page: 'plan',
+        children: [{ label: '运营计划管理', page: 'plan' }],
     },
     {
         icon: Megaphone,
         label: '营销渠道',
-        active: true,
+        page: 'sms',
         children: [
-            { label: '短信', active: true },
+            { label: '短信', page: 'sms' },
             { label: 'WhatsApp' },
             { label: '电销' },
             { label: '智能语音' },
@@ -55,7 +72,7 @@ const MENU = [
     { icon: Settings, label: '系统管理' },
 ];
 
-function Sidebar() {
+function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?: (page: AppPage) => void }) {
     // 一级菜单展开状态：默认全部展开，点击一级菜单可伸缩
     const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
         Object.fromEntries(MENU.filter((item) => item.children).map((item) => [item.label, true]))
@@ -75,7 +92,7 @@ function Sidebar() {
                 {MENU.map((item) => (
                     <div key={item.label}>
                         <div
-                            className={`sms-menu-item${item.active ? ' active' : ''}${
+                            className={`sms-menu-item${item.page && activePage === item.page ? ' active' : ''}${
                                 item.children ? ` open${expanded[item.label] ? ' expanded' : ''}` : ''
                             }`}
                             onClick={item.children ? () => toggleMenu(item.label) : undefined}
@@ -90,13 +107,15 @@ function Sidebar() {
                             <div className="sms-menu-sub">
                                 {item.children.map((child) => {
                                     const childLabel = typeof child === 'string' ? child : child.label;
-                                    const childActive = typeof child === 'object' ? child.active : false;
+                                    const childPage = typeof child === 'object' ? child.page : undefined;
+                                    const childActive = childPage ? activePage === childPage : false;
                                     return (
                                         <div
                                             key={childLabel}
                                             className={`sms-menu-item${childActive ? ' active' : ''}${
                                                 childLabel === '短信' ? ' sms-menu-sub-sms' : ''
                                             }`}
+                                            onClick={childPage ? () => onNavigate?.(childPage) : undefined}
                                         >
                                             <span>{childLabel}</span>
                                         </div>
@@ -116,7 +135,7 @@ function Sidebar() {
     );
 }
 
-function Header() {
+function Header({ activePage }: { activePage: AppPage }) {
     return (
         <header className="sms-header">
             <div className="sms-breadcrumb">
@@ -124,12 +143,23 @@ function Header() {
                     <Menu size={16} />
                 </span>
                 <a href="#">首页</a>
-                <span className="sep">/</span>
-                <span>短信</span>
-                <span className="sep">/</span>
-                <span>运营计划管理</span>
-                <span className="sep">/</span>
-                <span style={{ color: '#031938' }}>短信</span>
+                {activePage === 'sms' ? (
+                    <>
+                        <span className="sep">/</span>
+                        <span>短信</span>
+                        <span className="sep">/</span>
+                        <span>运营计划管理</span>
+                        <span className="sep">/</span>
+                        <span style={{ color: '#031938' }}>短信</span>
+                    </>
+                ) : (
+                    <>
+                        <span className="sep">/</span>
+                        <span>运营计划</span>
+                        <span className="sep">/</span>
+                        <span style={{ color: '#031938' }}>运营计划管理</span>
+                    </>
+                )}
             </div>
             <div className="sms-header-right">
                 <span className="sms-header-time">
@@ -150,12 +180,12 @@ function Header() {
     );
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, activePage = 'sms', onNavigate }: LayoutProps) {
     return (
         <div className="sms-app">
-            <Sidebar />
+            <Sidebar activePage={activePage} onNavigate={onNavigate} />
             <div className="sms-main">
-                <Header />
+                <Header activePage={activePage} />
                 <main className="sms-content">{children}</main>
             </div>
         </div>
