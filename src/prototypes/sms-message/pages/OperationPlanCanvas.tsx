@@ -529,7 +529,9 @@ export default function OperationPlanCanvas({ planName, onBack }: OperationPlanC
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [dragover, setDragover] = useState(false);
+    const [savedTip, setSavedTip] = useState(false);
     const [linkPreview, setLinkPreview] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+    const savedTipTimer = useRef<number | null>(null);
 
     const areaRef = useRef<HTMLDivElement>(null);
     const dragRef = useRef<{
@@ -691,7 +693,17 @@ export default function OperationPlanCanvas({ planName, onBack }: OperationPlanC
                     <button type="button" className="sms-btn">
                         取 消
                     </button>
-                    <button type="button" className="sms-btn plan-canvas-save">
+                    <button
+                        type="button"
+                        className="sms-btn plan-canvas-save"
+                        onClick={() => {
+                            setSavedTip(true);
+                            if (savedTipTimer.current !== null) {
+                                window.clearTimeout(savedTipTimer.current);
+                            }
+                            savedTipTimer.current = window.setTimeout(() => setSavedTip(false), 2600);
+                        }}
+                    >
                         保 存
                     </button>
                     <button type="button" className="sms-btn sms-btn-primary plan-canvas-publish">
@@ -863,6 +875,8 @@ export default function OperationPlanCanvas({ planName, onBack }: OperationPlanC
                     })}
                 </div>
             </div>
+
+            {savedTip && <div className="plan-canvas-toast">已保存，可继续编辑</div>}
 
             {editingNode?.def.id === 'touch-precheck' && (
                 <PrecheckConfigModal
