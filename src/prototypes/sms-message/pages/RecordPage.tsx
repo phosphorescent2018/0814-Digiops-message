@@ -238,7 +238,6 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
                     <thead>
                         <tr>
                             <th className="sms-col-index">序号</th>
-                            <th className="sms-record-col-batch">批次 ID</th>
                             <th className="sms-col-sendtime">发送时间</th>
                             <th className="sms-col-business">BusinessID</th>
                             <th className="sms-col-plan">计划名称</th>
@@ -249,6 +248,7 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
                             <th className="sms-col-sender">发送名称</th>
                             <th className="sms-col-status">发送状态</th>
                             <th className="sms-record-col-delivery">送达状态</th>
+                            <th className="sms-record-col-batch">补发批次 ID</th>
                             <th className="sms-col-sol">路径标记</th>
                         </tr>
                     </thead>
@@ -256,7 +256,6 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
                         {rows.map((row) => (
                             <tr key={row.index}>
                                 <td className="sms-col-index">{row.index}</td>
-                                <td>{row.batchId ? `B${row.batchId}` : <span className="sms-dash">—</span>}</td>
                                 <td>{row.sendTime}</td>
                                 <td>
                                     <span className="sms-cell">{row.businessId}</span>
@@ -279,6 +278,7 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
                                 <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
+                                <td>{row.batchId ? `B${row.batchId}` : <span className="sms-dash">—</span>}</td>
                                 <td>
                                     <span className="sms-cell sms-dash">{row.solId}</span>
                                 </td>

@@ -255,7 +255,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             );
             setTerminating(false);
             setTerminateTarget(null);
-            showToast(`批次 ${terminateTarget.id} 已终止`);
+            showToast(`补发批次 ${terminateTarget.id} 已终止`);
         }, 600);
     };
 
@@ -399,7 +399,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <table className="sms-table resend-table resend-batch-table">
                         <thead>
                             <tr>
-                                <th>批次 ID</th>
+                                <th>补发批次 ID</th>
                                 <th>补发开始时间</th>
                                 <th>补发结束时间</th>
                                 <th>补发方式</th>
@@ -610,7 +610,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         <div className="sms-modal-header">终止补发</div>
                         <div className="sms-modal-body">
                             <p className="resend-terminate-tip">
-                                确认终止批次 <strong>B{terminateTarget.id}</strong>？
+                                确认终止补发批次 <strong>B{terminateTarget.id}</strong>？
                             </p>
                             <p className="resend-terminate-sub">
                                 终止后该批次将停止继续补发，已发送的部分不受影响。
