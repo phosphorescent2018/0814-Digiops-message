@@ -141,7 +141,12 @@ export default function AutoResend() {
                             </div>
                         </div>
                         <div className="sms-form-item">
-                            <label className="sms-form-label">补发间隔</label>
+                            <label className="sms-form-label">
+                                <span className="sms-tooltip-wrap">
+                                    补发间隔
+                                    <span className="sms-tooltip">同一条短信两次补发之间的最小间隔</span>
+                                </span>
+                            </label>
                             <div className="sms-form-control">
                                 <select className="sms-select">
                                     <option value="1">1 小时</option>
