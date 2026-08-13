@@ -23,7 +23,7 @@ export default function AutoResend() {
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
     const [saveModal, setSaveModal] = useState(false);
-    const [scheduleEnabled, setScheduleEnabled] = useState(false);
+    const [scheduleMode, setScheduleMode] = useState<'all' | 'range'>('all');
     const [windowStart, setWindowStart] = useState('08:00');
     const [windowEnd, setWindowEnd] = useState('22:00');
     const [batchThreshold, setBatchThreshold] = useState(1000);
@@ -222,16 +222,27 @@ export default function AutoResend() {
                             <label className="sms-form-label">生效时段</label>
                             <div className="sms-form-control">
                                 <div className="resend-schedule-inline">
-                                    <label className="resend-switch">
-                                        <input
-                                            type="checkbox"
-                                            checked={scheduleEnabled}
-                                            onChange={(e) => setScheduleEnabled(e.target.checked)}
-                                        />
-                                        <span className="resend-switch-slider" />
-                                        <span className="resend-switch-text">{scheduleEnabled ? '指定时段' : '全天'}</span>
-                                    </label>
-                                    {scheduleEnabled ? (
+                                    <div className="resend-radio-group">
+                                        <label className={`resend-radio-item${scheduleMode === 'all' ? ' checked' : ''}`}>
+                                            <input
+                                                type="radio"
+                                                name="scheduleMode"
+                                                checked={scheduleMode === 'all'}
+                                                onChange={() => setScheduleMode('all')}
+                                            />
+                                            全天
+                                        </label>
+                                        <label className={`resend-radio-item${scheduleMode === 'range' ? ' checked' : ''}`}>
+                                            <input
+                                                type="radio"
+                                                name="scheduleMode"
+                                                checked={scheduleMode === 'range'}
+                                                onChange={() => setScheduleMode('range')}
+                                            />
+                                            指定时段
+                                        </label>
+                                    </div>
+                                    {scheduleMode === 'range' && (
                                         <div className="resend-time-range">
                                             <input
                                                 type="time"
@@ -247,8 +258,6 @@ export default function AutoResend() {
                                                 onChange={(e) => setWindowEnd(e.target.value)}
                                             />
                                         </div>
-                                    ) : (
-                                        <span className="resend-schedule-all">不限制发送时段</span>
                                     )}
                                 </div>
                             </div>

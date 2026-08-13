@@ -1199,7 +1199,7 @@ button {
 .resend-schedule-inline {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .resend-time-range {
@@ -1210,7 +1210,7 @@ button {
 
 .resend-time-input {
     width: 120px;
-    height: 32px;
+    height: 28px;
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 0 8px;
@@ -1220,11 +1220,6 @@ button {
 }
 
 .resend-time-sep {
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.resend-schedule-all {
     color: var(--text-muted);
     font-size: 13px;
 }
