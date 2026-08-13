@@ -1303,14 +1303,14 @@ button {
 }
 
 .plan-canvas-save {
-    background: #69b1ff;
-    border-color: #69b1ff;
+    background: #1890ff;
+    border-color: #1890ff;
     color: #ffffff;
 }
 
 .plan-canvas-save:hover {
-    background: #8ac0ff;
-    border-color: #8ac0ff;
+    background: #40a9ff;
+    border-color: #40a9ff;
     color: #ffffff;
 }
 
