@@ -612,47 +612,47 @@ button {
 }
 
 .sms-record-table .sms-col-index {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-sendtime {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-business {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-plan {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-group {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-phone {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-type {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-record-col-content {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-sender {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-col-status {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table .sms-record-col-delivery {
-    width: 8%;
+    width: 7.5%;
 }
 
 .sms-record-table td.sms-record-col-delivery {
@@ -665,7 +665,11 @@ button {
 }
 
 .sms-record-table .sms-col-sol {
-    width: 8%;
+    width: 7.5%;
+}
+
+.sms-record-table .sms-record-col-batch {
+    width: 90px;
 }
 
 .sms-cell {

@@ -161,10 +161,14 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
     );
 }
 
-function RecordTable({ onExport }: { onExport: () => void }) {
+function RecordTable({ onExport, filter }: { onExport: () => void; filter?: RecordFilter }) {
     const [page, setPage] = useState(1);
-    const rows = useMemo(() => recordRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [page]);
-    const totalPages = Math.ceil(recordRows.length / PAGE_SIZE);
+    const filteredRows = useMemo(
+        () => (filter?.batchId ? recordRows.filter((r) => r.batchId === filter.batchId) : recordRows),
+        [filter?.batchId]
+    );
+    const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
+    const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
 
     const renderStatus = (status: string) => {
         const statusMap: Record<string, { className: string; text: string }> = {
@@ -234,6 +238,7 @@ function RecordTable({ onExport }: { onExport: () => void }) {
                     <thead>
                         <tr>
                             <th className="sms-col-index">序号</th>
+                            <th className="sms-record-col-batch">批次 ID</th>
                             <th className="sms-col-sendtime">发送时间</th>
                             <th className="sms-col-business">BusinessID</th>
                             <th className="sms-col-plan">计划名称</th>
@@ -251,6 +256,7 @@ function RecordTable({ onExport }: { onExport: () => void }) {
                         {rows.map((row) => (
                             <tr key={row.index}>
                                 <td className="sms-col-index">{row.index}</td>
+                                <td>{row.batchId ? `B${row.batchId}` : <span className="sms-dash">—</span>}</td>
                                 <td>{row.sendTime}</td>
                                 <td>
                                     <span className="sms-cell">{row.businessId}</span>
@@ -282,7 +288,7 @@ function RecordTable({ onExport }: { onExport: () => void }) {
                 </table>
             </div>
             <div className="sms-pagination">
-                <span className="sms-pagination-total">共 {recordRows.length} 条</span>
+                <span className="sms-pagination-total">共 {filteredRows.length} 条</span>
                 <button
                     type="button"
                     className="sms-page-btn"
@@ -330,7 +336,7 @@ export default function RecordPage({ activeKey, filter }: RecordPageProps) {
     return (
         <div>
             <SearchForm filter={filter} />
-            <RecordTable onExport={() => setExportVisible(true)} />
+            <RecordTable onExport={() => setExportVisible(true)} filter={filter} />
 
             {exportVisible && (
                 <div className="sms-mask" onClick={() => setExportVisible(false)}>

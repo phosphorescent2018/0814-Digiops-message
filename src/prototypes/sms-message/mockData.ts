@@ -16,6 +16,8 @@ export interface RecordRow {
     notifyStatus: '0' | '1' | '2';
     /** 送达状态：回执中 / 已送达 / 未送达 / 回执超时 / -- / 未知 */
     deliveryStatus: string;
+    /** 关联补发批次 ID（无批次则无） */
+    batchId?: string;
     /** 是否历史短信（历史短信送达状态一律展示 --） */
     isHistory: boolean;
     solId: string;
@@ -35,6 +37,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
         deliveryStatus: '回执中',
+        batchId: '20260812003',
         isHistory: false,
         solId: '-',
     },
@@ -51,6 +54,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
         deliveryStatus: '已送达',
+        batchId: '20260812003',
         isHistory: false,
         solId: '-',
     },
@@ -67,6 +71,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
         deliveryStatus: '未送达',
+        batchId: '20260812002',
         isHistory: false,
         solId: '-',
     },
@@ -83,6 +88,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
         deliveryStatus: '回执超时',
+        batchId: '20260812002',
         isHistory: false,
         solId: '-',
     },
@@ -115,6 +121,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '0',
         deliveryStatus: '未知',
+        batchId: '20260812004',
         isHistory: false,
         solId: '-',
     },
@@ -131,6 +138,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '1',
         deliveryStatus: '--',
+        batchId: '20260812002',
         isHistory: false,
         solId: '-',
     },

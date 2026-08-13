@@ -17,6 +17,7 @@ export interface RecordFilter {
     sendTimeEnd?: string;
     businessId?: string;
     deliveryStatus?: string;
+    batchId?: string;
 }
 
 interface DetailRow {
@@ -268,6 +269,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                                 sendTimeEnd: '2026-08-12',
                                                 businessId: 'MTN_UG_Account_id',
                                                 deliveryStatus: '回执超时',
+                                                batchId: batch.id,
                                             })
                                         }
                                     >
