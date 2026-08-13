@@ -294,3 +294,30 @@ export const statusOptions = [
     { value: '1', label: '失败' },
     { value: '0', label: '暂无数据' },
 ];
+
+/** 黑名单：名单库资产，供人工补发 / 自动补发 / 运营计划前置校验使用 */
+export interface BlacklistRow {
+    index: number;
+    phone: string;
+    businessId: string;
+    addTime: string;
+    effectiveTime: string;
+    expireTime: string;
+    status: 'active' | 'expired';
+    remark: string;
+}
+
+export const blacklistRows: BlacklistRow[] = [
+    { index: 1, phone: '2567****1234', businessId: 'MTN_UG_Account_id', addTime: '2026-08-12 10:24:18', effectiveTime: '2026-08-12 10:24:18', expireTime: '永久', status: 'active', remark: '回执超时 3 次，自动加入' },
+    { index: 2, phone: '2567****8901', businessId: 'MTN_UG_Account_id', addTime: '2026-08-12 09:41:02', effectiveTime: '2026-08-12 09:41:02', expireTime: '2026-09-30 23:59:59', status: 'active', remark: '用户投诉，临时屏蔽至月底' },
+    { index: 3, phone: '2567****3456', businessId: 'MTN_UG_Product_id', addTime: '2026-08-11 17:08:45', effectiveTime: '2026-08-11 17:08:45', expireTime: '永久', status: 'active', remark: '计划「新客激活活动」命中黑名单' },
+    { index: 4, phone: '2567****7890', businessId: 'MTN_UG_Account_id', addTime: '2026-08-11 15:32:19', effectiveTime: '2026-08-11 15:32:19', expireTime: '永久', status: 'active', remark: '补发前校验命中黑名单' },
+    { index: 5, phone: '2567****2345', businessId: 'MTN_UG_Account_id', addTime: '2026-08-10 11:15:37', effectiveTime: '2026-08-10 11:15:37', expireTime: '2026-08-20 23:59:59', status: 'active', remark: '号码停机，等待复机' },
+    { index: 6, phone: '2567****6789', businessId: 'MTN_UG_Product_id', addTime: '2026-08-10 09:02:11', effectiveTime: '2026-08-10 09:02:11', expireTime: '永久', status: 'active', remark: '未送达 2 次，自动加入' },
+    { index: 7, phone: '2567****0123', businessId: 'MTN_UG_Account_id', addTime: '2026-08-09 16:47:53', effectiveTime: '2026-08-09 16:47:53', expireTime: '2026-09-15 23:59:59', status: 'active', remark: '计划「还款提醒」命中黑名单' },
+    { index: 8, phone: '2567****4567', businessId: 'MTN_UG_Account_id', addTime: '2026-08-08 14:20:08', effectiveTime: '2026-08-08 14:20:08', expireTime: '永久', status: 'active', remark: '运营反馈高投诉用户' },
+    { index: 9, phone: '2567****8901', businessId: 'MTN_UG_Product_id', addTime: '2026-08-07 10:33:26', effectiveTime: '2026-08-07 10:33:26', expireTime: '2026-08-07 23:59:59', status: 'expired', remark: '历史批次临时排除，已到期' },
+    { index: 10, phone: '2567****2345', businessId: 'MTN_UG_Account_id', addTime: '2026-08-06 18:55:44', effectiveTime: '2026-08-06 18:55:44', expireTime: '永久', status: 'active', remark: '提交失败 3 次，自动加入' },
+    { index: 11, phone: '2567****6789', businessId: 'MTN_UG_Account_id', addTime: '2026-08-05 12:08:31', effectiveTime: '2026-08-05 12:08:31', expireTime: '2026-08-12 23:59:59', status: 'expired', remark: '短期风控名单，已到期' },
+    { index: 12, phone: '2567****0123', businessId: 'MTN_UG_Product_id', addTime: '2026-08-04 09:14:57', effectiveTime: '2026-08-04 09:14:57', expireTime: '永久', status: 'active', remark: '计划「逾期提醒」命中黑名单' },
+];

@@ -3311,7 +3311,7 @@ button {
 }
 
 /* ================================================================
-   黑名单
+  黑名单
    ================================================================ */
 
 .blacklist-tip {
@@ -3348,14 +3348,33 @@ button {
 }
 
 .blacklist-search .sms-search-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
 }
 
-.blacklist-search-divider {
-    width: 1px;
-    height: 20px;
-    margin: 0 4px;
-    background: var(--border-soft);
+.blacklist-search .sms-form-label {
+    width: 80px;
+}
+
+.blacklist-search-actions {
+    justify-content: space-between;
+}
+
+.blacklist-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.blacklist-search .sms-date-range {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.blacklist-search .sms-date-range .arrow {
+    margin: 0;
 }
 
 .blacklist-card {
@@ -3402,8 +3421,8 @@ button {
     width: 150px;
 }
 
-.blacklist-col-source {
-    width: 110px;
+.blacklist-col-business {
+    width: 170px;
 }
 
 .blacklist-col-time {
@@ -3427,15 +3446,11 @@ button {
     color: var(--text-main);
 }
 
-.blacklist-source {
-    display: inline-flex;
-    align-items: center;
-    height: 22px;
-    padding: 0 8px;
-    border-radius: 3px;
-    background: #f5f5f5;
-    color: #595959;
-    font-size: 12px;
+.blacklist-cell {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .blacklist-remark {
@@ -3521,6 +3536,11 @@ button {
     accent-color: var(--primary);
 }
 
+.blacklist-required {
+    color: #f5222d;
+    margin-right: 2px;
+}
+
 .blacklist-expire-inline {
     display: inline-flex;
     align-items: center;
@@ -3538,6 +3558,132 @@ button {
     font-size: 13px;
     background: #ffffff;
     white-space: nowrap;
+    cursor: pointer;
+}
+
+.blacklist-expire-date.has-value {
+    color: var(--text-main);
+}
+
+.blacklist-date-picker {
+    position: relative;
+    display: inline-flex;
+}
+
+.blacklist-filter-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.blacklist-filter-date-arrow {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: #cbd0db;
+}
+
+.blacklist-filter-date .blacklist-expire-date {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+
+.blacklist-date-pop {
+    position: fixed;
+    z-index: 220;
+    width: 264px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(30, 45, 75, 0.16);
+}
+
+.blacklist-date-pop-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.blacklist-date-pop-head span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.blacklist-date-pop-head button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.blacklist-date-pop-head button:hover {
+    background: #f0f2f5;
+    color: var(--primary);
+}
+
+.blacklist-date-pop-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.blacklist-date-pop-week span {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.blacklist-date-pop-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.blacklist-date-cell {
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    font-size: 13px;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.blacklist-date-cell:hover:not(.empty) {
+    background: #f0f5ff;
+    color: var(--primary);
+}
+
+.blacklist-date-cell.empty {
+    cursor: default;
+}
+
+.blacklist-date-cell.today {
+    border: 1px solid var(--primary);
+}
+
+.blacklist-date-cell.selected {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.blacklist-date-cell.selected:hover {
+    background: var(--primary);
+    color: #ffffff;
 }
 
 .blacklist-file-drop {
@@ -3571,6 +3717,12 @@ button {
     color: #ad6800;
     font-size: 13px;
     line-height: 1.5;
+}
+
+.blacklist-import-template {
+    display: inline-block;
+    margin-top: 12px;
+    margin-right: 0;
 }
 
 .blacklist-remove-tip {

@@ -1,0 +1,635 @@
+/**
+ * 黑名单：名单库资产管理
+ * 供人工补发（提交前可选手动过滤）、自动补发（默认强制校验）、运营计划前置校验（可选配置）使用
+ */
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import {
+    Download,
+    Upload,
+    Plus,
+    RotateCcw,
+    Search,
+    Calendar,
+    ChevronLeft,
+    ChevronRight,
+    ArrowRight,
+    Info,
+    CheckCircle2,
+    FileSpreadsheet,
+} from 'lucide-react';
+import { blacklistRows, type BlacklistRow } from '../mockData';
+import ExportModal from '../components/ExportModal';
+
+const PAGE_SIZE = 10;
+
+/** 状态 hover 提示 */
+function BlacklistTooltip({ text, children }: { text: string; children: React.ReactNode }) {
+    return (
+        <span className="sms-tooltip-wrap">
+            {children}
+            <span className="sms-tooltip">{text}</span>
+        </span>
+    );
+}
+
+function SearchForm() {
+    const [collapsed, setCollapsed] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+
+    const renderSelect = (placeholder = '请选择', options?: string[]) => (
+        <select className="sms-select placeholder" defaultValue="">
+            <option value="">{placeholder}</option>
+            {options?.map((opt) => (
+                <option key={opt} value={opt}>
+                    {opt}
+                </option>
+            ))}
+        </select>
+    );
+
+    return (
+        <div className="sms-card sms-search blacklist-search">
+            <div className="sms-search-grid">
+                <div className="sms-form-item">
+                    <label className="sms-form-label">手机号码</label>
+                    <div className="sms-form-control">
+                        <input className="sms-input" placeholder="请输入" />
+                    </div>
+                </div>
+                <div className="sms-form-item">
+                    <label className="sms-form-label">状态</label>
+                    <div className="sms-form-control">{renderSelect(undefined, ['生效中', '已失效'])}</div>
+                </div>
+                {!collapsed && (
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">添加日期</label>
+                        <div className="sms-form-control">
+                            <div className="blacklist-filter-date">
+                                <ExpireDatePicker value={startDate} onChange={setStartDate} placeholder="起始日期" />
+                                <span className="blacklist-filter-date-arrow">
+                                    <ArrowRight size={12} />
+                                </span>
+                                <ExpireDatePicker value={endDate} onChange={setEndDate} placeholder="结束日期" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+            <div className="sms-search-actions blacklist-search-actions">
+                <div className="blacklist-actions-left">
+                    <button type="button" className="sms-btn">
+                        <RotateCcw size={14} />
+                        重置
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary">
+                        <Search size={14} />
+                        查询
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
+                        {collapsed ? '展开' : '收起'}
+                        <ArrowRight size={14} style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(90deg)' }} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/** 日期选择：轻量日历弹层，仅用于原型演示 */
+function ExpireDatePicker({
+    value,
+    onChange,
+    placeholder = '选择日期',
+}: {
+    value: string;
+    onChange: (date: string) => void;
+    placeholder?: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+    const [view, setView] = useState(() => {
+        const now = new Date();
+        return { year: now.getFullYear(), month: now.getMonth() };
+    });
+    const triggerRef = useRef<HTMLDivElement>(null);
+
+    const openPicker = () => {
+        const rect = triggerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        setPos({ top: Math.round(rect.bottom + 4), left: Math.round(rect.left) });
+        setOpen(true);
+    };
+
+    useEffect(() => {
+        if (!open) return;
+        const onDocMouseDown = (e: MouseEvent) => {
+            const pop = document.querySelector('.blacklist-date-pop');
+            if (pop && !pop.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener('mousedown', onDocMouseDown);
+        return () => document.removeEventListener('mousedown', onDocMouseDown);
+    }, [open]);
+
+    const today = new Date();
+    const firstDay = new Date(view.year, view.month, 1);
+    const startWeekday = firstDay.getDay();
+    const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
+    const cells: (number | null)[] = [
+        ...Array.from({ length: startWeekday }, () => null),
+        ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+    ];
+
+    const selectDate = (day: number) => {
+        onChange(`${view.year}-${String(view.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+        setOpen(false);
+    };
+
+    return (
+        <div className="blacklist-date-picker">
+            <div
+                ref={triggerRef}
+                className={`sms-date-range blacklist-expire-date${value ? ' has-value' : ''}`}
+                onClick={openPicker}
+                role="button"
+                tabIndex={0}
+            >
+                <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
+                {value || placeholder}
+            </div>
+            {open &&
+                pos &&
+                createPortal(
+                    <div className="blacklist-date-pop" style={{ top: pos.top, left: pos.left }}>
+                        <div className="blacklist-date-pop-head">
+                            <button type="button" onClick={() => setView((v) => (v.month === 0 ? { year: v.year - 1, month: 11 } : { ...v, month: v.month - 1 }))}>
+                                <ChevronLeft size={14} />
+                            </button>
+                            <span>
+                                {view.year} 年 {view.month + 1} 月
+                            </span>
+                            <button type="button" onClick={() => setView((v) => (v.month === 11 ? { year: v.year + 1, month: 0 } : { ...v, month: v.month + 1 }))}>
+                                <ChevronRight size={14} />
+                            </button>
+                        </div>
+                        <div className="blacklist-date-pop-week">
+                            {['日', '一', '二', '三', '四', '五', '六'].map((w) => (
+                                <span key={w}>{w}</span>
+                            ))}
+                        </div>
+                        <div className="blacklist-date-pop-grid">
+                            {cells.map((day, i) => (
+                                <button
+                                    type="button"
+                                    key={i}
+                                    className={[
+                                        'blacklist-date-cell',
+                                        day === null ? ' empty' : '',
+                                        day === today.getDate() && view.month === today.getMonth() && view.year === today.getFullYear() ? ' today' : '',
+                                        value === `${view.year}-${String(view.month + 1).padStart(2, '0')}-${String(day ?? '').padStart(2, '0')}` ? ' selected' : '',
+                                    ].join('')}
+                                    disabled={day === null}
+                                    onClick={() => day !== null && selectDate(day)}
+                                >
+                                    {day ?? ''}
+                                </button>
+                            ))}
+                        </div>
+                    </div>,
+                    document.body
+                )}
+        </div>
+    );
+}
+
+function BlacklistTable({
+    onAdd,
+    onImport,
+    onRemove,
+    onDetail,
+    onExport,
+}: {
+    onAdd: () => void;
+    onImport: () => void;
+    onRemove: (row: BlacklistRow) => void;
+    onDetail: (row: BlacklistRow) => void;
+    onExport: () => void;
+}) {
+    const [page, setPage] = useState(1);
+    const rows = blacklistRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const totalPages = Math.ceil(blacklistRows.length / PAGE_SIZE);
+
+    return (
+        <div className="sms-card sms-table-card blacklist-card">
+            <div className="sms-toolbar">
+                <span className="blacklist-table-title">黑名单列表</span>
+                <div className="sms-toolbar-right">
+                    <button type="button" className="sms-btn" onClick={onImport}>
+                        <Upload size={14} />
+                        批量导入
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onAdd}>
+                        <Plus size={14} />
+                        新增黑名单
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onExport}>
+                        <Download size={14} />
+                        导出
+                    </button>
+                </div>
+            </div>
+            <div className="sms-table-wrap">
+                <table className="sms-table blacklist-table">
+                    <thead>
+                        <tr>
+                            <th className="blacklist-col-index">序号</th>
+                            <th className="blacklist-col-phone">手机号码</th>
+                            <th className="blacklist-col-business">BusinessID</th>
+                            <th className="blacklist-col-time">添加时间</th>
+                            <th className="blacklist-col-time">生效时间</th>
+                            <th className="blacklist-col-time">失效时间</th>
+                            <th className="blacklist-col-status">状态</th>
+                            <th className="blacklist-col-remark">备注</th>
+                            <th className="blacklist-col-actions">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.map((row) => (
+                            <tr key={row.index}>
+                                <td className="blacklist-col-index">{row.index}</td>
+                                <td className="blacklist-col-phone">
+                                    <span className="blacklist-phone">{row.phone}</span>
+                                </td>
+                                <td className="blacklist-col-business">
+                                    <span className="blacklist-cell" title={row.businessId}>
+                                        {row.businessId}
+                                    </span>
+                                </td>
+                                <td className="blacklist-col-time">{row.addTime}</td>
+                                <td className="blacklist-col-time">{row.effectiveTime}</td>
+                                <td className="blacklist-col-time">
+                                    {row.expireTime === '永久' ? (
+                                        <span className="sms-dash">永久</span>
+                                    ) : (
+                                        row.expireTime
+                                    )}
+                                </td>
+                                <td className="blacklist-col-status">
+                                    {row.status === 'active' ? (
+                                        <BlacklistTooltip text="参与补发 / 发送拦截">
+                                            <span className="sms-status sms-status-success">生效中</span>
+                                        </BlacklistTooltip>
+                                    ) : (
+                                        <BlacklistTooltip text="不再参与拦截">
+                                            <span className="sms-status sms-status-unknown">已失效</span>
+                                        </BlacklistTooltip>
+                                    )}
+                                </td>
+                                <td className="blacklist-col-remark">
+                                    <span className="blacklist-remark" title={row.remark}>
+                                        {row.remark}
+                                    </span>
+                                </td>
+                                <td className="blacklist-col-actions">
+                                    <button type="button" className="sms-action-link" onClick={() => onDetail(row)}>
+                                        查看
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="sms-action-link sms-action-danger"
+                                        onClick={() => onRemove(row)}
+                                    >
+                                        移除
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="sms-pagination">
+                <span className="sms-pagination-total">共 {blacklistRows.length} 条</span>
+                <button
+                    type="button"
+                    className="sms-page-btn"
+                    disabled={page <= 1}
+                    onClick={() => setPage(page - 1)}
+                >
+                    ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <button
+                        type="button"
+                        key={p}
+                        className={`sms-page-btn${p === page ? ' active' : ''}`}
+                        onClick={() => setPage(p)}
+                    >
+                        {p}
+                    </button>
+                ))}
+                <button
+                    type="button"
+                    className="sms-page-btn"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage(page + 1)}
+                >
+                    ›
+                </button>
+                <select className="sms-page-size" defaultValue={PAGE_SIZE}>
+                    <option value={10}>10 条/页</option>
+                    <option value={20}>20 条/页</option>
+                    <option value={50}>50 条/页</option>
+                </select>
+            </div>
+        </div>
+    );
+}
+
+function AddModal({ onClose }: { onClose: () => void }) {
+    const [expireType, setExpireType] = useState<'forever' | 'expire'>('forever');
+    const [expireDate, setExpireDate] = useState('');
+    const [phones, setPhones] = useState('');
+    const [businessId, setBusinessId] = useState('');
+
+    const canSubmit = phones.trim() !== '' && businessId.trim() !== '' && (expireType === 'forever' || expireDate !== '');
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal blacklist-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">新增黑名单</div>
+                <div className="sms-modal-body">
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">
+                            <span className="blacklist-required">*</span>手机号码
+                        </label>
+                        <div className="sms-form-control">
+                            <textarea
+                                className="blacklist-textarea"
+                                placeholder={'每行一个手机号码\n支持批量添加'}
+                                rows={4}
+                                value={phones}
+                                onChange={(e) => setPhones(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">
+                            <span className="blacklist-required">*</span>BusinessID
+                        </label>
+                        <div className="sms-form-control">
+                            <input
+                                className="sms-input"
+                                placeholder="请输入 BusinessID"
+                                value={businessId}
+                                onChange={(e) => setBusinessId(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">
+                            <span className="blacklist-required">*</span>有效期
+                        </label>
+                        <div className="sms-form-control">
+                            <div className="blacklist-radio-group">
+                                <label className="blacklist-radio">
+                                    <input
+                                        type="radio"
+                                        name="expireType"
+                                        checked={expireType === 'forever'}
+                                        onChange={() => setExpireType('forever')}
+                                    />
+                                    永久
+                                </label>
+                                <label className="blacklist-radio">
+                                    <input
+                                        type="radio"
+                                        name="expireType"
+                                        checked={expireType === 'expire'}
+                                        onChange={() => setExpireType('expire')}
+                                    />
+                                    指定时间
+                                </label>
+                                {expireType === 'expire' && (
+                                    <div className="blacklist-expire-inline">
+                                        <ExpireDatePicker value={expireDate} onChange={setExpireDate} />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">备注</label>
+                        <div className="sms-form-control">
+                            <input className="sms-input" placeholder="请输入备注" />
+                        </div>
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" disabled={!canSubmit} onClick={onClose}>
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ImportModal({ onClose }: { onClose: () => void }) {
+    const [templateTip, setTemplateTip] = useState('');
+
+    const downloadTemplate = () => {
+        setTemplateTip('黑名单导入模板下载成功');
+        window.setTimeout(() => setTemplateTip(''), 2500);
+    };
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal blacklist-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">批量导入黑名单</div>
+                <div className="sms-modal-body">
+                    <div className="blacklist-file-drop">
+                        <FileSpreadsheet size={28} />
+                        <span>点击选择或拖拽文件到此处</span>
+                        <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；每次仅允许上传 1 万条</span>
+                        <button type="button" className="sms-btn">
+                            选择文件
+                        </button>
+                    </div>
+                    <div className="blacklist-import-tip">
+                        导入前请确认号码格式正确，导入后立即生效；已有号码将自动跳过。
+                    </div>
+                    <button
+                        type="button"
+                        className="sms-action-link blacklist-import-template"
+                        onClick={downloadTemplate}
+                    >
+                        下载导入模板
+                    </button>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onClose}>
+                        确定
+                    </button>
+                </div>
+            </div>
+            {templateTip && (
+                <div className="resend-toast">
+                    <CheckCircle2 size={15} />
+                    {templateTip}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function RemoveModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">移除黑名单</div>
+                <div className="sms-modal-body">
+                    <div className="resend-danger-text">
+                        确认移除 <b>{row.phone}</b> 吗？
+                    </div>
+                    <div className="blacklist-remove-tip">
+                        移除后该号码将不再被黑名单拦截，人工补发、自动补发及运营计划将可能向其发送短信。
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button type="button" className="sms-btn resend-danger-btn" onClick={onClose}>
+                        确认移除
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function DetailModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
+    const hits = [
+        { time: '2026-08-13 09:32:18', source: '自动补发校验', result: '已拦截，未进入补发队列' },
+        { time: '2026-08-13 08:15:47', source: '运营计划 · 新客激活活动', result: '命中黑名单，流向结束节点' },
+        { time: '2026-08-12 19:04:22', source: '人工补发校验', result: '命中黑名单，未计入可补数量' },
+    ];
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal blacklist-modal blacklist-detail-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">黑名单详情</div>
+                <div className="sms-modal-body">
+                    <div className="blacklist-detail-grid">
+                        <div>
+                            <span className="blacklist-detail-label">手机号码</span>
+                            <span className="blacklist-detail-value">{row.phone}</span>
+                        </div>
+                        <div>
+                            <span className="blacklist-detail-label">BusinessID</span>
+                            <span className="blacklist-detail-value">{row.businessId}</span>
+                        </div>
+                        <div>
+                            <span className="blacklist-detail-label">添加时间</span>
+                            <span className="blacklist-detail-value">{row.addTime}</span>
+                        </div>
+                        <div>
+                            <span className="blacklist-detail-label">生效时间</span>
+                            <span className="blacklist-detail-value">{row.effectiveTime}</span>
+                        </div>
+                        <div>
+                            <span className="blacklist-detail-label">失效时间</span>
+                            <span className="blacklist-detail-value">{row.expireTime}</span>
+                        </div>
+                        <div>
+                            <span className="blacklist-detail-label">状态</span>
+                            <span className="blacklist-detail-value">
+                                {row.status === 'active' ? '生效中' : '已失效'}
+                            </span>
+                        </div>
+                        <div className="blacklist-detail-full">
+                            <span className="blacklist-detail-label">备注</span>
+                            <span className="blacklist-detail-value">{row.remark}</span>
+                        </div>
+                    </div>
+                    <div className="blacklist-hit-title">最近拦截记录</div>
+                    <div className="blacklist-hit-list">
+                        {hits.map((hit, i) => (
+                            <div className="blacklist-hit-item" key={i}>
+                                <span className="blacklist-hit-time">{hit.time}</span>
+                                <span className="blacklist-hit-source">{hit.source}</span>
+                                <span className="sms-status sms-status-fail">{hit.result}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onClose}>
+                        知道了
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function BlacklistPage() {
+    const [exportVisible, setExportVisible] = useState(false);
+    const [addVisible, setAddVisible] = useState(false);
+    const [importVisible, setImportVisible] = useState(false);
+    const [removeTarget, setRemoveTarget] = useState<BlacklistRow | null>(null);
+    const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
+
+    const stats = [
+        { label: '名单总数', value: '12,847', tone: '' },
+        { label: '生效中', value: '11,203', tone: 'success' },
+        { label: '已失效', value: '1,644', tone: 'unknown' },
+        { label: '今日拦截', value: '236', tone: 'danger' },
+    ];
+
+    return (
+        <div className="blacklist-page">
+            <div className="blacklist-tip">
+                <Info size={14} />
+                <span>
+                    人工补发可选手动过滤，自动补发默认强制校验，支持在运营计划画布中配置。
+                </span>
+            </div>
+
+            <div className="blacklist-stat-row">
+                {stats.map((s) => (
+                    <div className="resend-stat-card" key={s.label}>
+                        <div className="resend-stat-main">
+                            <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
+                            <div className="resend-stat-label">{s.label}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="blacklist-section">
+                <SearchForm />
+                <BlacklistTable
+                    onAdd={() => setAddVisible(true)}
+                    onImport={() => setImportVisible(true)}
+                    onRemove={(row) => setRemoveTarget(row)}
+                    onDetail={(row) => setDetailTarget(row)}
+                    onExport={() => setExportVisible(true)}
+                />
+            </div>
+
+            {exportVisible && <ExportModal visible defaultName="黑名单_20260813" onClose={() => setExportVisible(false)} />}
+            {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
+            {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
+            {removeTarget && <RemoveModal row={removeTarget} onClose={() => setRemoveTarget(null)} />}
+            {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
+        </div>
+    );
+}

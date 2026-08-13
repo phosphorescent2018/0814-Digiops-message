@@ -7,20 +7,22 @@ import TemplatePage from './pages/TemplatePage';
 import RecordPage from './pages/RecordPage';
 import ReportPage from './pages/ReportPage';
 import ResendCenter from './pages/ResendCenter';
+import BlacklistPage from './pages/BlacklistPage';
 import OperationPlanPage from './pages/OperationPlanPage';
 import type { RecordFilter } from './pages/resend/BatchDetail';
-import { MessageSquareText, MessageCircle, BarChart3, Send } from 'lucide-react';
+import { MessageSquareText, MessageCircle, BarChart3, Send, Ban } from 'lucide-react';
 import './style.css';
 import { AnnotationViewer, type AnnotationSourceDocument } from '@axhub/annotation';
 import annotationSourceDocument from './annotation-source.json';
 
-type TabKey = 'template' | 'record' | 'report' | 'resend';
+type TabKey = 'template' | 'record' | 'report' | 'resend' | 'blacklist';
 
 const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'template', label: '模版', icon: MessageSquareText },
     { key: 'record', label: '发送记录', icon: MessageCircle },
     { key: 'report', label: '报表', icon: BarChart3 },
     { key: 'resend', label: '补发中心', icon: Send },
+    { key: 'blacklist', label: '黑名单', icon: Ban },
 ];
 
 export default function SmsMessage() {
@@ -63,6 +65,7 @@ export default function SmsMessage() {
                               }}
                           />
                       )}
+                      {activeTab === 'blacklist' && <BlacklistPage />}
                   </>
               )}
           </Layout>
