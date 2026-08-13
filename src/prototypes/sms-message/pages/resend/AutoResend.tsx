@@ -50,7 +50,7 @@ export default function AutoResend() {
         { label: '今日补发', value: 128, tone: '' },
         { label: '补发成功', value: 96, tone: 'success' },
         { label: '补发失败', value: 21, tone: 'danger' },
-        { label: '队列中', value: 11, tone: 'warn' },
+        { label: '队列中', value: enabled ? 11 : 0, tone: 'warn' },
     ];
 
     return (
@@ -68,9 +68,7 @@ export default function AutoResend() {
             </div>
             <div className="resend-queue-tip">
                 <Clock size={14} />
-                <span>
-                    队列中 11 条 · 预计 14:05 发送 · 满 {batchThreshold.toLocaleString()} 条提前触发
-                </span>
+                <span>{enabled ? `队列中 11 条 · 预计 14:05 发送 · 满 ${batchThreshold.toLocaleString()} 条提前触发` : '自动补发已关闭'}</span>
             </div>
 
             {/* 规则配置 */}
