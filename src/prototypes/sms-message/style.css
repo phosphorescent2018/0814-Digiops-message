@@ -1124,6 +1124,11 @@ button {
     border: 1px solid var(--border-soft);
 }
 
+/* 自动补发内容与子 Tab 拉开间距 */
+.resend-auto {
+    margin-top: 16px;
+}
+
 .resend-section + .resend-section {
     margin-top: 16px;
 }
