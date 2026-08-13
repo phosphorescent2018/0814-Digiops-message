@@ -4,6 +4,8 @@
 import React, { useState } from 'react';
 import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar } from 'lucide-react';
 import BatchDetail from './BatchDetail';
+import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
+import ExportModal from '../../components/ExportModal';
 import type { RecordFilter } from './BatchDetail';
 
 interface ManualResendProps {
@@ -135,6 +137,17 @@ export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完�
 type ModalType = 'immediate' | 'scheduled' | null;
 type IgnoreBlacklist = 'yes' | 'no';
 
+const MANUAL_COLUMNS: ColumnDef[] = [
+    { key: 'batchId', label: '补发批次 ID' },
+    { key: 'startTime', label: '补发开始时间' },
+    { key: 'endTime', label: '补发结束时间' },
+    { key: 'mode', label: '补发方式' },
+    { key: 'userVerified', label: '提交校验数量' },
+    { key: 'systemVerified', label: '实际发送数量' },
+    { key: 'status', label: '补发状态' },
+    { key: 'action', label: '操作', fixed: true },
+];
+
 export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
     const [querying, setQuerying] = useState(false);
@@ -153,6 +166,12 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [terminating, setTerminating] = useState(false);
     const [batches, setBatches] = useState<BatchRow[]>(BATCHES);
     const [detailBatch, setDetailBatch] = useState<BatchRow | null>(null);
+    const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
+    const [exportVisible, setExportVisible] = useState(false);
+
+    const toggleCol = (key: string, checked: boolean) => {
+        setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
+    };
 
     const showToast = (text: string) => {
         setToast(text);
@@ -381,32 +400,45 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
 
             {/* ============ 板块二：批次补发记录 ============ */}
             <div className="sms-card resend-section">
-                <div className="resend-section-title">
-                    <span>人工补发记录</span>
-                    <span className="resend-section-sub">共 {batches.length} 个批次</span>
+                <div className="resend-table-toolbar">
+                    <div className="resend-section-title">
+                        <span>人工补发记录</span>
+                        <span className="resend-section-sub">共 {batches.length} 个批次</span>
+                    </div>
+                    <div className="resend-table-toolbar-actions">
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setExportVisible(true)}>
+                            <Download size={14} />
+                            导出
+                        </button>
+                        <ColumnSettings columns={MANUAL_COLUMNS} visible={visibleCols} onChange={toggleCol} />
+                    </div>
                 </div>
                 <div className="sms-table-wrap resend-batch-wrap">
                     <table className="sms-table resend-table resend-batch-table">
                         <thead>
                             <tr>
-                                <th>补发批次 ID</th>
-                                <th>补发开始时间</th>
-                                <th>补发结束时间</th>
-                                <th>补发方式</th>
-                                <th className="resend-th-tooltip">
-                                    <span className="sms-tooltip-wrap">
-                                        提交校验数量
-                                        <span className="sms-tooltip">提交前用户校验的补发数量</span>
-                                    </span>
-                                </th>
-                                <th className="resend-th-tooltip">
-                                    <span className="sms-tooltip-wrap">
-                                        实际发送数量
-                                        <span className="sms-tooltip">实际执行了发送动作的条数</span>
-                                    </span>
-                                </th>
-                                <th>补发状态</th>
-                                <th style={{ width: 160 }}>操作</th>
+                                {visibleCols.includes('batchId') && <th>补发批次 ID</th>}
+                                {visibleCols.includes('startTime') && <th>补发开始时间</th>}
+                                {visibleCols.includes('endTime') && <th>补发结束时间</th>}
+                                {visibleCols.includes('mode') && <th>补发方式</th>}
+                                {visibleCols.includes('userVerified') && (
+                                    <th className="resend-th-tooltip">
+                                        <span className="sms-tooltip-wrap">
+                                            提交校验数量
+                                            <span className="sms-tooltip">提交前用户校验的补发数量</span>
+                                        </span>
+                                    </th>
+                                )}
+                                {visibleCols.includes('systemVerified') && (
+                                    <th className="resend-th-tooltip">
+                                        <span className="sms-tooltip-wrap">
+                                            实际发送数量
+                                            <span className="sms-tooltip">实际执行了发送动作的条数</span>
+                                        </span>
+                                    </th>
+                                )}
+                                {visibleCols.includes('status') && <th>补发状态</th>}
+                                {visibleCols.includes('action') && <th style={{ width: 160 }}>操作</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -415,36 +447,44 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 const canTerminate = status === '待执行' || status === '执行中';
                                 return (
                                     <tr key={b.id}>
-                                        <td>
-                                            <span className="resend-batch-id">B{b.id}</span>
-                                        </td>
-                                        <td>{b.scheduledTime}</td>
-                                        <td>{b.endTime}</td>
-                                        <td>{b.mode}</td>
-                                        <td>{b.userVerifiedCount.toLocaleString()}</td>
-                                        <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
-                                        <td>
-                                            <span className={`sms-status ${STATUS_CLASS[status]}`}>{status}</span>
-                                        </td>
-                                        <td>
-                                            <button
-                                                type="button"
-                                                className="sms-action-link"
-                                                onClick={() => setDetailBatch(b)}
-                                            >
-                                                <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                                详情
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="sms-action-link resend-terminate"
-                                                disabled={!canTerminate}
-                                                onClick={() => setTerminateTarget(b)}
-                                            >
-                                                <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                                终止
-                                            </button>
-                                        </td>
+                                        {visibleCols.includes('batchId') && (
+                                            <td>
+                                                <span className="resend-batch-id">B{b.id}</span>
+                                            </td>
+                                        )}
+                                        {visibleCols.includes('startTime') && <td>{b.scheduledTime}</td>}
+                                        {visibleCols.includes('endTime') && <td>{b.endTime}</td>}
+                                        {visibleCols.includes('mode') && <td>{b.mode}</td>}
+                                        {visibleCols.includes('userVerified') && <td>{b.userVerifiedCount.toLocaleString()}</td>}
+                                        {visibleCols.includes('systemVerified') && (
+                                            <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
+                                        )}
+                                        {visibleCols.includes('status') && (
+                                            <td>
+                                                <span className={`sms-status ${STATUS_CLASS[status]}`}>{status}</span>
+                                            </td>
+                                        )}
+                                        {visibleCols.includes('action') && (
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="sms-action-link"
+                                                    onClick={() => setDetailBatch(b)}
+                                                >
+                                                    <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                    详情
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="sms-action-link resend-terminate"
+                                                    disabled={!canTerminate}
+                                                    onClick={() => setTerminateTarget(b)}
+                                                >
+                                                    <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                    终止
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 );
                             })}
@@ -636,6 +676,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     {toast}
                 </div>
             )}
+
+            {/* 导出补发记录 */}
+            <ExportModal
+                visible={exportVisible}
+                defaultName="人工补发记录_20260813"
+                onClose={() => setExportVisible(false)}
+            />
         </div>
     );
 }

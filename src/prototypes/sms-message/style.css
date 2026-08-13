@@ -2150,6 +2150,83 @@ button {
     gap: 10px;
 }
 
+/* 补发记录：表格工具栏（标题 + 导出 / 列设置） */
+.resend-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.resend-table-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 列设置 */
+.column-settings {
+    position: relative;
+}
+
+.column-settings .sms-btn-icon.active {
+    background: #e6f4ff;
+    border-color: #91caff;
+    color: var(--primary);
+}
+
+.column-settings-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 80;
+    width: 168px;
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(30, 45, 75, 0.14);
+}
+
+.column-settings-head {
+    padding: 2px 8px 8px;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.column-settings-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-main);
+    cursor: pointer;
+    user-select: none;
+}
+
+.column-settings-item:hover {
+    background: #f5f7fa;
+}
+
+.column-settings-item.fixed {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.column-settings-item.fixed:hover {
+    background: transparent;
+}
+
+.column-settings-item input {
+    accent-color: var(--primary);
+}
+
 /* 自动补发：规则 */
 .resend-rule-header {
     display: flex;

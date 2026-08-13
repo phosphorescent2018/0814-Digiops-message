@@ -2,8 +2,10 @@
  * 自动补发：规则配置 + 运行统计 + 补发记录
  */
 import React, { useRef, useState } from 'react';
-import { Save, Check, RefreshCw, Clock, AlertCircle, Eye, Info } from 'lucide-react';
+import { Save, Check, RefreshCw, Clock, AlertCircle, Eye, Info, Download } from 'lucide-react';
 import AutoBatchDetail, { AUTO_BATCH_STATUS_CLASS, type AutoBatchRow } from './AutoBatchDetail';
+import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
+import ExportModal from '../../components/ExportModal';
 import type { RecordFilter } from './BatchDetail';
 
 const AUTO_BATCHES: AutoBatchRow[] = [
@@ -64,6 +66,15 @@ const AUTO_BATCHES: AutoBatchRow[] = [
     },
 ];
 
+const AUTO_COLUMNS: ColumnDef[] = [
+    { key: 'batchId', label: '补发批次 ID' },
+    { key: 'status', label: '当前状态' },
+    { key: 'startTime', label: '补发开始时间' },
+    { key: 'endTime', label: '补发结束时间' },
+    { key: 'actualCount', label: '实际发送数量' },
+    { key: 'action', label: '操作', fixed: true },
+];
+
 interface AutoResendProps {
     onSwitchTab?: (tab: 'record', filter?: RecordFilter) => void;
 }
@@ -85,7 +96,13 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     const [detailBatch, setDetailBatch] = useState<AutoBatchRow | null>(null);
     const [toast, setToast] = useState('');
     const [refreshing, setRefreshing] = useState(false);
+    const [visibleCols, setVisibleCols] = useState<string[]>(AUTO_COLUMNS.map((c) => c.key));
+    const [exportVisible, setExportVisible] = useState(false);
     const toastTimer = useRef<number | null>(null);
+
+    const toggleCol = (key: string, checked: boolean) => {
+        setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
+    };
 
     const thresholdNum = typeof batchThreshold === 'number' ? batchThreshold : 0;
     const configReady =
@@ -492,46 +509,63 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
             <div className="sms-card resend-section">
                 <div className="sms-toolbar">
                     <span className="resend-toolbar-title">自动补发记录</span>
+                    <div className="sms-toolbar-right resend-table-toolbar-actions">
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setExportVisible(true)}>
+                            <Download size={14} />
+                            导出
+                        </button>
+                        <ColumnSettings columns={AUTO_COLUMNS} visible={visibleCols} onChange={toggleCol} />
+                    </div>
                 </div>
                 <div className="sms-table-wrap resend-batch-wrap">
                     <table className="sms-table resend-table resend-history-table">
                         <thead>
                             <tr>
-                                <th>补发批次 ID</th>
-                                <th>当前状态</th>
-                                <th>补发开始时间</th>
-                                <th>补发结束时间</th>
-                                <th className="resend-th-tooltip">
-                                    <span className="sms-tooltip-wrap">
-                                        实际发送数量
-                                        <span className="sms-tooltip">实际执行了发送动作的条数</span>
-                                    </span>
-                                </th>
-                                <th>操作</th>
+                                {visibleCols.includes('batchId') && <th>补发批次 ID</th>}
+                                {visibleCols.includes('status') && <th>当前状态</th>}
+                                {visibleCols.includes('startTime') && <th>补发开始时间</th>}
+                                {visibleCols.includes('endTime') && <th>补发结束时间</th>}
+                                {visibleCols.includes('actualCount') && (
+                                    <th className="resend-th-tooltip">
+                                        <span className="sms-tooltip-wrap">
+                                            实际发送数量
+                                            <span className="sms-tooltip">实际执行了发送动作的条数</span>
+                                        </span>
+                                    </th>
+                                )}
+                                {visibleCols.includes('action') && <th>操作</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {batches.map((b) => (
                                 <tr key={b.batchId}>
-                                    <td>
-                                        <span className="resend-batch-id">{b.batchId}</span>
-                                    </td>
-                                    <td>
-                                        <span className={`sms-status ${AUTO_BATCH_STATUS_CLASS[b.status]}`}>{b.status}</span>
-                                    </td>
-                                    <td>{b.startTime}</td>
-                                    <td>{b.endTime}</td>
-                                    <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className="sms-action-link"
-                                            onClick={() => setDetailBatch(b)}
-                                        >
-                                            <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                            详情
-                                        </button>
-                                    </td>
+                                    {visibleCols.includes('batchId') && (
+                                        <td>
+                                            <span className="resend-batch-id">{b.batchId}</span>
+                                        </td>
+                                    )}
+                                    {visibleCols.includes('status') && (
+                                        <td>
+                                            <span className={`sms-status ${AUTO_BATCH_STATUS_CLASS[b.status]}`}>{b.status}</span>
+                                        </td>
+                                    )}
+                                    {visibleCols.includes('startTime') && <td>{b.startTime}</td>}
+                                    {visibleCols.includes('endTime') && <td>{b.endTime}</td>}
+                                    {visibleCols.includes('actualCount') && (
+                                        <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
+                                    )}
+                                    {visibleCols.includes('action') && (
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="sms-action-link"
+                                                onClick={() => setDetailBatch(b)}
+                                            >
+                                                <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                详情
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>
@@ -558,6 +592,13 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                     {toast}
                 </div>
             )}
+
+            {/* 导出自动补发记录 */}
+            <ExportModal
+                visible={exportVisible}
+                defaultName="自动补发记录_20260813"
+                onClose={() => setExportVisible(false)}
+            />
         </div>
     );
 }
