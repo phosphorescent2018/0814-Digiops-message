@@ -25,7 +25,7 @@ const STATUS_CLASS: Record<string, string> = {
 };
 
 export default function AutoResend() {
-    const [enabled, setEnabled] = useState(true);
+    const [enabled, setEnabled] = useState(false);
     const [saved, setSaved] = useState(false);
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
