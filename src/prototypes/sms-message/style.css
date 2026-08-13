@@ -399,6 +399,18 @@ button {
     color: #cbd0db;
 }
 
+/* 本次新增字段高亮：淡紫色背景（与侧边栏短信菜单一致） */
+.sms-input.sms-control-purple,
+.sms-select.sms-control-purple {
+    background-color: #ede7f6;
+    border-color: #d8c8ef;
+}
+
+.sms-input.sms-control-purple:focus,
+.sms-select.sms-control-purple:focus {
+    border-color: #b79fe0;
+}
+
 .sms-date-range {
     display: flex;
     align-items: center;

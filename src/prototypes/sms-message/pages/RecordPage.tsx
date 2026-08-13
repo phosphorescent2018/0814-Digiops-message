@@ -116,7 +116,7 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                         <label className="sms-form-label">送达状态</label>
                         <div className="sms-form-control">
                             <select
-                                className={`sms-select${filter?.deliveryStatus ? '' : ' placeholder'}`}
+                                className={`sms-select sms-control-purple${filter?.deliveryStatus ? '' : ' placeholder'}`}
                                 defaultValue={filter?.deliveryStatus ?? ''}
                             >
                                 <option value="">请选择</option>
@@ -133,7 +133,7 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                         <label className="sms-form-label">补发批次 ID</label>
                         <div className="sms-form-control">
                             <input
-                                className="sms-input"
+                                className="sms-input sms-control-purple"
                                 placeholder="请输入"
                                 defaultValue={filter?.batchId ?? ''}
                             />
