@@ -1262,6 +1262,19 @@ button {
     white-space: nowrap;
 }
 
+.plan-canvas-name-input {
+    width: 240px;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+    background: #ffffff;
+}
+
 .plan-canvas-edit {
     width: 26px;
     height: 26px;

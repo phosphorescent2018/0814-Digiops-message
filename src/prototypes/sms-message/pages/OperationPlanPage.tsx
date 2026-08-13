@@ -81,6 +81,7 @@ export default function OperationPlanPage() {
     if (canvasCtx) {
         return (
             <OperationPlanCanvas
+                key={canvasCtx.planId ?? `new-${canvasCtx.name}`}
                 planName={canvasCtx.name}
                 onBack={() => setCanvasCtx(null)}
                 onSaved={(savedName) => {
@@ -88,7 +89,7 @@ export default function OperationPlanPage() {
                         const now = new Date();
                         const pad = (n: number) => String(n).padStart(2, '0');
                         const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
-                        const finalName = `新建计划_${ts}`;
+                        const finalName = savedName && savedName !== '未命名计划' ? savedName : `新建计划_${ts}`;
                         const row: PlanRow = {
                             id: `p${Date.now()}`,
                             createdAt: '2026-08-13 10:00:00',

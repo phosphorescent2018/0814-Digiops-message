@@ -529,6 +529,9 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
     const [edges, setEdges] = useState<CanvasEdge[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [name, setName] = useState(planName);
+    const [editingName, setEditingName] = useState(false);
+    const [nameDraft, setNameDraft] = useState('');
     const [dragover, setDragover] = useState(false);
     const [savedTip, setSavedTip] = useState(false);
     const [linkPreview, setLinkPreview] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
@@ -674,8 +677,44 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                         <ArrowLeft size={15} />
                         返回列表
                     </button>
-                    <span className="plan-canvas-name">{planName}</span>
-                    <button type="button" className="sms-btn sms-btn-icon plan-canvas-edit" title="编辑名称">
+                    {editingName ? (
+                        <input
+                            className="plan-canvas-name-input"
+                            value={nameDraft}
+                            autoFocus
+                            onFocus={(e) => e.currentTarget.select()}
+                            onChange={(e) => setNameDraft(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const trimmed = nameDraft.trim();
+                                    if (trimmed) {
+                                        setName(trimmed);
+                                        setEditingName(false);
+                                    }
+                                } else if (e.key === 'Escape') {
+                                    setEditingName(false);
+                                }
+                            }}
+                            onBlur={() => {
+                                const trimmed = nameDraft.trim();
+                                if (trimmed) {
+                                    setName(trimmed);
+                                }
+                                setEditingName(false);
+                            }}
+                        />
+                    ) : (
+                        <span className="plan-canvas-name">{name}</span>
+                    )}
+                    <button
+                        type="button"
+                        className="sms-btn sms-btn-icon plan-canvas-edit"
+                        title="编辑名称"
+                        onClick={() => {
+                            setNameDraft(name);
+                            setEditingName(true);
+                        }}
+                    >
                         <Pencil size={14} />
                     </button>
                     <button type="button" className="sms-btn plan-canvas-tag">
@@ -703,7 +742,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                 window.clearTimeout(savedTipTimer.current);
                             }
                             savedTipTimer.current = window.setTimeout(() => setSavedTip(false), 2600);
-                            onSaved?.(planName);
+                            onSaved?.(name);
                         }}
                     >
                         保 存
