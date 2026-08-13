@@ -202,7 +202,7 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
-                                    累计阈值
+                                    排队阈值
                                     <span className="sms-tooltip">排队数量达到该值时立即触发补发</span>
                                 </span>
                             </label>
