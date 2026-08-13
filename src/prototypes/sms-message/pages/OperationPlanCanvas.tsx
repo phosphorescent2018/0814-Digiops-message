@@ -136,10 +136,14 @@ interface CanvasNode {
     config: PrecheckConfig | ResendControlConfig | null;
 }
 
+type PortDir = 'left' | 'right' | 'top' | 'bottom';
+
 interface CanvasEdge {
     id: string;
     from: string;
     to: string;
+    fromPort: PortDir;
+    toPort: PortDir;
 }
 
 /* ================= 摘要 ================= */
@@ -546,9 +550,34 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
         origY: number;
         moved: boolean;
     } | null>(null);
-    const linkDragRef = useRef<{ fromId: string; startX: number; startY: number } | null>(null);
+    const linkDragRef = useRef<{ fromId: string; fromPort: PortDir; startX: number; startY: number } | null>(null);
 
     const editingNode = nodes.find((n) => n.id === editingId) ?? null;
+
+    const portPoint = (node: CanvasNode, port: PortDir) => {
+        switch (port) {
+            case 'left':
+                return { x: node.x, y: node.y + NODE_H / 2 };
+            case 'right':
+                return { x: node.x + NODE_W, y: node.y + NODE_H / 2 };
+            case 'top':
+                return { x: node.x + NODE_W / 2, y: node.y };
+            case 'bottom':
+                return { x: node.x + NODE_W / 2, y: node.y + NODE_H };
+        }
+    };
+
+    const edgePath = (from: CanvasNode, fromPort: PortDir, to: CanvasNode, toPort: PortDir) => {
+        const p1 = portPoint(from, fromPort);
+        const p2 = portPoint(to, toPort);
+        const dx = Math.abs(p2.x - p1.x);
+        const dy = Math.abs(p2.y - p1.y);
+        const c1x = p1.x + (fromPort === 'right' ? dx / 2 : fromPort === 'left' ? -dx / 2 : 0);
+        const c1y = p1.y + (fromPort === 'bottom' ? dy / 2 : fromPort === 'top' ? -dy / 2 : 0);
+        const c2x = p2.x + (toPort === 'left' ? -dx / 2 : toPort === 'right' ? dx / 2 : 0);
+        const c2y = p2.y + (toPort === 'top' ? -dy / 2 : toPort === 'bottom' ? dy / 2 : 0);
+        return `M ${p1.x} ${p1.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
+    };
 
     const toArea = (clientX: number, clientY: number) => {
         const rect = areaRef.current?.getBoundingClientRect();
@@ -617,12 +646,13 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
         }
     };
 
-    const onPortPointerDown = (e: React.PointerEvent<HTMLSpanElement>, node: CanvasNode) => {
+    const onPortPointerDown = (e: React.PointerEvent<HTMLSpanElement>, node: CanvasNode, port: PortDir) => {
         e.stopPropagation();
         e.preventDefault();
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         linkDragRef.current = {
             fromId: node.id,
+            fromPort: port,
             startX: rect.left + rect.width / 2,
             startY: rect.top + rect.height / 2,
         };
@@ -640,12 +670,30 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
             const fromId = linkDragRef.current?.fromId;
+            const fromPort = linkDragRef.current?.fromPort ?? 'right';
             const el = document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null;
-            const targetId = el?.closest?.('[data-node-id]')?.getAttribute('data-node-id') ?? null;
-            if (fromId && targetId && targetId !== fromId) {
+            const targetEl = el?.closest?.('[data-node-id]') as HTMLElement | null;
+            const targetId = targetEl?.getAttribute('data-node-id') ?? null;
+            if (fromId && targetId && targetEl && targetId !== fromId) {
+                const r = targetEl.getBoundingClientRect();
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                const candidates: { port: PortDir; dist: number }[] = [
+                    { port: 'left', dist: Math.hypot(ev.clientX - r.left, ev.clientY - cy) },
+                    { port: 'right', dist: Math.hypot(ev.clientX - r.right, ev.clientY - cy) },
+                    { port: 'top', dist: Math.hypot(ev.clientX - cx, ev.clientY - r.top) },
+                    { port: 'bottom', dist: Math.hypot(ev.clientX - cx, ev.clientY - r.bottom) },
+                ];
+                const toPort = candidates.reduce((best, c) => (c.dist < best.dist ? c : best)).port;
                 setEdges((prev) => [
                     ...prev,
-                    { id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, from: fromId, to: targetId },
+                    {
+                        id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                        from: fromId,
+                        to: targetId,
+                        fromPort,
+                        toPort,
+                    },
                 ]);
             }
             setLinkPreview(null);
@@ -827,15 +875,10 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                             const from = nodes.find((n) => n.id === edge.from);
                             const to = nodes.find((n) => n.id === edge.to);
                             if (!from || !to) return null;
-                            const x1 = from.x + NODE_W;
-                            const y1 = from.y + NODE_H / 2;
-                            const x2 = to.x;
-                            const y2 = to.y + NODE_H / 2;
-                            const mx = (x1 + x2) / 2;
                             return (
                                 <path
                                     key={edge.id}
-                                    d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
+                                    d={edgePath(from, edge.fromPort, to, edge.toPort)}
                                     fill="none"
                                     stroke="#98a1b8"
                                     strokeWidth="1.6"
@@ -904,12 +947,22 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                 <span
                                     className="plan-canvas-port plan-canvas-port-right"
                                     title="拖拽连线"
-                                    onPointerDown={(e) => onPortPointerDown(e, node)}
+                                    onPointerDown={(e) => onPortPointerDown(e, node, 'right')}
                                 />
                                 <span
                                     className="plan-canvas-port plan-canvas-port-left"
                                     title="拖拽连线"
-                                    onPointerDown={(e) => onPortPointerDown(e, node)}
+                                    onPointerDown={(e) => onPortPointerDown(e, node, 'left')}
+                                />
+                                <span
+                                    className="plan-canvas-port plan-canvas-port-top"
+                                    title="拖拽连线"
+                                    onPointerDown={(e) => onPortPointerDown(e, node, 'top')}
+                                />
+                                <span
+                                    className="plan-canvas-port plan-canvas-port-bottom"
+                                    title="拖拽连线"
+                                    onPointerDown={(e) => onPortPointerDown(e, node, 'bottom')}
                                 />
                             </div>
                         );

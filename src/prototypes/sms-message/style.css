@@ -1626,6 +1626,20 @@ button {
     left: -5px;
 }
 
+.plan-canvas-port-top {
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.plan-canvas-port-bottom {
+    top: auto;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
 .plan-canvas-item:hover .plan-canvas-port,
 .plan-canvas-item.selected .plan-canvas-port {
     opacity: 1;
