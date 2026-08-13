@@ -1820,6 +1820,67 @@ button {
     line-height: 1.5;
 }
 
+.plan-canvas-wiring-tip {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: #f0f6ff;
+    border: 1px solid #d6e6ff;
+    border-radius: 6px;
+}
+
+.plan-canvas-wiring-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3b5b9b;
+    margin-bottom: 8px;
+}
+
+.plan-canvas-wiring-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 2px 0;
+}
+
+.plan-canvas-wiring-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+}
+
+.plan-canvas-wiring-dot.green {
+    background: #52c41a;
+}
+
+.plan-canvas-wiring-dot.red {
+    background: #ff4d4f;
+}
+
+.plan-canvas-wiring-dot.blue {
+    background: #1890ff;
+}
+
+.plan-canvas-wiring-dot.orange {
+    background: #fa8c16;
+}
+
+.plan-canvas-wiring-text {
+    font-size: 12px;
+    color: #44506d;
+    line-height: 1.5;
+}
+
+.plan-canvas-wiring-note {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #c9d9f5;
+    font-size: 12px;
+    color: #7a87a6;
+    line-height: 1.5;
+}
+
 
 
 .sms-resend-center {
