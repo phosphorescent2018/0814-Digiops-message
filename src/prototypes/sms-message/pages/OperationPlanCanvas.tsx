@@ -57,19 +57,14 @@ interface NodeGroup {
 
 const NODE_GROUPS: NodeGroup[] = [
     {
-        title: '定制组件',
-        nodes: [
-            { id: 'touch-precheck', label: '触达前置校验', color: '#1890ff', icon: ShieldCheck },
-            { id: 'resend-control', label: '补发控制', color: '#fa8c16', icon: RefreshCw },
-        ],
-    },
-    {
         title: '进入',
         nodes: [{ id: 'customer-group', label: '客户群组', color: '#98a1b8', icon: Users }],
     },
     {
         title: '动作',
         nodes: [
+            { id: 'touch-precheck', label: '触达前置校验', color: '#1890ff', icon: ShieldCheck },
+            { id: 'resend-control', label: '补发控制', color: '#fa8c16', icon: RefreshCw },
             { id: 'end', label: '结束节点', color: '#98a1b8', shape: 'circle', text: 'END' },
             { id: 'delay', label: '延时器', color: '#98a1b8', shape: 'circle', icon: ClockIcon },
             { id: 'ab-test', label: 'A/B测试', color: '#98a1b8', icon: GitBranch },
