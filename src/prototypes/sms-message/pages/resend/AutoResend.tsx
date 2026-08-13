@@ -144,17 +144,6 @@ export default function AutoResend() {
                             </div>
                         </div>
                         <div className="sms-form-item">
-                            <label className="sms-form-label">补发内容</label>
-                            <div className="sms-form-control">
-                                <select className="sms-select">
-                                    <option value="original" selected>
-                                        沿用原短信内容
-                                    </option>
-                                    <option value="template">指定模板</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="sms-form-item">
                             <label className="sms-form-label">生效时段</label>
                             <div className="sms-form-control">
                                 <select className="sms-select">
