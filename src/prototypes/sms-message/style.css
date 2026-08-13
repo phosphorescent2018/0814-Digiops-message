@@ -1135,6 +1135,10 @@ button {
 }
 
 .resend-stat-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 18px 20px;
     border: 1px solid var(--border-soft);
     border-radius: 8px;
@@ -1167,7 +1171,10 @@ button {
 }
 
 .resend-stat-sub {
-    margin-top: 4px;
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 12px;
     color: var(--text-muted);
     font-size: 12px;
     line-height: 1.5;
