@@ -1,114 +1,66 @@
 /**
- * 批次详情抽屉：批次信息 / 数量概览 / 执行统计 / 明细表 / 操作
+ * 自动补发批次详情抽屉：批次信息 / 数量概览 / 执行统计 / 操作
+ * 仿照人工补发详情，差异：无单批次终止（全局关闭产生已终止）
  */
 import React, { useMemo, useState } from 'react';
-import { X, RefreshCw, Ban, ChevronDown, ChevronRight, ExternalLink, Download } from 'lucide-react';
-import { computeStatus, STATUS_CLASS, type BatchRow } from './ManualResend';
+import { X, RefreshCw, ChevronDown, ChevronRight, ExternalLink, Download } from 'lucide-react';
+import type { RecordFilter } from './BatchDetail';
 
-interface BatchDetailProps {
-    batch: BatchRow;
+export interface AutoBatchRow {
+    batchId: string;
+    status: '待执行' | '执行中' | '已完成' | '已终止' | '失败';
+    startTime: string;
+    endTime: string;
+    systemVerifiedCount: number | null;
+    queuedCount: number;
+    triggerReasons: string[];
+    source: string;
+    createdAt: string;
+}
+
+export const AUTO_BATCH_STATUS_CLASS: Record<string, string> = {
+    待执行: 'sms-status-pending',
+    执行中: 'sms-status-delivering',
+    已完成: 'sms-status-success',
+    已终止: 'sms-status-unknown',
+    失败: 'sms-status-fail',
+};
+
+interface AutoBatchDetailProps {
+    batch: AutoBatchRow;
     onClose: () => void;
-    onTerminate: (batch: BatchRow) => void;
     onViewRecords?: (filter?: RecordFilter) => void;
 }
 
-export interface RecordFilter {
-    sendTimeStart?: string;
-    sendTimeEnd?: string;
-    businessId?: string;
-    deliveryStatus?: string;
-    batchId?: string;
-}
-
-interface DetailRow {
-    id: number;
-    phone: string;
-    content: string;
-    sendStatus: string;
-    deliveryStatus: string;
-    failReason: string;
-}
-
-/**
- * 明细 mock：补发批次只包含新短信（失败 / 未送达 / 回执超时等可补发场景），
- * 不含历史短信；送达状态 -- 与发送状态失败数量保持一致。
- */
-const DETAIL_ROWS: DetailRow[] = [
-    {
-        id: 1,
-        phone: 'n6cHZ+wHVUE1uN3IqCAedg==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '成功',
-        deliveryStatus: '回执中',
-        failReason: '',
-    },
-    {
-        id: 2,
-        phone: '4U4I9nOEeJsD6sIIYO6MCw==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '成功',
-        deliveryStatus: '已送达',
-        failReason: '',
-    },
-    {
-        id: 3,
-        phone: 'tUAH5d+eIqihMk6w7bfD7w==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '成功',
-        deliveryStatus: '未送达',
-        failReason: '',
-    },
-    {
-        id: 4,
-        phone: 'Wb+OvlfeXjTvpR+XIFDcUg==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '成功',
-        deliveryStatus: '回执超时',
-        failReason: '',
-    },
-    {
-        id: 5,
-        phone: 'fMlMy9u5342709lpj03DYA==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '失败',
-        deliveryStatus: '--',
-        failReason: '通道拒绝：号码无效',
-    },
-    {
-        id: 6,
-        phone: 'ISeQoDpJ7hmFgwSrN84srw==',
-        content: "Y'ello! Your MoMo Advance has been successfully activated...",
-        sendStatus: '失败',
-        deliveryStatus: '--',
-        failReason: '提交失败：通道限流',
-    },
-    {
-        id: 7,
-        phone: 'qO3Vx8yC2sTpR9wLk5eHuA==',
-        content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '暂无数据',
-        deliveryStatus: '未知',
-        failReason: '',
-    },
+/** 执行统计 mock：与人工补发明细分布一致 */
+const DETAIL_ROWS = [
+    { sendStatus: '成功', deliveryStatus: '回执中' },
+    { sendStatus: '成功', deliveryStatus: '已送达' },
+    { sendStatus: '成功', deliveryStatus: '未送达' },
+    { sendStatus: '成功', deliveryStatus: '回执超时' },
+    { sendStatus: '失败', deliveryStatus: '--' },
+    { sendStatus: '失败', deliveryStatus: '--' },
+    { sendStatus: '暂无数据', deliveryStatus: '未知' },
 ];
 
-const SEND_STATUS_CLASS: Record<string, string> = {
-    成功: 'sms-status-success',
-    失败: 'sms-status-fail',
-    暂无数据: 'sms-status-unknown',
+const SEND_COLORS: Record<string, string> = {
+    成功: '#52c41a',
+    失败: '#f5222d',
+    暂无数据: '#98a1b8',
 };
 
-const DELIVERY_CLASS: Record<string, string> = {
-    回执中: 'sms-status-delivering',
-    已送达: 'sms-status-success',
-    未送达: 'sms-status-fail',
-    回执超时: 'sms-status-timeout',
-    未知: 'sms-status-unknown',
+const DELIVERY_COLORS: Record<string, string> = {
+    回执中: '#1677ff',
+    已送达: '#52c41a',
+    未送达: '#f5222d',
+    回执超时: '#fa8c16',
+    '--': '#98a1b8',
+    未知: '#8b94a3',
 };
 
-export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords }: BatchDetailProps) {
-    const status = computeStatus(batch);
-    const [showConditions, setShowConditions] = useState(false);
+export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoBatchDetailProps) {
+    const { status } = batch;
+    const [showRules, setShowRules] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [exported, setExported] = useState(false);
 
@@ -124,33 +76,15 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
 
     const progress =
         status === '执行中' && batch.systemVerifiedCount !== null
-            ? Math.min((batch.systemVerifiedCount / batch.userVerifiedCount) * 100, 100)
+            ? Math.min((batch.systemVerifiedCount / batch.queuedCount) * 100, 100)
             : null;
 
-    const canTerminate = status === '待执行' || status === '执行中';
     const canExport = status === '已完成' || status === '已终止' || status === '失败';
+    const hasExecutionData = status !== '待执行';
 
     const refresh = () => {
         setRefreshing(true);
         setTimeout(() => setRefreshing(false), 600);
-    };
-
-    const hasExecutionData = status !== '待执行';
-
-    const deliveryTotal = Object.values(stats.delivery).reduce((a, b) => a + b, 0);
-    const sendTotal = Object.values(stats.send).reduce((a, b) => a + b, 0);
-    const SEND_COLORS: Record<string, string> = {
-        成功: '#52c41a',
-        失败: '#f5222d',
-        暂无数据: '#98a1b8',
-    };
-    const DELIVERY_COLORS: Record<string, string> = {
-        回执中: '#1677ff',
-        已送达: '#52c41a',
-        未送达: '#f5222d',
-        回执超时: '#fa8c16',
-        '--': '#98a1b8',
-        未知: '#8b94a3',
     };
 
     const handleExport = () => {
@@ -159,14 +93,17 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
         setTimeout(() => setExported(false), 2000);
     };
 
+    const deliveryTotal = Object.values(stats.delivery).reduce((a, b) => a + b, 0);
+    const sendTotal = Object.values(stats.send).reduce((a, b) => a + b, 0);
+
     return (
         <div className="sms-mask resend-drawer-mask" onClick={onClose}>
             <div className="resend-drawer" onClick={(e) => e.stopPropagation()}>
                 {/* 抽屉头部 */}
                 <div className="resend-drawer-header">
                     <div className="resend-drawer-title">
-                        <span className="resend-batch-id">B{batch.id}</span>
-                        <span className={`sms-status ${STATUS_CLASS[status]}`}>{status}</span>
+                        <span className="resend-batch-id">{batch.batchId}</span>
+                        <span className={`sms-status ${AUTO_BATCH_STATUS_CLASS[status]}`}>{status}</span>
                     </div>
                     <button type="button" className="resend-drawer-close" onClick={onClose}>
                         <X size={18} />
@@ -179,44 +116,43 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                         <div className="resend-detail-section-title">批次信息</div>
                         <div className="resend-detail-grid">
                             <div className="resend-detail-item">
-                                <span className="resend-detail-label">补发方式</span>
-                                <span className="resend-detail-value">{batch.mode}</span>
+                                <span className="resend-detail-label">规则来源</span>
+                                <span className="resend-detail-value">{batch.source}</span>
                             </div>
                             <div className="resend-detail-item">
                                 <span className="resend-detail-label">计划补发时间</span>
-                                <span className="resend-detail-value">{batch.scheduledTime}</span>
+                                <span className="resend-detail-value">{batch.startTime}</span>
                             </div>
                             <div className="resend-detail-item">
                                 <span className="resend-detail-label">补发开始时间</span>
-                                <span className="resend-detail-value">
-                                    {status === '待执行' ? '—' : batch.scheduledTime}
-                                </span>
+                                <span className="resend-detail-value">{status === '待执行' ? '—' : batch.startTime}</span>
                             </div>
                             <div className="resend-detail-item">
                                 <span className="resend-detail-label">补发结束时间</span>
                                 <span className="resend-detail-value">{batch.endTime}</span>
                             </div>
                             <div className="resend-detail-item">
-                                <span className="resend-detail-label">黑名单用户是否发送</span>
-                                <span className="resend-detail-value">否</span>
+                                <span className="resend-detail-label">入队时间</span>
+                                <span className="resend-detail-value">{batch.createdAt}</span>
                             </div>
                             <div className="resend-detail-item">
-                                <span className="resend-detail-label">提交时间</span>
-                                <span className="resend-detail-value">2026-08-12 15:02:00</span>
+                                <span className="resend-detail-label">黑名单校验</span>
+                                <span className="resend-detail-value">是（黑名单内不发送）</span>
                             </div>
                         </div>
                         <button
                             type="button"
                             className="resend-conditions-toggle"
-                            onClick={() => setShowConditions(!showConditions)}
+                            onClick={() => setShowRules(!showRules)}
                         >
-                            {showConditions ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            筛选条件快照
+                            {showRules ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                            规则快照
                         </button>
-                        {showConditions && (
+                        {showRules && (
                             <div className="resend-conditions-box">
-                                发送时间：2026-08-01 ~ 2026-08-12 · BusinessID：MTN_UG_Account_id ·
-                                送达状态：未送达、回执超时 · 其余条件为空
+                                触发条件：{batch.triggerReasons.join('、')} · 生效时段：全天 ·
+                                最多补发次数：3 次 · 补发时间间隔：1 小时 · 最大排队数量：1,000 条 ·
+                                批次最长等待：15 分钟
                             </div>
                         )}
                     </div>
@@ -226,8 +162,11 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                         <div className="resend-detail-section-title">数量概览</div>
                         <div className="resend-count-cards">
                             <div className="resend-count-card">
-                                <span className="resend-count-label">提交校验数量</span>
-                                <span className="resend-count-value">{batch.userVerifiedCount.toLocaleString()}</span>
+                                <span className="sms-tooltip-wrap">
+                                    <span className="resend-count-label">入队数量</span>
+                                    <span className="sms-tooltip">聚批时进入本批次的短信条数</span>
+                                </span>
+                                <span className="resend-count-value">{batch.queuedCount.toLocaleString()}</span>
                             </div>
                             <div className="resend-count-card">
                                 <span className="sms-tooltip-wrap">
@@ -245,7 +184,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                     <div className="resend-progress-fill" style={{ width: `${progress}%` }} />
                                 </div>
                                 <span className="resend-progress-text">
-                                    已发送 {batch.systemVerifiedCount?.toLocaleString()} / {batch.userVerifiedCount.toLocaleString()} 条
+                                    已发送 {batch.systemVerifiedCount?.toLocaleString()} / {batch.queuedCount.toLocaleString()} 条 · 实时更新
                                 </span>
                             </div>
                         )}
@@ -262,11 +201,9 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                         className="resend-link-btn"
                                         onClick={() =>
                                             onViewRecords?.({
-                                                sendTimeStart: '2026-08-01',
-                                                sendTimeEnd: '2026-08-12',
-                                                businessId: 'MTN_UG_Account_id',
-                                                deliveryStatus: '回执超时',
-                                                batchId: batch.id,
+                                                sendTimeStart: batch.startTime.slice(0, 10),
+                                                sendTimeEnd: (batch.endTime !== '—' ? batch.endTime : batch.startTime).slice(0, 10),
+                                                batchId: batch.batchId,
                                             })
                                         }
                                     >
@@ -283,22 +220,18 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                             <Download size={14} />
                                             {exported ? '已导出' : '导出'}
                                         </button>
-                                        {!canExport && (
-                                            <span className="sms-tooltip">
-                                                待任务结束后可导出
-                                            </span>
-                                        )}
+                                        {!canExport && <span className="sms-tooltip">待任务结束后可导出</span>}
                                     </span>
                                 </div>
                             </div>
-                            {batch.isFailed && (
+                            {status === '失败' && (
                                 <div className="resend-fail-banner">
-                                    批次失败：通道异常，执行中断于 {batch.endTime}
+                                    批次失败：系统异常，执行中断于 {batch.endTime}
                                 </div>
                             )}
                             {status === '已终止' && (
                                 <div className="resend-fail-banner resend-fail-banner-grey">
-                                    已手动终止于 {batch.endTime}，剩余未执行条数未计入实际执行
+                                    该批次因关闭自动补发被中断于 {batch.endTime}，已发送部分保留统计
                                 </div>
                             )}
                             <div className="resend-stats-grid">
@@ -309,10 +242,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                             <div
                                                 key={k}
                                                 className="resend-delivery-seg"
-                                                style={{
-                                                    width: `${(v / sendTotal) * 100}%`,
-                                                    background: SEND_COLORS[k] ?? '#98a1b8',
-                                                }}
+                                                style={{ width: `${(v / sendTotal) * 100}%`, background: SEND_COLORS[k] ?? '#98a1b8' }}
                                                 title={`${k}：${v}`}
                                             />
                                         ))}
@@ -333,10 +263,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                             <div
                                                 key={k}
                                                 className="resend-delivery-seg"
-                                                style={{
-                                                    width: `${(v / deliveryTotal) * 100}%`,
-                                                    background: DELIVERY_COLORS[k] ?? '#98a1b8',
-                                                }}
+                                                style={{ width: `${(v / deliveryTotal) * 100}%`, background: DELIVERY_COLORS[k] ?? '#98a1b8' }}
                                                 title={`${k}：${v}`}
                                             />
                                         ))}
@@ -358,10 +285,10 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                 {/* 底部操作栏 */}
                 <div className="resend-drawer-footer">
                     <span className="resend-drawer-footer-tip">
-                        {status === '待执行' && '定时任务等待执行，可终止'}
-                        {status === '执行中' && '批次正在执行，可刷新进度或终止'}
+                        {status === '待执行' && '批次等待执行'}
+                        {status === '执行中' && '批次正在执行，实际发送数量实时更新'}
                         {status === '已完成' && '批次已执行完成'}
-                        {status === '已终止' && '批次已手动终止'}
+                        {status === '已终止' && '该批次因关闭自动补发被中断'}
                         {status === '失败' && '批次执行失败'}
                     </span>
                     <div className="resend-drawer-actions">
@@ -369,12 +296,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             <button type="button" className="sms-btn" onClick={refresh} disabled={refreshing}>
                                 <RefreshCw size={14} />
                                 {refreshing ? '刷新中…' : '刷新'}
-                            </button>
-                        )}
-                        {canTerminate && (
-                            <button type="button" className="sms-btn resend-danger-btn" onClick={() => onTerminate(batch)}>
-                                <Ban size={14} />
-                                终止批次
                             </button>
                         )}
                     </div>

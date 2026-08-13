@@ -1131,7 +1131,7 @@ button {
 /* 统计卡 */
 .resend-stat-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
     margin-top: 12px;
 }
@@ -1170,6 +1170,10 @@ button {
 
 .resend-stat-num.resend-stat-success {
     color: #52c41a;
+}
+
+.resend-stat-num.resend-stat-info {
+    color: #1677ff;
 }
 
 .resend-stat-label {
@@ -1233,18 +1237,6 @@ button {
     font-size: 13px;
 }
 
-.resend-number-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.resend-number-unit {
-    color: var(--text-secondary);
-    font-size: 13px;
-    white-space: nowrap;
-}
-
 .resend-filter-actions {
     display: flex;
     justify-content: flex-end;
@@ -1269,6 +1261,22 @@ button {
     color: var(--text-muted);
     font-size: 13px;
     font-weight: 400;
+}
+
+/* 自动补发：板块标题（与人工补发「条件筛选」同规格） */
+.resend-toolbar-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* 自动补发规则必填标记 */
+.resend-required {
+    color: #f5222d;
+    margin-right: 2px;
 }
 
 /* 人工补发：10 字段筛选 */
@@ -1397,6 +1405,18 @@ button {
     font-weight: 500;
 }
 
+/* 自动补发记录表：铺满容器宽度，避免继承 1849px 固定宽度产生横向滑轨 */
+.resend-history-table {
+    width: 100%;
+}
+
+/* 末列表头气泡右对齐，窄屏下不越出容器产生横向滚动 */
+.resend-history-table th:last-child .sms-tooltip {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
 /* 为表头向上弹出的气泡预留空间，负 margin 抵消视觉偏移 */
 .resend-batch-wrap {
     padding-top: 40px;
@@ -1416,6 +1436,12 @@ button {
     background: #f5222d;
     border-color: #f5222d;
     color: #ffffff;
+}
+
+.resend-danger-text {
+    color: #f5222d;
+    font-style: normal;
+    font-weight: 600;
 }
 
 .resend-danger-btn:hover {
@@ -1730,7 +1756,7 @@ button {
 /* 数量概览 */
 .resend-count-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
 
@@ -1911,6 +1937,12 @@ button {
     align-items: center;
     justify-content: space-between;
     padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+/* 任务卡标题与规则卡标题水平对齐（去掉 .sms-toolbar 自带左右内边距） */
+.resend-section > .sms-toolbar {
+    padding: 0 0 14px;
     border-bottom: 1px solid var(--border-soft);
 }
 
@@ -2184,6 +2216,10 @@ button {
 @media (max-width: 1024px) {
     .resend-stat-row {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .resend-stat-row .resend-stat-card:last-child:nth-child(odd) {
+        grid-column: span 2;
     }
 
     .resend-filter-grid {

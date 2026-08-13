@@ -1,40 +1,98 @@
 /**
- * 自动补发：规则配置 + 运行统计 + 补发任务列表
+ * 自动补发：规则配置 + 运行统计 + 补发记录
  */
 import React, { useRef, useState } from 'react';
-import { Zap, Save, Check, RefreshCw, Clock, AlertCircle } from 'lucide-react';
+import { Save, Check, RefreshCw, Clock, AlertCircle, Eye } from 'lucide-react';
+import AutoBatchDetail, { AUTO_BATCH_STATUS_CLASS, type AutoBatchRow } from './AutoBatchDetail';
+import type { RecordFilter } from './BatchDetail';
 
-const TASKS = [
-    { id: 1, time: '2026-08-12 13:20:05', phone: 'n6cHZ+wHVUE1uN3IqCAedg==', reason: '回执超时', times: '2/3', status: '已送达' },
-    { id: 2, time: '2026-08-12 12:58:44', phone: '4U4I9nOEeJsD6sIIYO6MCw==', reason: '未送达', times: '1/3', status: '回执中' },
-    { id: 3, time: '2026-08-12 12:47:12', phone: 'fMlMy9u5342709lpj03DYA==', reason: '发送失败', times: '1/3', status: '失败' },
-    { id: 4, time: '2026-08-12 12:30:58', phone: 'tUAH5d+eIqihMk6w7bfD7w==', reason: '回执超时', times: '3/3', status: '已送达' },
+const AUTO_BATCHES: AutoBatchRow[] = [
+    {
+        batchId: 'A20260813001',
+        status: '执行中',
+        startTime: '2026-08-13 10:02:11',
+        endTime: '—',
+        systemVerifiedCount: 620,
+        queuedCount: 1000,
+        triggerReasons: ['回执超时', '未送达'],
+        source: '全局规则',
+        createdAt: '2026-08-13 10:01:40',
+    },
+    {
+        batchId: 'A20260813002',
+        status: '已完成',
+        startTime: '2026-08-13 09:30:00',
+        endTime: '2026-08-13 09:33:18',
+        systemVerifiedCount: 2018,
+        queuedCount: 2050,
+        triggerReasons: ['发送失败', '回执超时'],
+        source: '运营计划：新客激活活动',
+        createdAt: '2026-08-13 09:29:20',
+    },
+    {
+        batchId: 'A20260812005',
+        status: '待执行',
+        startTime: '2026-08-13 14:05:00',
+        endTime: '—',
+        systemVerifiedCount: null,
+        queuedCount: 968,
+        triggerReasons: ['未送达'],
+        source: '全局规则',
+        createdAt: '2026-08-13 13:50:00',
+    },
+    {
+        batchId: 'A20260812003',
+        status: '已终止',
+        startTime: '2026-08-12 21:10:00',
+        endTime: '2026-08-12 21:12:45',
+        systemVerifiedCount: 486,
+        queuedCount: 500,
+        triggerReasons: ['发送失败'],
+        source: '全局规则',
+        createdAt: '2026-08-12 21:09:30',
+    },
+    {
+        batchId: 'A20260812004',
+        status: '失败',
+        startTime: '2026-08-12 22:15:00',
+        endTime: '2026-08-12 22:15:03',
+        systemVerifiedCount: 0,
+        queuedCount: 300,
+        triggerReasons: ['回执超时'],
+        source: '全局规则',
+        createdAt: '2026-08-12 22:14:00',
+    },
 ];
 
-const STATUS_CLASS: Record<string, string> = {
-    已送达: 'sms-status-success',
-    回执中: 'sms-status-delivering',
-    失败: 'sms-status-fail',
-};
+interface AutoResendProps {
+    onSwitchTab?: (tab: 'record', filter?: RecordFilter) => void;
+}
 
-export default function AutoResend() {
+export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     const [enabled, setEnabled] = useState(false);
     const [saved, setSaved] = useState(false);
     const [conditions, setConditions] = useState<string[]>([]);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
     const [saveModal, setSaveModal] = useState(false);
-    const [scheduleMode, setScheduleMode] = useState<'all' | 'range'>('all');
+    const [scheduleMode, setScheduleMode] = useState<'all' | 'range' | ''>('');
     const [windowStart, setWindowStart] = useState('08:00');
     const [windowEnd, setWindowEnd] = useState('22:00');
     const [maxResend, setMaxResend] = useState('');
     const [interval, setInterval] = useState('');
     const [batchThreshold, setBatchThreshold] = useState<number | ''>('');
     const [maxWait, setMaxWait] = useState('');
+    const [detailBatch, setDetailBatch] = useState<AutoBatchRow | null>(null);
     const [toast, setToast] = useState('');
     const toastTimer = useRef<number | null>(null);
 
     const thresholdNum = typeof batchThreshold === 'number' ? batchThreshold : 0;
-    const configReady = conditions.length > 0 && !!maxResend && (maxResend === '1' || !!interval) && thresholdNum > 0 && !!maxWait;
+    const configReady =
+        conditions.length > 0 &&
+        !!maxResend &&
+        (maxResend === '1' || !!interval) &&
+        thresholdNum > 0 &&
+        !!maxWait &&
+        !!scheduleMode;
 
     const showToast = (text: string) => {
         setToast(text);
@@ -71,6 +129,7 @@ export default function AutoResend() {
         { label: '今日补发', value: 128, tone: '' },
         { label: '补发成功', value: 96, tone: 'success' },
         { label: '补发失败', value: 21, tone: 'danger' },
+        { label: '待确认', value: 11, tone: 'info' },
         { label: '队列中', value: enabled ? 11 : 0, tone: 'warn' },
     ];
 
@@ -97,7 +156,6 @@ export default function AutoResend() {
                 <div className="resend-rule-header">
                     <div className="resend-rule-title-wrap">
                         <span className="resend-toolbar-title">
-                            <Zap size={16} />
                             自动补发规则
                         </span>
                         <div className="resend-rule-tip">
@@ -115,7 +173,10 @@ export default function AutoResend() {
                 <div className={`resend-rule-body${enabled ? ' resend-rule-disabled' : ''}`}>
                     <div className="resend-cond-row">
                         <div className="sms-form-item">
-                            <label className="sms-form-label">触发条件</label>
+                            <label className="sms-form-label">
+                                <span className="resend-required">*</span>
+                                触发条件
+                            </label>
                             <div className="sms-form-control">
                                 <div className="resend-cond-groups">
                                     <div className="resend-cond-group">
@@ -163,6 +224,7 @@ export default function AutoResend() {
                     <div className="resend-form-grid">
                         <div className="sms-form-item">
                             <label className="sms-form-label">
+                                <span className="resend-required">*</span>
                                 <span className="sms-tooltip-wrap">
                                     最多补发次数
                                     <span className="sms-tooltip">同一条短信的最多自动补发次数</span>
@@ -182,6 +244,7 @@ export default function AutoResend() {
                         </div>
                         <div className="sms-form-item">
                             <label className="sms-form-label">
+                                {maxResend !== '1' && <span className="resend-required">*</span>}
                                 <span className="sms-tooltip-wrap">
                                     补发时间间隔
                                     <span className="sms-tooltip">同一条短信两次自动补发之间的最小间隔</span>
@@ -206,27 +269,33 @@ export default function AutoResend() {
                         </div>
                         <div className="sms-form-item">
                             <label className="sms-form-label">
+                                <span className="resend-required">*</span>
                                 <span className="sms-tooltip-wrap">
                                     最大排队数量
                                     <span className="sms-tooltip">队列积累达到该数量时立即触发补发</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
-                                <div className="resend-number-wrap">
-                                    <input
-                                        type="number"
-                                        className="sms-input"
-                                        min={100}
-                                        step={100}
-                                        value={batchThreshold}
-                                        placeholder="请输入"
-                                        onChange={(e) => setBatchThreshold(e.target.value === '' ? '' : Number(e.target.value))}
-                                    />
-                                </div>
+                                <select
+                                    className={`sms-select${batchThreshold === '' ? ' placeholder' : ''}`}
+                                    value={batchThreshold}
+                                    onChange={(e) => setBatchThreshold(e.target.value === '' ? '' : Number(e.target.value))}
+                                >
+                                    <option value="" disabled>
+                                        请选择
+                                    </option>
+                                    <option value={100}>100 条</option>
+                                    <option value={500}>500 条</option>
+                                    <option value={1000}>1,000 条</option>
+                                    <option value={2000}>2,000 条</option>
+                                    <option value={5000}>5,000 条</option>
+                                    <option value={10000}>10,000 条</option>
+                                </select>
                             </div>
                         </div>
                         <div className="sms-form-item">
                             <label className="sms-form-label">
+                                <span className="resend-required">*</span>
                                 <span className="sms-tooltip-wrap">
                                     批次最长等待
                                     <span className="sms-tooltip">从该批次第一条短信入队起算，未达最大排队数量时到点也会强制补发</span>
@@ -248,7 +317,10 @@ export default function AutoResend() {
                     </div>
                     <div className="resend-schedule-row">
                         <div className="sms-form-item">
-                            <label className="sms-form-label">生效时段</label>
+                            <label className="sms-form-label">
+                                <span className="resend-required">*</span>
+                                生效时段
+                            </label>
                             <div className="sms-form-control">
                                 <div className="resend-schedule-inline">
                                     <div className="resend-cond-options">
@@ -344,8 +416,8 @@ export default function AutoResend() {
                                     </>
                                 ) : (
                                     <>
-                                        <span>关闭后，系统将不再自动补发失败短信</span>
-                                        <span>已在补发队列中的批次不受影响</span>
+                                        <span>关闭后，系统将<em className="resend-danger-text">立即停止</em>自动补发</span>
+                                        <span>已有的自动补发队列会被清空，进行中的人工补发不受影响</span>
                                     </>
                                 )}
                             </div>
@@ -369,7 +441,7 @@ export default function AutoResend() {
             {/* 任务列表 */}
             <div className="sms-card resend-section">
                 <div className="sms-toolbar">
-                    <span className="resend-toolbar-title">自动补发任务</span>
+                    <span className="resend-toolbar-title">自动补发记录</span>
                     <div className="sms-toolbar-right">
                         <button type="button" className="sms-btn sms-btn-icon" title="刷新">
                             <RefreshCw size={15} />
@@ -380,32 +452,40 @@ export default function AutoResend() {
                     <table className="sms-table resend-table resend-history-table">
                         <thead>
                             <tr>
-                                <th>序号</th>
-                                <th>补发时间</th>
-                                <th>手机号码</th>
-                                <th>触发原因</th>
-                                <th>补发次数</th>
-                                <th>状态</th>
+                                <th>补发批次 ID</th>
+                                <th>当前状态</th>
+                                <th>补发开始时间</th>
+                                <th>补发结束时间</th>
+                                <th className="resend-th-tooltip">
+                                    <span className="sms-tooltip-wrap">
+                                        实际发送数量
+                                        <span className="sms-tooltip">实际执行了发送动作的条数，含单条提交失败</span>
+                                    </span>
+                                </th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {TASKS.map((t) => (
-                                <tr key={t.id}>
-                                    <td>{t.id}</td>
-                                    <td>{t.time}</td>
+                            {AUTO_BATCHES.map((b) => (
+                                <tr key={b.batchId}>
                                     <td>
-                                        <span className="sms-cell">{t.phone}</span>
+                                        <span className="resend-batch-id">{b.batchId}</span>
                                     </td>
                                     <td>
-                                        <span className={`resend-reason resend-reason-${t.reason === '发送失败' ? 'fail' : t.reason === '回执超时' ? 'timeout' : 'undelivered'}`}>
-                                            {t.reason}
-                                        </span>
+                                        <span className={`sms-status ${AUTO_BATCH_STATUS_CLASS[b.status]}`}>{b.status}</span>
                                     </td>
-                                    <td>{t.times}</td>
+                                    <td>{b.startTime}</td>
+                                    <td>{b.endTime}</td>
+                                    <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
                                     <td>
-                                        <span className={`sms-status ${STATUS_CLASS[t.status] ?? 'sms-status-unknown'}`}>
-                                            {t.status}
-                                        </span>
+                                        <button
+                                            type="button"
+                                            className="sms-action-link"
+                                            onClick={() => setDetailBatch(b)}
+                                        >
+                                            <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                            详情
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -413,6 +493,18 @@ export default function AutoResend() {
                     </table>
                 </div>
             </div>
+
+            {/* 批次详情抽屉 */}
+            {detailBatch && (
+                <AutoBatchDetail
+                    batch={detailBatch}
+                    onClose={() => setDetailBatch(null)}
+                    onViewRecords={(filter) => {
+                        setDetailBatch(null);
+                        onSwitchTab?.('record', filter);
+                    }}
+                />
+            )}
 
             {/* 轻提示 */}
             {toast && (

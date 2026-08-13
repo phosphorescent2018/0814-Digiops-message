@@ -35,7 +35,7 @@ export default function ResendCenter({ onSwitchTab }: ResendCenterProps) {
                     </div>
                 ))}
             </div>
-            {tab === 'manual' ? <ManualResend onSwitchTab={onSwitchTab} /> : <AutoResend />}
+            {tab === 'manual' ? <ManualResend onSwitchTab={onSwitchTab} /> : <AutoResend onSwitchTab={onSwitchTab} />}
         </div>
     );
 }

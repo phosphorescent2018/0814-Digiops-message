@@ -130,6 +130,16 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                         </div>
                     </div>
                     <div className="sms-form-item">
+                        <label className="sms-form-label">补发批次 ID</label>
+                        <div className="sms-form-control">
+                            <input
+                                className="sms-input"
+                                placeholder="请输入"
+                                defaultValue={filter?.batchId ?? ''}
+                            />
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
                         <label className="sms-form-label">路径标记</label>
                         <div className="sms-form-control">
                             <input className="sms-input" placeholder="请输入" />
@@ -278,7 +288,13 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
                                 <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
-                                <td>{row.batchId ? `B${row.batchId}` : <span className="sms-dash">—</span>}</td>
+                                <td>
+                                    {row.batchId ? (
+                                        row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`
+                                    ) : (
+                                        <span className="sms-dash">—</span>
+                                    )}
+                                </td>
                                 <td>
                                     <span className="sms-cell sms-dash">{row.solId}</span>
                                 </td>

@@ -30,12 +30,10 @@ export interface BatchRow {
     mode: '立即补发' | '定时补发';
     isTerminated: boolean;
     isFailed: boolean;
-    /** 执行校验数量：提交时用户校验的补发数量 */
+    /** 提交校验数量：提交时用户校验的补发数量 */
     userVerifiedCount: number;
-    /** 系统校验数量：执行开始时系统校验的数量；待执行时为 null */
+    /** 实际发送数量：实际执行了发送动作的条数（含单条提交失败）；待执行时为 null */
     systemVerifiedCount: number | null;
-    /** 实际执行数量：实际做了发送动作的条数（不看发送状态）；未执行/进行中可更新 */
-    executedCount: number | null;
 }
 
 const BATCHES: BatchRow[] = [
@@ -47,8 +45,7 @@ const BATCHES: BatchRow[] = [
         isTerminated: false,
         isFailed: false,
         userVerifiedCount: 1284,
-        systemVerifiedCount: 1284,
-        executedCount: 620,
+        systemVerifiedCount: 620,
     },
     {
         id: '20260812002',
@@ -59,7 +56,6 @@ const BATCHES: BatchRow[] = [
         isFailed: false,
         userVerifiedCount: 860,
         systemVerifiedCount: 842,
-        executedCount: 842,
     },
     {
         id: '20260812001',
@@ -69,8 +65,7 @@ const BATCHES: BatchRow[] = [
         isTerminated: true,
         isFailed: false,
         userVerifiedCount: 512,
-        systemVerifiedCount: 480,
-        executedCount: 352,
+        systemVerifiedCount: 352,
     },
     {
         id: '20260811007',
@@ -81,7 +76,6 @@ const BATCHES: BatchRow[] = [
         isFailed: false,
         userVerifiedCount: 2035,
         systemVerifiedCount: 2018,
-        executedCount: 2018,
     },
     {
         id: '20260823001',
@@ -92,7 +86,6 @@ const BATCHES: BatchRow[] = [
         isFailed: false,
         userVerifiedCount: 968,
         systemVerifiedCount: null,
-        executedCount: null,
     },
     {
         id: '20260812004',
@@ -102,8 +95,7 @@ const BATCHES: BatchRow[] = [
         isTerminated: false,
         isFailed: true,
         userVerifiedCount: 300,
-        systemVerifiedCount: 300,
-        executedCount: 0,
+        systemVerifiedCount: 0,
     },
     {
         id: '20260812005',
@@ -113,8 +105,7 @@ const BATCHES: BatchRow[] = [
         isTerminated: false,
         isFailed: true,
         userVerifiedCount: 1500,
-        systemVerifiedCount: 1500,
-        executedCount: 620,
+        systemVerifiedCount: 620,
     },
 ];
 
@@ -231,7 +222,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             isFailed: false,
             userVerifiedCount: verifiedCount,
             systemVerifiedCount: isImmediate ? verifiedCount : null,
-            executedCount: null,
         };
         setBatches((prev) => [newBatch, ...prev]);
         // 提交后清空筛选条件、隐藏命中面板，回到初始状态
@@ -405,20 +395,14 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 <th>补发方式</th>
                                 <th className="resend-th-tooltip">
                                     <span className="sms-tooltip-wrap">
-                                        执行校验数量
+                                        提交校验数量
                                         <span className="sms-tooltip">提交前用户校验的补发数量</span>
                                     </span>
                                 </th>
                                 <th className="resend-th-tooltip">
                                     <span className="sms-tooltip-wrap">
-                                        系统校验数量
-                                        <span className="sms-tooltip">执行开始时系统校验的数量</span>
-                                    </span>
-                                </th>
-                                <th className="resend-th-tooltip">
-                                    <span className="sms-tooltip-wrap">
-                                        实际执行数量
-                                        <span className="sms-tooltip">实际做了发送动作的条数，与发送状态无关</span>
+                                        实际发送数量
+                                        <span className="sms-tooltip">实际执行了发送动作的条数，含单条提交失败</span>
                                     </span>
                                 </th>
                                 <th>补发状态</th>
@@ -439,7 +423,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                         <td>{b.mode}</td>
                                         <td>{b.userVerifiedCount.toLocaleString()}</td>
                                         <td>{b.systemVerifiedCount === null ? '—' : b.systemVerifiedCount.toLocaleString()}</td>
-                                        <td>{b.executedCount === null ? '—' : b.executedCount.toLocaleString()}</td>
                                         <td>
                                             <span className={`sms-status ${STATUS_CLASS[status]}`}>{status}</span>
                                         </td>

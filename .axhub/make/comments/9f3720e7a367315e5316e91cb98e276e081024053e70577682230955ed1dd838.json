@@ -135,50 +135,6 @@
       "code": null
     },
     {
-      "label": "div(\"导出序号发送时间BusinessID计划名称用户分组手机号码内容类型内容发送名称发送状态路径标记12026-08-11 12:…\")",
-      "locator": {
-        "selectors": [
-          ".sms-table-card",
-          ".sms-card.sms-table-card",
-          "body > div > div > div > main > div:nth-of-type(2) > div:nth-of-type(2)",
-          "#root div > div > main > div:nth-of-type(2) > div:nth-of-type(2)"
-        ],
-        "fingerprint": "div|class=sms-card.sms-table-card|text=导出序号发送时间BusinessID计划名称用户分组手机号码内容",
-        "path": [
-          0,
-          1,
-          0,
-          0,
-          1,
-          1,
-          2,
-          1
-        ]
-      },
-      "marker": {
-        "clientX": 342.06378173828125,
-        "clientY": 459.437255859375,
-        "documentX": 342.06378173828125,
-        "documentY": 459.437255859375,
-        "xPercent": 23.754429287380642,
-        "y": 459.437255859375,
-        "isFixed": false,
-        "offsetX": 92.06378173828125,
-        "offsetY": 10.437255859375,
-        "dirtySince": 1786505008343
-      },
-      "id": "7c2337a4-5ce0-40d7-8aff-932b92b843dd",
-      "state": "completed",
-      "comment": "列间距太长 我要同屏展示",
-      "pageScope": "/prototypes/sms-message",
-      "provider": "codex",
-      "requestId": "annotation-mspj7l79-9wym62",
-      "sessionId": "annotation-mspj7l79-9wym62",
-      "updatedAt": 1786505510236,
-      "message": "修改完成",
-      "code": null
-    },
-    {
       "label": "select(\"MTN_UG_Account_id\")",
       "locator": {
         "selectors": [
@@ -295,32 +251,72 @@
           7
         ]
       },
-      "skillIds": [
-        "prototype-annotation",
-        "impeccable"
-      ],
       "marker": {
-        "clientX": 1102.0546875,
-        "clientY": 531.5,
-        "documentX": 1102.0546875,
-        "documentY": 531.5,
-        "xPercent": 76.53157552083333,
-        "y": 531.5,
+        "clientX": 986.375,
+        "clientY": 535.1173706054688,
+        "documentX": 986.375,
+        "documentY": 535.1173706054688,
+        "xPercent": 68.49826388888889,
+        "y": 535.1173706054688,
         "isFixed": false,
-        "offsetX": 96.1015625,
-        "offsetY": 18,
-        "dirtySince": 1786506256782
+        "offsetX": 73.6328125,
+        "offsetY": 21.61737060546875,
+        "dirtySince": 1786505732677
       },
-      "id": "8364d3b8-da69-445b-8500-a6778c1b04ae",
-      "state": "completed",
-      "comment": "这个太宽\n",
+      "id": "5741b8e2-1c85-413f-b5a7-98fbf263ddaa",
+      "state": "editing",
+      "comment": "撤销这个改动",
       "pageScope": "/prototypes/sms-message",
       "provider": "codex",
-      "requestId": "annotation-mspjp6ks-yqpwfr",
-      "sessionId": "annotation-mspjp6ks-yqpwfr",
-      "updatedAt": 1786506278732,
-      "message": "修改完成",
+      "requestId": "annotation-mspo5hd4-vfdth1",
+      "sessionId": "annotation-mspo5hd4-vfdth1",
+      "updatedAt": 1786513736513,
+      "message": "AI 编辑中",
       "code": null
+    },
+    {
+      "label": "div(\"导出序号发送时间BusinessID计划名称用户分组手机号码内容类型内容发送名称发送状态路径标记12026-08-11 12:…\")",
+      "locator": {
+        "selectors": [
+          ".sms-table-card",
+          ".sms-card.sms-table-card",
+          "body > div > div > div > main > div:nth-of-type(2) > div:nth-of-type(2)",
+          "#root div > div > main > div:nth-of-type(2) > div:nth-of-type(2)"
+        ],
+        "fingerprint": "div|class=sms-card.sms-table-card|text=导出序号发送时间BusinessID计划名称用户分组手机号码内容",
+        "path": [
+          0,
+          1,
+          0,
+          0,
+          1,
+          1,
+          2,
+          1
+        ]
+      },
+      "marker": {
+        "clientX": 252.16397094726562,
+        "clientY": 461.08148193359375,
+        "documentX": 252.16397094726562,
+        "documentY": 461.08148193359375,
+        "xPercent": 17.51138687133789,
+        "y": 461.08148193359375,
+        "isFixed": false,
+        "offsetX": 2.163970947265625,
+        "offsetY": 12.08148193359375,
+        "dirtySince": 1786505008343
+      },
+      "id": "7c2337a4-5ce0-40d7-8aff-932b92b843dd",
+      "state": "idle",
+      "comment": "撤销这个改动",
+      "pageScope": "/prototypes/sms-message",
+      "provider": null,
+      "requestId": null,
+      "sessionId": null,
+      "updatedAt": 1786513750365,
+      "code": null,
+      "message": "待处理"
     },
     {
       "label": "th(\"内容\")",
@@ -347,26 +343,30 @@
           7
         ]
       },
+      "skillIds": [
+        "prototype-annotation",
+        "impeccable"
+      ],
       "marker": {
-        "clientX": 1134.091064453125,
-        "clientY": 535.1173706054688,
-        "documentX": 1134.091064453125,
-        "documentY": 535.1173706054688,
-        "xPercent": 78.7563239203559,
-        "y": 535.1173706054688,
+        "clientX": 1102.0546875,
+        "clientY": 531.5,
+        "documentX": 1102.0546875,
+        "documentY": 531.5,
+        "xPercent": 76.53157552083333,
+        "y": 531.5,
         "isFixed": false,
-        "offsetX": 128.137939453125,
-        "offsetY": 21.61737060546875,
-        "dirtySince": 1786505732677
+        "offsetX": 96.1015625,
+        "offsetY": 18,
+        "dirtySince": 1786506256782
       },
-      "id": "5741b8e2-1c85-413f-b5a7-98fbf263ddaa",
+      "id": "8364d3b8-da69-445b-8500-a6778c1b04ae",
       "state": "completed",
-      "comment": "这个你有没有觉得间距太长了，还是太长",
+      "comment": "这个太宽\n",
       "pageScope": "/prototypes/sms-message",
       "provider": "codex",
-      "requestId": "annotation-mspjfgqw-v36oxz",
-      "sessionId": "annotation-mspjfgqw-v36oxz",
-      "updatedAt": 1786505839884,
+      "requestId": "annotation-mspjp6ks-yqpwfr",
+      "sessionId": "annotation-mspjp6ks-yqpwfr",
+      "updatedAt": 1786506278732,
       "message": "修改完成",
       "code": null
     }
