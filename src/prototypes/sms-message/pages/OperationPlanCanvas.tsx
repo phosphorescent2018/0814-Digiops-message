@@ -98,14 +98,12 @@ const NODE_H = 92;
 
 /** 前置校验配置 */
 interface PrecheckConfig {
-    enabled: boolean;
     checks: string[];
     windows: { start: string; end: string }[];
     strategy: 'wait';
 }
 
 const DEFAULT_PRECHECK: PrecheckConfig = {
-    enabled: false,
     checks: [],
     windows: [{ start: '09:00', end: '18:00' }],
     strategy: 'wait',
@@ -113,7 +111,6 @@ const DEFAULT_PRECHECK: PrecheckConfig = {
 
 /** 补发控制配置 */
 interface ResendControlConfig {
-    enabled: boolean;
     triggers: string[];
     maxWaitHours: string;
     maxResend: string;
@@ -121,7 +118,6 @@ interface ResendControlConfig {
 }
 
 const DEFAULT_RESEND_CONTROL: ResendControlConfig = {
-    enabled: false,
     triggers: [],
     maxWaitHours: '24',
     maxResend: '3',
@@ -149,9 +145,6 @@ interface CanvasEdge {
 /* ================= 摘要 ================= */
 
 function PrecheckSummary({ config }: { config: PrecheckConfig }) {
-    if (!config.enabled) {
-        return <span className="plan-canvas-item-summary">复用全局默认</span>;
-    }
     const parts: string[] = [];
     if (config.checks.includes('blacklist')) {
         parts.push('黑名单校验');
@@ -163,13 +156,10 @@ function PrecheckSummary({ config }: { config: PrecheckConfig }) {
     if (config.checks.includes('timeWindow') && config.strategy === 'wait') {
         parts.push('非时段等待');
     }
-    return <span className="plan-canvas-item-summary">{parts.length ? parts.join(' · ') : '未选择校验项'}</span>;
+    return <span className="plan-canvas-item-summary">{parts.length ? parts.join(' · ') : '未配置'}</span>;
 }
 
 function ResendControlSummary({ config }: { config: ResendControlConfig }) {
-    if (!config.enabled) {
-        return <span className="plan-canvas-item-summary">跟随全局自动补发</span>;
-    }
     const parts: string[] = [];
     if (config.triggers.includes('submitFail')) {
         parts.push('提交失败');
@@ -178,7 +168,7 @@ function ResendControlSummary({ config }: { config: ResendControlConfig }) {
         parts.push(`回执超时${config.maxWaitHours}h`);
     }
     parts.push(`最多${config.maxResend}次`, `间隔${config.interval}分钟`);
-    return <span className="plan-canvas-item-summary">{parts.join(' · ')}</span>;
+    return <span className="plan-canvas-item-summary">{parts.length ? parts.join(' · ') : '未配置'}</span>;
 }
 
 /* ================= 前置校验配置面板 ================= */
@@ -191,7 +181,6 @@ interface PrecheckModalProps {
 
 function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
     const [draft, setDraft] = useState<PrecheckConfig>(() => ({
-        enabled: initial.enabled,
         checks: [...initial.checks],
         windows: initial.windows.map((w) => ({ ...w })),
         strategy: initial.strategy,
@@ -217,26 +206,7 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
             <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="sms-modal-header">前置校验</div>
                 <div className="sms-modal-body">
-                    <div className="sms-form-item">
-                        <label className="sms-form-label">启用自定义规则</label>
-                        <div className="sms-form-control">
-                            <div className="plan-canvas-switch-row">
-                                <label className="resend-switch">
-                                    <input
-                                        type="checkbox"
-                                        checked={draft.enabled}
-                                        onChange={(e) => setDraft((prev) => ({ ...prev, enabled: e.target.checked }))}
-                                    />
-                                    <span className="resend-switch-slider" />
-                                </label>
-                                <span className="plan-canvas-switch-tip">
-                                    {draft.enabled ? '本计划按此组件配置执行' : '复用全局默认'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={`plan-canvas-config-group${draft.enabled ? '' : ' disabled'}`}>
+                    <div className="plan-canvas-config-group">
                         <div className="sms-form-item">
                             <label className="sms-form-label">校验能力</label>
                             <div className="sms-form-control">
@@ -246,7 +216,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                             <input
                                                 type="checkbox"
                                                 checked={draft.checks.includes('blacklist')}
-                                                disabled={!draft.enabled}
                                                 onChange={() => toggleCheck('blacklist')}
                                             />
                                             <span className="resend-cond-option-text">黑名单校验</span>
@@ -264,7 +233,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                         <input
                                             type="checkbox"
                                             checked={draft.checks.includes('timeWindow')}
-                                            disabled={!draft.enabled}
                                             onChange={() => toggleCheck('timeWindow')}
                                         />
                                         <span className="resend-cond-option-text">发送时段校验</span>
@@ -284,7 +252,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                                     type="time"
                                                     className="plan-canvas-time-input"
                                                     value={w.start}
-                                                    disabled={!draft.enabled}
                                                     onChange={(e) => updateWindow(index, 'start', e.target.value)}
                                                 />
                                                 <span className="plan-canvas-time-sep">-</span>
@@ -292,7 +259,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                                     type="time"
                                                     className="plan-canvas-time-input"
                                                     value={w.end}
-                                                    disabled={!draft.enabled}
                                                     onChange={(e) => updateWindow(index, 'end', e.target.value)}
                                                 />
                                                 {draft.windows.length > 1 && (
@@ -300,7 +266,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                                         type="button"
                                                         className="plan-canvas-time-del"
                                                         title="删除该时段"
-                                                        disabled={!draft.enabled}
                                                         onClick={() =>
                                                             setDraft((prev) => ({
                                                                 ...prev,
@@ -317,7 +282,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                             <button
                                                 type="button"
                                                 className="plan-canvas-time-add"
-                                                disabled={!draft.enabled}
                                                 onClick={() =>
                                                     setDraft((prev) => ({
                                                         ...prev,
@@ -339,7 +303,6 @@ function PrecheckConfigModal({ initial, onClose, onSave }: PrecheckModalProps) {
                                                 type="radio"
                                                 name="precheck-strategy"
                                                 checked={draft.strategy === 'wait'}
-                                                disabled={!draft.enabled}
                                                 onChange={() => setDraft((prev) => ({ ...prev, strategy: 'wait' }))}
                                             />
                                             <span className="resend-cond-option-text">等到下一允许时段再继续</span>
@@ -373,7 +336,6 @@ interface ResendControlModalProps {
 
 function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProps) {
     const [draft, setDraft] = useState<ResendControlConfig>(() => ({
-        enabled: initial.enabled,
         triggers: [...initial.triggers],
         maxWaitHours: initial.maxWaitHours,
         maxResend: initial.maxResend,
@@ -393,28 +355,7 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
             <div className="sms-modal plan-canvas-config-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="sms-modal-header">补发控制</div>
                 <div className="sms-modal-body">
-                    <div className="sms-form-item">
-                        <label className="sms-form-label">启用本计划自定义补发</label>
-                        <div className="sms-form-control">
-                            <div className="plan-canvas-switch-row">
-                                <label className="resend-switch">
-                                    <input
-                                        type="checkbox"
-                                        checked={draft.enabled}
-                                        onChange={(e) => setDraft((prev) => ({ ...prev, enabled: e.target.checked }))}
-                                    />
-                                    <span className="resend-switch-slider" />
-                                </label>
-                                <span className="plan-canvas-switch-tip">
-                                    {draft.enabled
-                                        ? '开启后全局不再触发本计划的自动补发'
-                                        : '跟随全局自动补发规则'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={`plan-canvas-config-group${draft.enabled ? '' : ' disabled'}`}>
+                    <div className="plan-canvas-config-group">
                         <div className="sms-form-item plan-canvas-time-item">
                             <label className="sms-form-label">触发条件</label>
                             <div className="sms-form-control">
@@ -423,7 +364,6 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
                                         <input
                                             type="checkbox"
                                             checked={draft.triggers.includes('submitFail')}
-                                            disabled={!draft.enabled}
                                             onChange={() => toggleTrigger('submitFail')}
                                         />
                                         <span className="resend-cond-option-text">提交失败</span>
@@ -433,7 +373,6 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
                                             <input
                                                 type="checkbox"
                                                 checked={draft.triggers.includes('receiptTimeout')}
-                                                disabled={!draft.enabled}
                                                 onChange={() => toggleTrigger('receiptTimeout')}
                                             />
                                             <span className="resend-cond-option-text">回执超时</span>
@@ -442,7 +381,6 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
                                         <select
                                             className="plan-canvas-inline-select"
                                             value={draft.maxWaitHours}
-                                            disabled={!draft.enabled}
                                             onChange={(e) => setDraft((prev) => ({ ...prev, maxWaitHours: e.target.value }))}
                                         >
                                             <option value="6">6</option>
@@ -462,7 +400,6 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
                                 <select
                                     className="sms-select plan-canvas-inline-select"
                                     value={draft.maxResend}
-                                    disabled={!draft.enabled}
                                     onChange={(e) => setDraft((prev) => ({ ...prev, maxResend: e.target.value }))}
                                 >
                                     <option value="1">1 次</option>
@@ -479,7 +416,6 @@ function ResendControlModal({ initial, onClose, onSave }: ResendControlModalProp
                                 <select
                                     className="sms-select plan-canvas-inline-select"
                                     value={draft.interval}
-                                    disabled={!draft.enabled}
                                     onChange={(e) => setDraft((prev) => ({ ...prev, interval: e.target.value }))}
                                 >
                                     <option value="10">10 分钟</option>
@@ -594,7 +530,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
             y: rect ? Math.max(8, Math.min(y, rect.height - NODE_H - 8)) : y,
             config:
                 def.id === 'touch-precheck'
-                    ? { ...DEFAULT_PRECHECK, windows: [{ start: '09:00', end: '18:00' }] }
+                    ? { ...DEFAULT_PRECHECK }
                     : def.id === 'resend-control'
                       ? { ...DEFAULT_RESEND_CONTROL }
                       : null,
