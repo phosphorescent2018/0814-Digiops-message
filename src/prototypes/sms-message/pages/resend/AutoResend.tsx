@@ -28,6 +28,7 @@ export default function AutoResend() {
     const [enabled, setEnabled] = useState(true);
     const [saved, setSaved] = useState(false);
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
+    const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
 
     const toggleCondition = (value: string) => {
         setConditions((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
@@ -36,6 +37,13 @@ export default function AutoResend() {
     const save = () => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
+    };
+
+    const confirmSwitch = () => {
+        if (switchModal) {
+            setEnabled(switchModal === 'open');
+        }
+        setSwitchModal(null);
     };
 
     return (
@@ -64,22 +72,22 @@ export default function AutoResend() {
                         </div>
                     </div>
                     <label className="resend-switch">
-                        <input type="checkbox" checked={enabled} onChange={() => setEnabled(!enabled)} />
+                        <input type="checkbox" checked={enabled} onChange={() => setSwitchModal(enabled ? 'close' : 'open')} />
                         <span className="resend-switch-slider" />
                         <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
                     </label>
                 </div>
 
                 <div className={`resend-rule-body${enabled ? '' : ' resend-rule-disabled'}`}>
-                    <div className="resend-form-grid">
+                    <div className="resend-cond-row">
                         <div className="sms-form-item">
                             <label className="sms-form-label">触发条件</label>
                             <div className="sms-form-control">
-                                <div className="resend-cond-list">
-                                    <div className="resend-cond-card">
-                                        <div className="resend-cond-card-head">
-                                            <span className="resend-cond-card-title">提交失败时</span>
-                                            <span className="resend-cond-card-desc">无需等待回执</span>
+                                <div className="resend-cond-groups">
+                                    <div className="resend-cond-group">
+                                        <div className="resend-cond-group-head">
+                                            <span className="resend-cond-group-title">提交失败时</span>
+                                            <span className="resend-cond-group-desc">无需等待回执</span>
                                         </div>
                                         <label className="resend-cond-option">
                                             <input
@@ -87,13 +95,13 @@ export default function AutoResend() {
                                                 checked={conditions.includes('发送失败')}
                                                 onChange={() => toggleCondition('发送失败')}
                                             />
-                                            <span>发送失败</span>
+                                            <span className="resend-cond-option-text">发送失败</span>
                                         </label>
                                     </div>
-                                    <div className="resend-cond-card">
-                                        <div className="resend-cond-card-head">
-                                            <span className="resend-cond-card-title">回执判定后</span>
-                                            <span className="resend-cond-card-desc">未送达或 24 小时内无明确回执</span>
+                                    <div className="resend-cond-group">
+                                        <div className="resend-cond-group-head">
+                                            <span className="resend-cond-group-title">回执判定后</span>
+                                            <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
                                         </div>
                                         <div className="resend-cond-options">
                                             <label className="resend-cond-option">
@@ -102,7 +110,7 @@ export default function AutoResend() {
                                                     checked={conditions.includes('未送达')}
                                                     onChange={() => toggleCondition('未送达')}
                                                 />
-                                                <span>未送达</span>
+                                                <span className="resend-cond-option-text">未送达</span>
                                             </label>
                                             <label className="resend-cond-option">
                                                 <input
@@ -110,13 +118,15 @@ export default function AutoResend() {
                                                     checked={conditions.includes('回执超时')}
                                                     onChange={() => toggleCondition('回执超时')}
                                                 />
-                                                <span>回执超时</span>
+                                                <span className="resend-cond-option-text">回执超时</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="resend-form-grid">
                         <div className="sms-form-item">
                             <label className="sms-form-label">最多补发</label>
                             <div className="sms-form-control">
@@ -156,7 +166,7 @@ export default function AutoResend() {
                         </div>
                     </div>
                     <div className="resend-rule-footer">
-                        <button type="button" className="sms-btn sms-btn-primary" onClick={save} disabled={!enabled}>
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={save} disabled={enabled}>
                             {saved ? (
                                 <>
                                     <Check size={14} />
@@ -172,6 +182,34 @@ export default function AutoResend() {
                     </div>
                 </div>
             </div>
+
+            {/* 开关确认弹窗 */}
+            {switchModal && (
+                <div className="sms-mask" onClick={() => setSwitchModal(null)}>
+                    <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="sms-modal-header">{switchModal === 'open' ? '开启自动补发' : '关闭自动补发'}</div>
+                        <div className="sms-modal-body">
+                            <p className="resend-switch-tip">
+                                {switchModal === 'open'
+                                    ? '开启后，满足触发条件的失败短信将由系统自动补发，请确认规则已配置正确。'
+                                    : '关闭后，系统将不再自动补发失败短信，已在补发队列中的批次不受影响。'}
+                            </p>
+                        </div>
+                        <div className="sms-modal-actions">
+                            <button type="button" className="sms-btn" onClick={() => setSwitchModal(null)}>
+                                取消
+                            </button>
+                            <button
+                                type="button"
+                                className={`sms-btn ${switchModal === 'close' ? 'resend-danger-btn' : 'sms-btn-primary'}`}
+                                onClick={confirmSwitch}
+                            >
+                                {switchModal === 'open' ? '确认开启' : '确认关闭'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* 任务列表 */}
             <div className="sms-card resend-section">

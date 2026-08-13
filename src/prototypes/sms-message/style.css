@@ -457,8 +457,12 @@ button {
     color: #ffffff;
 }
 
-.sms-btn:disabled {
-    opacity: 0.5;
+.sms-btn:disabled,
+.sms-btn-primary:disabled {
+    background: #f0f2f5;
+    border-color: #d9d9d9;
+    color: rgba(0, 0, 0, 0.35);
+    opacity: 1;
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -1844,39 +1848,48 @@ button {
 
 .resend-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0 24px;
 }
 
-.resend-cond-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.resend-cond-row {
+    margin-bottom: 18px;
 }
 
-.resend-cond-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #f8fafc;
-    border: 1px solid rgba(203, 208, 219, 0.45);
-    border-radius: 6px;
+.resend-cond-row .sms-form-item {
+    align-items: flex-start;
+    margin-bottom: 0;
 }
 
-.resend-cond-card-head {
+.resend-cond-groups {
+    display: flex;
+    gap: 24px;
+    padding: 6px 0;
+}
+
+.resend-cond-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 14px;
+    border-left: 2px solid #e6ebf2;
+}
+
+.resend-cond-group-head {
     display: flex;
     align-items: baseline;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
-.resend-cond-card-title {
+.resend-cond-group-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-main);
+    line-height: 1.4;
 }
 
-.resend-cond-card-desc {
+.resend-cond-group-desc {
     font-size: 12px;
     color: var(--text-muted);
 }
@@ -1884,34 +1897,81 @@ button {
 .resend-cond-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 20px;
     align-items: center;
 }
 
 .resend-cond-option {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--text-main);
     cursor: pointer;
     user-select: none;
 }
 
 .resend-cond-option input {
-    accent-color: var(--primary);
-    width: 14px;
-    height: 14px;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
     margin: 0;
+    flex-shrink: 0;
+    border: 1.5px solid #c9cfda;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.resend-cond-option input:hover {
+    border-color: var(--primary);
+}
+
+.resend-cond-option input:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.resend-cond-option input:checked::after {
+    content: '';
+    position: absolute;
+    left: 4.5px;
+    top: 1.5px;
+    width: 4px;
+    height: 8px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.resend-cond-option-text {
+    line-height: 1.4;
+}
+
+/* 响应式：窄屏下触发条件分组与参数均单列 */
+@media (max-width: 1100px) {
+    .resend-cond-groups {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }
 
 .resend-rule-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding-top: 16px;
     margin-top: 8px;
     border-top: 1px solid var(--border-soft);
+}
+
+.resend-switch-tip {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-main);
 }
 
 .resend-rule-tip {
