@@ -1837,6 +1837,24 @@ button {
     line-height: 1.5;
 }
 
+.plan-canvas-non-slot-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: linear-gradient(135deg, #eef4ff 0%, #f7f9fc 100%);
+    border: 1px solid #d9e4f5;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #46536e;
+    line-height: 1.5;
+}
+
+.plan-canvas-non-slot-icon {
+    flex-shrink: 0;
+    color: #1890ff;
+}
+
 
 .sms-resend-center {
     min-height: 420px;

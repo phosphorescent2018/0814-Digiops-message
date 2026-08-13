@@ -440,13 +440,9 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                                             </div>
                                         </div>
 
-                                        <div className="sms-form-item plan-canvas-time-item">
-                                            <label className="sms-form-label">非时段处理策略</label>
-                                            <div className="sms-form-control">
-                                                <div className="plan-canvas-fixed-tip">
-                                                    非允许时段内发送将自动挂起，等到下一允许时段再继续
-                                                </div>
-                                            </div>
+                                        <div className="plan-canvas-non-slot-tip">
+                                            <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
+                                            <span>非允许时段内发送将自动挂起，等到下一允许时段再继续</span>
                                         </div>
                                     </>
                                 )}
