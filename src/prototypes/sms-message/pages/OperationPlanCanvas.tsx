@@ -481,7 +481,7 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                     <div className="plan-canvas-config-group">
                         <div className="plan-canvas-non-slot-tip">
                             <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
-                            <span>流程将在此停留，直到补发完成（补发成功或达到上限）后继续，补发进行前将进行前置校验</span>
+                            <span>流程将在此停留，直到补发完成（补发成功或达到上限）后继续；补发前复用画布「前置校验」规则，未配置则不校验</span>
                         </div>
 
                         <div className="sms-form-item plan-canvas-time-item">
