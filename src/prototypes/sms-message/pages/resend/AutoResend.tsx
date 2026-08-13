@@ -271,14 +271,14 @@ export default function AutoResend() {
                                         <div className="resend-time-range">
                                             <input
                                                 type="time"
-                                                className="resend-time-input"
+                                                className="resend-range-input"
                                                 value={windowStart}
                                                 onChange={(e) => setWindowStart(e.target.value)}
                                             />
                                             <span className="resend-time-sep">-</span>
                                             <input
                                                 type="time"
-                                                className="resend-time-input"
+                                                className="resend-range-input"
                                                 value={windowEnd}
                                                 onChange={(e) => setWindowEnd(e.target.value)}
                                             />

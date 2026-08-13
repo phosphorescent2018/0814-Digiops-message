@@ -1189,7 +1189,7 @@ button {
 }
 
 .resend-schedule-row {
-    margin-top: 18px;
+    margin-top: 12px;
 }
 
 .resend-schedule-row .sms-form-item {
@@ -1208,7 +1208,7 @@ button {
     align-items: center;
 }
 
-.resend-time-input {
+.resend-range-input {
     width: 96px;
     height: 32px;
     border: 1px solid var(--border);
@@ -1219,7 +1219,7 @@ button {
     background: #ffffff;
 }
 
-.resend-time-input::-webkit-calendar-picker-indicator {
+.resend-range-input::-webkit-calendar-picker-indicator {
     opacity: 0.55;
     cursor: pointer;
 }
@@ -2185,7 +2185,7 @@ button {
     }
 
     .resend-form-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
