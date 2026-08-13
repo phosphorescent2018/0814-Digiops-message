@@ -2168,6 +2168,44 @@ button {
     color: var(--text-main);
 }
 
+/* 保存规则提醒弹窗：图标 + 标题 + 说明 */
+.resend-save-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.resend-save-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e6f4ff;
+    color: #1677ff;
+    flex-shrink: 0;
+}
+
+.resend-save-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.resend-save-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.resend-save-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
 .resend-rule-tip {
     display: flex;
     flex-direction: column;

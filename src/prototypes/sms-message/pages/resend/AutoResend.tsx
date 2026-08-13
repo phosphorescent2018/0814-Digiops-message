@@ -2,7 +2,7 @@
  * 自动补发：规则配置 + 运行统计 + 补发记录
  */
 import React, { useRef, useState } from 'react';
-import { Save, Check, RefreshCw, Clock, AlertCircle, Eye } from 'lucide-react';
+import { Save, Check, RefreshCw, Clock, AlertCircle, Eye, Info } from 'lucide-react';
 import AutoBatchDetail, { AUTO_BATCH_STATUS_CLASS, type AutoBatchRow } from './AutoBatchDetail';
 import type { RecordFilter } from './BatchDetail';
 
@@ -405,9 +405,14 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">保存规则</div>
                         <div className="sms-modal-body">
-                            <div className="resend-switch-tip">
-                                <span>规则即将保存</span>
-                                <span>自动补发当前处于关闭状态，保存的规则将在补发开关开启后生效。</span>
+                            <div className="resend-save-body">
+                                <span className="resend-save-icon">
+                                    <Info size={18} />
+                                </span>
+                                <div className="resend-save-text">
+                                    <span className="resend-save-title">规则即将保存</span>
+                                    <span className="resend-save-desc">自动补发当前处于关闭状态，保存的规则将在补发开关开启后生效。</span>
+                                </div>
                             </div>
                         </div>
                         <div className="sms-modal-actions">
