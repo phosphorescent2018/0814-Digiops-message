@@ -1193,7 +1193,7 @@ button {
 }
 
 .resend-schedule-row {
-    margin-top: 16px;
+    margin-top: 24px;
 }
 
 .resend-schedule-row .sms-form-item {
@@ -1952,6 +1952,12 @@ button {
 .resend-cond-row .sms-form-item {
     align-items: flex-start;
     margin-bottom: 0;
+}
+
+.resend-cond-row .sms-form-label,
+.resend-form-grid .sms-form-label,
+.resend-schedule-row .sms-form-label {
+    text-align: left;
 }
 
 .resend-cond-groups {
