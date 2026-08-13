@@ -83,6 +83,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     const [maxWait, setMaxWait] = useState('');
     const [detailBatch, setDetailBatch] = useState<AutoBatchRow | null>(null);
     const [toast, setToast] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
     const toastTimer = useRef<number | null>(null);
 
     const thresholdNum = typeof batchThreshold === 'number' ? batchThreshold : 0;
@@ -98,6 +99,11 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
         setToast(text);
         if (toastTimer.current) window.clearTimeout(toastTimer.current);
         toastTimer.current = window.setTimeout(() => setToast(''), 3000);
+    };
+
+    const refresh = () => {
+        setRefreshing(true);
+        window.setTimeout(() => setRefreshing(false), 800);
     };
 
     const toggleCondition = (value: string) => {
@@ -153,11 +159,24 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                         </span>
                     </div>
                 </div>
-                <label className={`resend-switch${configReady ? '' : ' resend-switch-disabled'}`}>
-                    <input type="checkbox" checked={enabled} onChange={handleSwitchChange} />
-                    <span className="resend-switch-slider" />
-                    <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
-                </label>
+                <div className="resend-status-actions">
+                    {enabled && (
+                        <button
+                            type="button"
+                            className={`sms-btn sms-btn-icon resend-refresh-btn${refreshing ? ' spinning' : ''}`}
+                            title="刷新"
+                            aria-label="刷新"
+                            onClick={refresh}
+                        >
+                            <RefreshCw size={15} />
+                        </button>
+                    )}
+                    <label className={`resend-switch${configReady ? '' : ' resend-switch-disabled'}`}>
+                        <input type="checkbox" checked={enabled} onChange={handleSwitchChange} />
+                        <span className="resend-switch-slider" />
+                        <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
+                    </label>
+                </div>
             </div>
 
             {/* 运行统计 */}
@@ -464,11 +483,6 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
             <div className="sms-card resend-section">
                 <div className="sms-toolbar">
                     <span className="resend-toolbar-title">自动补发记录</span>
-                    <div className="sms-toolbar-right">
-                        <button type="button" className="sms-btn sms-btn-icon" title="刷新">
-                            <RefreshCw size={15} />
-                        </button>
-                    </div>
                 </div>
                 <div className="sms-table-wrap resend-batch-wrap">
                     <table className="sms-table resend-table resend-history-table">

@@ -1179,6 +1179,23 @@ button {
     color: var(--text-muted);
 }
 
+.resend-status-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.resend-refresh-btn.spinning svg {
+    animation: resend-refresh-spin 0.8s linear;
+}
+
+@keyframes resend-refresh-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .resend-stat-row {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
