@@ -1186,6 +1186,40 @@ button {
     flex-shrink: 0;
 }
 
+.resend-refresh-btn {
+    position: relative;
+}
+
+.resend-refresh-btn:hover {
+    background: #e6f4ff;
+    border-color: #91caff;
+}
+
+.resend-refresh-btn::after {
+    content: '刷新数据';
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: rgba(20, 30, 50, 0.9);
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.resend-refresh-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
 .resend-refresh-btn.spinning svg {
     animation: resend-refresh-spin 0.8s linear;
 }

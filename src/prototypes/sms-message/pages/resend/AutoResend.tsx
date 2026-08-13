@@ -71,6 +71,7 @@ interface AutoResendProps {
 export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     const [enabled, setEnabled] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [batches, setBatches] = useState<AutoBatchRow[]>(AUTO_BATCHES);
     const [conditions, setConditions] = useState<string[]>([]);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
     const [saveModal, setSaveModal] = useState(false);
@@ -103,6 +104,14 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
 
     const refresh = () => {
         setRefreshing(true);
+        setBatches((prev) =>
+            prev.map((b) =>
+                b.status === '执行中' && b.systemVerifiedCount !== null
+                    ? { ...b, systemVerifiedCount: b.systemVerifiedCount + 26 }
+                    : b,
+            ),
+        );
+        showToast('数据已刷新');
         window.setTimeout(() => setRefreshing(false), 800);
     };
 
@@ -502,7 +511,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {AUTO_BATCHES.map((b) => (
+                            {batches.map((b) => (
                                 <tr key={b.batchId}>
                                     <td>
                                         <span className="resend-batch-id">{b.batchId}</span>
