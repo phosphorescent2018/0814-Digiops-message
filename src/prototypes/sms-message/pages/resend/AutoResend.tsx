@@ -164,7 +164,7 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
-                                    最多补发
+                                    最多补发次数
                                     <span className="sms-tooltip">同一条短信的最多自动补发次数</span>
                                 </span>
                             </label>
@@ -183,12 +183,17 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
-                                    补发间隔
+                                    补发时间间隔
                                     <span className="sms-tooltip">同一条短信两次自动补发之间的最小间隔</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
-                                <select className={`sms-select${interval ? '' : ' placeholder'}`} value={interval} onChange={(e) => setInterval(e.target.value)}>
+                                <select
+                                    className={`sms-select${interval ? '' : ' placeholder'}`}
+                                    value={interval}
+                                    disabled={maxResend === '1'}
+                                    onChange={(e) => setInterval(e.target.value)}
+                                >
                                     <option value="" disabled>
                                         请选择
                                     </option>
@@ -202,8 +207,8 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
-                                    排队阈值
-                                    <span className="sms-tooltip">排队数量达到该值时立即触发补发</span>
+                                    最大排队数量
+                                    <span className="sms-tooltip">队列积累达到该数量时立即触发补发</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
@@ -217,15 +222,14 @@ export default function AutoResend() {
                                         placeholder="请输入"
                                         onChange={(e) => setBatchThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                                     />
-                                    <span className="resend-number-unit">条</span>
                                 </div>
                             </div>
                         </div>
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="sms-tooltip-wrap">
-                                    最大等待时长
-                                    <span className="sms-tooltip">未达阈值时的最长等待时间，到点也会触发补发</span>
+                                    批次最长等待
+                                    <span className="sms-tooltip">从该批次第一条短信入队起算，未达最大排队数量时到点也会强制补发</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
