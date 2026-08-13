@@ -1931,7 +1931,7 @@ button {
     gap: 0 24px;
 }
 
-.resend-form-grid .sms-form-item:last-child {
+.resend-form-grid .sms-form-item {
     margin-bottom: 0;
 }
 
