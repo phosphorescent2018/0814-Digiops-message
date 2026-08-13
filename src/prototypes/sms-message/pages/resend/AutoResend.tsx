@@ -135,6 +135,31 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
 
     return (
         <div className="resend-auto">
+            {/* 自动补发状态条 */}
+            <div className="resend-status-bar">
+                <div className="resend-status-main">
+                    <div className="resend-status-title-row">
+                        <span className="resend-status-title">自动补发</span>
+                        <span className={`sms-status ${enabled ? 'sms-status-success' : 'sms-status-unknown'}`}>
+                            {enabled ? '已开启' : '已关闭'}
+                        </span>
+                    </div>
+                    <div className="resend-status-summary">
+                        <Clock size={13} />
+                        <span>
+                            {enabled
+                                ? `队列中 11 条 · 预计 14:05 发送 · 满 ${thresholdNum.toLocaleString()} 条提前触发`
+                                : '自动补发已关闭，规则可编辑'}
+                        </span>
+                    </div>
+                </div>
+                <label className={`resend-switch${configReady ? '' : ' resend-switch-disabled'}`}>
+                    <input type="checkbox" checked={enabled} onChange={handleSwitchChange} />
+                    <span className="resend-switch-slider" />
+                    <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
+                </label>
+            </div>
+
             {/* 运行统计 */}
             <div className="resend-stat-row">
                 {stats.map((s) => (
@@ -145,10 +170,6 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                         </div>
                     </div>
                 ))}
-            </div>
-            <div className="resend-queue-tip">
-                <Clock size={14} />
-                <span>{enabled ? `队列中 11 条 · 预计 14:05 发送 · 满 ${thresholdNum.toLocaleString()} 条提前触发` : '自动补发已关闭'}</span>
             </div>
 
             {/* 规则配置 */}
@@ -163,11 +184,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                             <span>本规则默认全局生效，但配置了自动补发组件的运营计划除外</span>
                         </div>
                     </div>
-                    <label className={`resend-switch${configReady ? '' : ' resend-switch-disabled'}`}>
-                        <input type="checkbox" checked={enabled} onChange={handleSwitchChange} />
-                        <span className="resend-switch-slider" />
-                        <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
-                    </label>
+                    {enabled && <span className="resend-rule-lock-tip">开启状态下规则不可编辑</span>}
                 </div>
 
                 <div className={`resend-rule-body${enabled ? ' resend-rule-disabled' : ''}`}>
