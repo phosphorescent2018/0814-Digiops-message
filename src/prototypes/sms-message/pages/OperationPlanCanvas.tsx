@@ -108,14 +108,12 @@ const DEFAULT_PRECHECK: PrecheckConfig = {
 /** 补发控制配置 */
 interface ResendControlConfig {
     triggers: string[];
-    maxWaitHours: string;
     maxResend: string;
     interval: string;
 }
 
 const DEFAULT_RESEND_CONTROL: ResendControlConfig = {
     triggers: [],
-    maxWaitHours: '24',
     maxResend: '3',
     interval: '30',
 };
@@ -132,7 +130,7 @@ interface JudgeConfig {
 const DEFAULT_JUDGE: JudgeConfig = {
     gateWayType: 'EVENT',
     precheck: { checks: [], windows: [{ start: '09:00', end: '18:00' }], strategy: 'wait' },
-    resend: { triggers: [], maxWaitHours: '24', maxResend: '3', interval: '30' },
+    resend: { triggers: [], maxResend: '3', interval: '30' },
     eventChannel: '短信',
     recentDay: '30',
 };
@@ -178,10 +176,13 @@ function JudgeSummary({ config }: { config: JudgeConfig }) {
         const r = config.resend;
         const parts: string[] = [];
         if (r.triggers.includes('submitFail')) {
-            parts.push('提交失败');
+            parts.push('发送失败');
+        }
+        if (r.triggers.includes('notDelivered')) {
+            parts.push('未送达');
         }
         if (r.triggers.includes('receiptTimeout')) {
-            parts.push(`回执超时${r.maxWaitHours}h`);
+            parts.push('回执超时');
         }
         parts.push(`最多${r.maxResend}次`);
         return <span className="plan-canvas-item-summary">补发控制 · {parts.join(' · ')}</span>;
@@ -454,36 +455,44 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                                 <div className="sms-form-item plan-canvas-time-item">
                                     <label className="sms-form-label">触发条件</label>
                                     <div className="sms-form-control">
-                                        <div className="plan-canvas-checks">
-                                            <label className="resend-cond-option">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={draft.resend.triggers.includes('submitFail')}
-                                                    onChange={() => toggleResendTrigger('submitFail')}
-                                                />
-                                                <span className="resend-cond-option-text">提交失败</span>
-                                            </label>
-                                            <div className="plan-canvas-check-row">
+                                        <div className="resend-cond-groups">
+                                            <div className="resend-cond-group">
+                                                <div className="resend-cond-group-head">
+                                                    <span className="resend-cond-group-title">提交失败时</span>
+                                                    <span className="resend-cond-group-desc">无需等待回执</span>
+                                                </div>
                                                 <label className="resend-cond-option">
                                                     <input
                                                         type="checkbox"
-                                                        checked={draft.resend.triggers.includes('receiptTimeout')}
-                                                        onChange={() => toggleResendTrigger('receiptTimeout')}
+                                                        checked={draft.resend.triggers.includes('submitFail')}
+                                                        onChange={() => toggleResendTrigger('submitFail')}
                                                     />
-                                                    <span className="resend-cond-option-text">回执超时</span>
+                                                    <span className="resend-cond-option-text">发送失败</span>
                                                 </label>
-                                                <span className="plan-canvas-inline-tip">最长等待</span>
-                                                <select
-                                                    className="plan-canvas-inline-select"
-                                                    value={draft.resend.maxWaitHours}
-                                                    onChange={(e) => updateResend({ maxWaitHours: e.target.value })}
-                                                >
-                                                    <option value="6">6</option>
-                                                    <option value="12">12</option>
-                                                    <option value="24">24</option>
-                                                    <option value="48">48</option>
-                                                </select>
-                                                <span className="plan-canvas-inline-tip">小时后无明确回执</span>
+                                            </div>
+                                            <div className="resend-cond-group">
+                                                <div className="resend-cond-group-head">
+                                                    <span className="resend-cond-group-title">回执判定后</span>
+                                                    <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
+                                                </div>
+                                                <div className="resend-cond-options">
+                                                    <label className="resend-cond-option">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={draft.resend.triggers.includes('notDelivered')}
+                                                            onChange={() => toggleResendTrigger('notDelivered')}
+                                                        />
+                                                        <span className="resend-cond-option-text">未送达</span>
+                                                    </label>
+                                                    <label className="resend-cond-option">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={draft.resend.triggers.includes('receiptTimeout')}
+                                                            onChange={() => toggleResendTrigger('receiptTimeout')}
+                                                        />
+                                                        <span className="resend-cond-option-text">回执超时</span>
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
