@@ -755,6 +755,7 @@ button {
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
+    width: max-content;
     max-width: 260px;
     padding: 6px 10px;
     border-radius: 4px;
@@ -762,7 +763,8 @@ button {
     color: #ffffff;
     font-size: 12px;
     line-height: 1.5;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: left;
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
