@@ -1210,13 +1210,18 @@ button {
 
 .resend-time-input {
     width: 120px;
-    height: 28px;
+    height: 32px;
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 0 8px;
     font-size: 14px;
     color: var(--text-main);
     background: #ffffff;
+}
+
+.resend-time-input::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+    cursor: pointer;
 }
 
 .resend-time-sep {
@@ -2018,6 +2023,24 @@ button {
     border: solid #ffffff;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+}
+
+/* 生效时段：单选圆点（与触发条件勾选同款，但为互斥单选） */
+.resend-cond-option input[type='radio'] {
+    border-radius: 50%;
+}
+
+.resend-cond-option input[type='radio']:checked::after {
+    content: '';
+    position: absolute;
+    left: 3.5px;
+    top: 3.5px;
+    width: 6px;
+    height: 6px;
+    border: none;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: none;
 }
 
 .resend-cond-option-text {

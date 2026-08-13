@@ -220,24 +220,24 @@ export default function AutoResend() {
                             <label className="sms-form-label">生效时段</label>
                             <div className="sms-form-control">
                                 <div className="resend-schedule-inline">
-                                    <div className="resend-radio-group">
-                                        <label className={`resend-radio-item${scheduleMode === 'all' ? ' checked' : ''}`}>
+                                    <div className="resend-cond-options">
+                                        <label className="resend-cond-option">
                                             <input
                                                 type="radio"
                                                 name="scheduleMode"
                                                 checked={scheduleMode === 'all'}
                                                 onChange={() => setScheduleMode('all')}
                                             />
-                                            全天
+                                            <span className="resend-cond-option-text">全天</span>
                                         </label>
-                                        <label className={`resend-radio-item${scheduleMode === 'range' ? ' checked' : ''}`}>
+                                        <label className="resend-cond-option">
                                             <input
                                                 type="radio"
                                                 name="scheduleMode"
                                                 checked={scheduleMode === 'range'}
                                                 onChange={() => setScheduleMode('range')}
                                             />
-                                            指定时段
+                                            <span className="resend-cond-option-text">指定时段</span>
                                         </label>
                                     </div>
                                     {scheduleMode === 'range' && (
