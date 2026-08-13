@@ -1135,8 +1135,9 @@ button {
 }
 
 .resend-stat-card {
-    display: grid;
-    grid-template-rows: 1fr auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 18px 20px;
     border: 1px solid var(--border-soft);
     border-radius: 8px;
@@ -1146,8 +1147,6 @@ button {
 .resend-stat-main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    flex: 1;
 }
 
 .resend-stat-num {
@@ -1175,12 +1174,17 @@ button {
     font-size: 13px;
 }
 
-.resend-stat-sub {
+.resend-queue-tip {
     display: flex;
-    align-items: flex-end;
-    min-height: 34px;
-    color: var(--text-muted);
-    font-size: 12px;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fff7e6;
+    border: 1px solid #ffd591;
+    border-radius: 6px;
+    color: #ad6800;
+    font-size: 13px;
     line-height: 1.5;
 }
 

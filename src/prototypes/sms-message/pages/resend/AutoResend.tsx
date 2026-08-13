@@ -2,7 +2,7 @@
  * 自动补发：规则配置 + 运行统计 + 补发任务列表
  */
 import React, { useState } from 'react';
-import { Zap, Save, Check, RefreshCw } from 'lucide-react';
+import { Zap, Save, Check, RefreshCw, Clock } from 'lucide-react';
 
 const TASKS = [
     { id: 1, time: '2026-08-12 13:20:05', phone: 'n6cHZ+wHVUE1uN3IqCAedg==', reason: '回执超时', times: '2/3', status: '已送达' },
@@ -50,12 +50,7 @@ export default function AutoResend() {
         { label: '今日补发', value: 128, tone: '' },
         { label: '补发成功', value: 96, tone: 'success' },
         { label: '补发失败', value: 21, tone: 'danger' },
-        {
-            label: '队列中',
-            value: 11,
-            tone: 'warn',
-            sub: `预计 14:05 发送 · 满 ${batchThreshold.toLocaleString()} 条提前触发`,
-        },
+        { label: '队列中', value: 11, tone: 'warn' },
     ];
 
     return (
@@ -68,9 +63,14 @@ export default function AutoResend() {
                             <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
                             <div className="resend-stat-label">{s.label}</div>
                         </div>
-                        <div className="resend-stat-sub">{s.sub ?? ''}</div>
                     </div>
                 ))}
+            </div>
+            <div className="resend-queue-tip">
+                <Clock size={14} />
+                <span>
+                    队列中 11 条 · 预计 14:05 发送 · 满 {batchThreshold.toLocaleString()} 条提前触发
+                </span>
             </div>
 
             {/* 规则配置 */}
