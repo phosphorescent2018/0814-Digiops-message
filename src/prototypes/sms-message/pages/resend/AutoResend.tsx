@@ -78,7 +78,7 @@ export default function AutoResend() {
                     </label>
                 </div>
 
-                <div className={`resend-rule-body${enabled ? '' : ' resend-rule-disabled'}`}>
+                <div className={`resend-rule-body${enabled ? ' resend-rule-disabled' : ''}`}>
                     <div className="resend-cond-row">
                         <div className="sms-form-item">
                             <label className="sms-form-label">触发条件</label>
