@@ -1149,10 +1149,12 @@ button {
 .resend-stat-main {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .resend-stat-num {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: #031938;
     line-height: 1.2;
