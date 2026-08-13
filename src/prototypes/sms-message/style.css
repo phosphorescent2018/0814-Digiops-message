@@ -1221,6 +1221,233 @@ button {
     font-size: 14px;
 }
 
+/* 运营计划画布配置页 */
+.plan-canvas {
+    margin-top: 16px;
+}
+
+.plan-canvas-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+}
+
+.plan-canvas-top-left,
+.plan-canvas-top-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.plan-canvas-back {
+    color: var(--text-secondary);
+    padding: 0 6px;
+}
+
+.plan-canvas-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+.plan-canvas-edit {
+    width: 26px;
+    height: 26px;
+    color: #5095ff;
+}
+
+.plan-canvas-tag {
+    border-style: dashed;
+    color: var(--text-secondary);
+    height: 28px;
+}
+
+.plan-canvas-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.plan-canvas-trigger-select {
+    width: 110px;
+    height: 28px;
+    font-size: 13px;
+}
+
+.plan-canvas-save {
+    background: #69b1ff;
+    border-color: #69b1ff;
+    color: #ffffff;
+}
+
+.plan-canvas-save:hover {
+    background: #8ac0ff;
+    border-color: #8ac0ff;
+    color: #ffffff;
+}
+
+.plan-canvas-publish {
+    background: #0958d9;
+    border-color: #0958d9;
+}
+
+.plan-canvas-publish:hover {
+    background: #0f67ee;
+    border-color: #0f67ee;
+    color: #ffffff;
+}
+
+.plan-canvas-body {
+    display: flex;
+    margin-top: 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 560px;
+}
+
+.plan-canvas-panel {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-soft);
+    padding: 12px 8px;
+    overflow-y: auto;
+}
+
+.plan-canvas-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px 10px;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.plan-canvas-group-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 8px 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.plan-canvas-nodes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 0 4px;
+}
+
+.plan-canvas-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.plan-canvas-node:hover {
+    background: #f5f7fa;
+    border-color: var(--border-soft);
+}
+
+.plan-canvas-node-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.plan-canvas-node-icon.shape-circle {
+    border-radius: 50%;
+}
+
+.plan-canvas-node-icon.shape-diamond {
+    border-radius: 6px;
+    transform: rotate(45deg);
+}
+
+.plan-canvas-node-icon.shape-diamond svg {
+    transform: rotate(-45deg);
+}
+
+.plan-canvas-node-label {
+    font-size: 12px;
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+.plan-canvas-area {
+    flex: 1;
+    position: relative;
+    min-height: 560px;
+    background: #ffffff;
+}
+
+.plan-canvas-toolbar {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(30, 45, 75, 0.12);
+}
+
+.plan-canvas-tool {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #74798c;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.plan-canvas-tool:hover {
+    background: #e6f4ff;
+    color: var(--primary);
+}
+
+.plan-canvas-tool.disabled {
+    color: #cbd0db;
+    cursor: not-allowed;
+}
+
+.plan-canvas-tool.disabled:hover {
+    background: transparent;
+}
+
 .sms-resend-center {
     min-height: 420px;
 }

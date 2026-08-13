@@ -17,6 +17,7 @@ import {
     Copy,
     MoreHorizontal,
 } from 'lucide-react';
+import OperationPlanCanvas from './OperationPlanCanvas';
 
 interface PlanRow {
     id: string;
@@ -70,6 +71,7 @@ export default function OperationPlanPage() {
     const [tab, setTab] = useState<'manage' | 'summary'>('manage');
     const [collapsed, setCollapsed] = useState(true);
     const [page, setPage] = useState(1);
+    const [view, setView] = useState<'list' | 'canvas'>('list');
 
     const renderSelect = (placeholder = '请选择', options?: string[]) => (
         <select className="sms-select placeholder" defaultValue="">
@@ -81,6 +83,12 @@ export default function OperationPlanPage() {
             ))}
         </select>
     );
+
+    if (view === 'canvas') {
+        return (
+            <OperationPlanCanvas planName="BL_RolloverPeriod_d16-30" onBack={() => setView('list')} />
+        );
+    }
 
     return (
         <div>
@@ -212,7 +220,12 @@ export default function OperationPlanPage() {
                                         <tr key={r.id}>
                                             <td className="plan-col-action">
                                                 <span className="plan-action-group">
-                                                    <button type="button" className="sms-btn sms-btn-icon" title="详情">
+                                                    <button
+                                                        type="button"
+                                                        className="sms-btn sms-btn-icon"
+                                                        title="详情"
+                                                        onClick={() => setView('canvas')}
+                                                    >
                                                         <Eye size={15} />
                                                     </button>
                                                     <button type="button" className="sms-btn sms-btn-icon" title="复制">
