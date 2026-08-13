@@ -1209,7 +1209,7 @@ button {
 }
 
 .resend-time-input {
-    width: 120px;
+    width: 96px;
     height: 32px;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -1570,6 +1570,10 @@ button {
 
 .resend-toast svg {
     color: #52c41a;
+}
+
+.resend-toast.warn svg {
+    color: #fa8c16;
 }
 
 /* ================================================================
@@ -2059,8 +2063,8 @@ button {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-top: 12px;
-    margin-top: 4px;
+    padding-top: 16px;
+    margin-top: 8px;
     border-top: 1px solid var(--border-soft);
 }
 
@@ -2127,6 +2131,15 @@ button {
 .resend-switch-text {
     color: var(--text-secondary);
     font-size: 13px;
+}
+
+.resend-switch-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.resend-switch-disabled .resend-switch-slider {
+    cursor: not-allowed;
 }
 
 /* 自动补发任务：触发原因标签 */

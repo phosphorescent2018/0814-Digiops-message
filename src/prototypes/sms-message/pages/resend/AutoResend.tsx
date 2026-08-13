@@ -1,8 +1,8 @@
 /**
  * 自动补发：规则配置 + 运行统计 + 补发任务列表
  */
-import React, { useState } from 'react';
-import { Zap, Save, Check, RefreshCw, Clock } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Zap, Save, Check, RefreshCw, Clock, AlertCircle } from 'lucide-react';
 
 const TASKS = [
     { id: 1, time: '2026-08-12 13:20:05', phone: 'n6cHZ+wHVUE1uN3IqCAedg==', reason: '回执超时', times: '2/3', status: '已送达' },
@@ -20,14 +20,27 @@ const STATUS_CLASS: Record<string, string> = {
 export default function AutoResend() {
     const [enabled, setEnabled] = useState(false);
     const [saved, setSaved] = useState(false);
-    const [conditions, setConditions] = useState(['未送达', '回执超时']);
+    const [conditions, setConditions] = useState<string[]>([]);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
     const [saveModal, setSaveModal] = useState(false);
     const [scheduleMode, setScheduleMode] = useState<'all' | 'range'>('all');
     const [windowStart, setWindowStart] = useState('08:00');
     const [windowEnd, setWindowEnd] = useState('22:00');
-    const [batchThreshold, setBatchThreshold] = useState(1000);
-    const [maxWait, setMaxWait] = useState(15);
+    const [maxResend, setMaxResend] = useState('');
+    const [interval, setInterval] = useState('');
+    const [batchThreshold, setBatchThreshold] = useState<number | ''>('');
+    const [maxWait, setMaxWait] = useState('');
+    const [toast, setToast] = useState('');
+    const toastTimer = useRef<number | null>(null);
+
+    const thresholdNum = typeof batchThreshold === 'number' ? batchThreshold : 0;
+    const configReady = conditions.length > 0 && !!maxResend && !!interval && thresholdNum > 0 && !!maxWait;
+
+    const showToast = (text: string) => {
+        setToast(text);
+        if (toastTimer.current) window.clearTimeout(toastTimer.current);
+        toastTimer.current = window.setTimeout(() => setToast(''), 3000);
+    };
 
     const toggleCondition = (value: string) => {
         setConditions((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
@@ -36,7 +49,15 @@ export default function AutoResend() {
     const save = () => {
         setSaveModal(false);
         setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+        setTimeout(() => setSaved(false), 5000);
+    };
+
+    const handleSwitchChange = () => {
+        if (!configReady) {
+            showToast('开启前需完成自动补发规则配置');
+            return;
+        }
+        setSwitchModal(enabled ? 'close' : 'open');
     };
 
     const confirmSwitch = () => {
@@ -68,7 +89,7 @@ export default function AutoResend() {
             </div>
             <div className="resend-queue-tip">
                 <Clock size={14} />
-                <span>{enabled ? `队列中 11 条 · 预计 14:05 发送 · 满 ${batchThreshold.toLocaleString()} 条提前触发` : '自动补发已关闭'}</span>
+                <span>{enabled ? `队列中 11 条 · 预计 14:05 发送 · 满 ${thresholdNum.toLocaleString()} 条提前触发` : '自动补发已关闭'}</span>
             </div>
 
             {/* 规则配置 */}
@@ -84,8 +105,8 @@ export default function AutoResend() {
                             <span>本规则默认全局生效，但配置了自动补发组件的运营计划除外</span>
                         </div>
                     </div>
-                    <label className="resend-switch">
-                        <input type="checkbox" checked={enabled} onChange={() => setSwitchModal(enabled ? 'close' : 'open')} />
+                    <label className={`resend-switch${configReady ? '' : ' resend-switch-disabled'}`}>
+                        <input type="checkbox" checked={enabled} onChange={handleSwitchChange} />
                         <span className="resend-switch-slider" />
                         <span className="resend-switch-text">{enabled ? '已开启' : '已关闭'}</span>
                     </label>
@@ -148,12 +169,13 @@ export default function AutoResend() {
                                 </span>
                             </label>
                             <div className="sms-form-control">
-                                <select className="sms-select">
+                                <select className={`sms-select${maxResend ? '' : ' placeholder'}`} value={maxResend} onChange={(e) => setMaxResend(e.target.value)}>
+                                    <option value="" disabled>
+                                        请选择
+                                    </option>
                                     <option value="1">1 次</option>
                                     <option value="2">2 次</option>
-                                    <option value="3" selected>
-                                        3 次
-                                    </option>
+                                    <option value="3">3 次</option>
                                     <option value="5">5 次</option>
                                 </select>
                             </div>
@@ -166,12 +188,13 @@ export default function AutoResend() {
                                 </span>
                             </label>
                             <div className="sms-form-control">
-                                <select className="sms-select">
+                                <select className={`sms-select${interval ? '' : ' placeholder'}`} value={interval} onChange={(e) => setInterval(e.target.value)}>
+                                    <option value="" disabled>
+                                        请选择
+                                    </option>
                                     <option value="1">1 小时</option>
                                     <option value="2">2 小时</option>
-                                    <option value="4" selected>
-                                        4 小时
-                                    </option>
+                                    <option value="4">4 小时</option>
                                     <option value="24">24 小时</option>
                                 </select>
                             </div>
@@ -191,7 +214,8 @@ export default function AutoResend() {
                                         min={100}
                                         step={100}
                                         value={batchThreshold}
-                                        onChange={(e) => setBatchThreshold(Number(e.target.value))}
+                                        placeholder="请输入"
+                                        onChange={(e) => setBatchThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                                     />
                                     <span className="resend-number-unit">条</span>
                                 </div>
@@ -205,7 +229,10 @@ export default function AutoResend() {
                                 </span>
                             </label>
                             <div className="sms-form-control">
-                                <select className="sms-select" value={maxWait} onChange={(e) => setMaxWait(Number(e.target.value))}>
+                                <select className={`sms-select${maxWait ? '' : ' placeholder'}`} value={maxWait} onChange={(e) => setMaxWait(e.target.value)}>
+                                    <option value="" disabled>
+                                        请选择
+                                    </option>
                                     <option value={5}>5 分钟</option>
                                     <option value={10}>10 分钟</option>
                                     <option value={15}>15 分钟</option>
@@ -262,7 +289,7 @@ export default function AutoResend() {
                         </div>
                     </div>
                     <div className="resend-rule-footer">
-                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setSaveModal(true)} disabled={enabled}>
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setSaveModal(true)} disabled={enabled || !configReady}>
                             {saved ? (
                                 <>
                                     <Check size={14} />
@@ -382,6 +409,14 @@ export default function AutoResend() {
                     </table>
                 </div>
             </div>
+
+            {/* 轻提示 */}
+            {toast && (
+                <div className="resend-toast warn">
+                    <AlertCircle size={14} />
+                    {toast}
+                </div>
+            )}
         </div>
     );
 }
