@@ -153,7 +153,12 @@ interface CanvasEdge {
     to: string;
     fromPort: PortDir;
     toPort: PortDir;
+    /** 网关分支语义：第一条 YES（对勾），第二条 NO（叉子） */
+    expect?: 'YES' | 'NO';
 }
+
+/** 网关类节点：出线自动带对勾/叉子分支标签 */
+const BRANCH_NODE_IDS = ['judge', 'action-judge', 'group-filter'];
 
 /* ================= 判断节点配置面板 ================= */
 
@@ -690,16 +695,23 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                     { port: 'bottom', dist: Math.hypot(ev.clientX - cx, ev.clientY - r.bottom) },
                 ];
                 const toPort = candidates.reduce((best, c) => (c.dist < best.dist ? c : best)).port;
-                setEdges((prev) => [
-                    ...prev,
-                    {
-                        id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                        from: fromId,
-                        to: targetId,
-                        fromPort,
-                        toPort,
-                    },
-                ]);
+                setEdges((prev) => {
+                    const sourceNode = nodes.find((n) => n.id === fromId);
+                    const isBranch = sourceNode ? BRANCH_NODE_IDS.includes(sourceNode.def.id) : false;
+                    const hasYes = prev.some((e) => e.from === fromId && e.expect === 'YES');
+                    const expect: 'YES' | 'NO' | undefined = isBranch ? (hasYes ? 'NO' : 'YES') : undefined;
+                    return [
+                        ...prev,
+                        {
+                            id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                            from: fromId,
+                            to: targetId,
+                            fromPort,
+                            toPort,
+                            expect,
+                        },
+                    ];
+                });
             }
             setLinkPreview(null);
             linkDragRef.current = null;
@@ -880,15 +892,38 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                             const from = nodes.find((n) => n.id === edge.from);
                             const to = nodes.find((n) => n.id === edge.to);
                             if (!from || !to) return null;
+                            const p1 = portPoint(from, edge.fromPort);
+                            const p2 = portPoint(to, edge.toPort);
                             return (
-                                <path
+                                <g
                                     key={edge.id}
-                                    d={edgePath(from, edge.fromPort, to, edge.toPort)}
-                                    fill="none"
-                                    stroke="#98a1b8"
-                                    strokeWidth="1.6"
-                                    markerEnd="url(#plan-arrow)"
-                                />
+                                >
+                                    <path
+                                        d={edgePath(from, edge.fromPort, to, edge.toPort)}
+                                        fill="none"
+                                        stroke="#98a1b8"
+                                        strokeWidth="1.6"
+                                        markerEnd="url(#plan-arrow)"
+                                    />
+                                    {edge.expect && (
+                                        <g
+                                            className="plan-canvas-edge-expect"
+                                            transform={`translate(${(p1.x + p2.x) / 2 - 10}, ${(p1.y + p2.y) / 2 - 10})`}
+                                        >
+                                            <title>{edge.expect === 'NO' ? '否' : '是'}</title>
+                                            <circle r="10" fill={edge.expect === 'NO' ? '#FF2855' : '#52C41A'} />
+                                            {edge.expect === 'NO' ? (
+                                                <g fill="white" transform="translate(6, 6)">
+                                                    <path d="M 11.7238 10.3819 L 7.33181 5.99504 L 11.7238 1.60826 C 12.0921 1.24034 12.0921 0.643852 11.7238 0.275936 C 11.3554 -0.0919788 10.7582 -0.0919788 10.3899 0.275936 L 5.99507 4.66568 L 1.61014 0.285775 C 1.24175 -0.0821398 0.644614 -0.0820943 0.276273 0.285775 C -0.0920682 0.653691 -0.0921138 1.25018 0.276273 1.6181 L 4.66818 6.00493 L 0.276273 10.3918 C -0.0920682 10.7596 -0.0921138 11.3562 0.276273 11.7241 C 0.64466 12.092 1.24179 12.092 1.61014 11.7241 L 6.00497 7.33433 L 10.3899 11.7142 C 10.7582 12.0821 11.3554 12.0821 11.7238 11.7142 C 12.0921 11.3463 12.0921 10.7498 11.7238 10.3819" />
+                                                </g>
+                                            ) : (
+                                                <g fill="white" transform="translate(5, 7)">
+                                                    <path d="M12.1131978,0.329504871 C12.5448299,-0.109834957 13.2446438,-0.109834957 13.6762759,0.329504871 C14.107908,0.768844699 14.107908,1.4811553 13.6762759,1.92049513 L5.57101276,10.1704951 C5.13938065,10.609835 4.43956672,10.609835 4.00793461,10.1704951 L0.323724084,6.42049513 C-0.107908028,5.9811553 -0.107908028,5.2688447 0.323724084,4.82950487 C0.755356196,4.39016504 1.45517012,4.39016504 1.88680223,4.82950487 L4.78947368,7.78400974 L12.1131978,0.329504871 Z" />
+                                                </g>
+                                            )}
+                                        </g>
+                                    )}
+                                </g>
                             );
                         })}
                         {previewStart && previewEnd && (

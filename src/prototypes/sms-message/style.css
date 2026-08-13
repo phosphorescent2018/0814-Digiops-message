@@ -1513,6 +1513,11 @@ button {
     overflow: visible;
 }
 
+.plan-canvas-edge-expect circle {
+    stroke: #ffffff;
+    stroke-width: 1.5;
+}
+
 .plan-canvas-item {
     position: absolute;
     width: 128px;
