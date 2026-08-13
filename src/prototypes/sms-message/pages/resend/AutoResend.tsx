@@ -4,13 +4,6 @@
 import React, { useState } from 'react';
 import { Zap, Save, Check, RefreshCw } from 'lucide-react';
 
-const STATS = [
-    { label: '今日补发', value: 128, tone: '' },
-    { label: '补发成功', value: 96, tone: 'success' },
-    { label: '补发失败', value: 21, tone: 'danger' },
-    { label: '队列中', value: 11, tone: 'warn' },
-];
-
 const TASKS = [
     { id: 1, time: '2026-08-12 13:20:05', phone: 'n6cHZ+wHVUE1uN3IqCAedg==', reason: '回执超时', times: '2/3', status: '已送达' },
     { id: 2, time: '2026-08-12 12:58:44', phone: '4U4I9nOEeJsD6sIIYO6MCw==', reason: '未送达', times: '1/3', status: '回执中' },
@@ -29,6 +22,11 @@ export default function AutoResend() {
     const [saved, setSaved] = useState(false);
     const [conditions, setConditions] = useState(['未送达', '回执超时']);
     const [switchModal, setSwitchModal] = useState<'open' | 'close' | null>(null);
+    const [scheduleType, setScheduleType] = useState<'all' | 'window'>('all');
+    const [windowStart, setWindowStart] = useState('08:00');
+    const [windowEnd, setWindowEnd] = useState('22:00');
+    const [batchThreshold, setBatchThreshold] = useState(1000);
+    const [maxWait, setMaxWait] = useState(15);
 
     const toggleCondition = (value: string) => {
         setConditions((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
@@ -46,14 +44,27 @@ export default function AutoResend() {
         setSwitchModal(null);
     };
 
+    const stats = [
+        { label: '今日补发', value: 128, tone: '' },
+        { label: '补发成功', value: 96, tone: 'success' },
+        { label: '补发失败', value: 21, tone: 'danger' },
+        {
+            label: '队列中',
+            value: 11,
+            tone: 'warn',
+            sub: `预计 14:05 发送 · 满 ${batchThreshold.toLocaleString()} 条提前触发`,
+        },
+    ];
+
     return (
         <div className="resend-auto">
             {/* 运行统计 */}
             <div className="resend-stat-row">
-                {STATS.map((s) => (
+                {stats.map((s) => (
                     <div className="resend-stat-card" key={s.label}>
                         <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
                         <div className="resend-stat-label">{s.label}</div>
+                        {s.sub && <div className="resend-stat-sub">{s.sub}</div>}
                     </div>
                 ))}
             </div>
@@ -166,11 +177,66 @@ export default function AutoResend() {
                         <div className="sms-form-item">
                             <label className="sms-form-label">生效时段</label>
                             <div className="sms-form-control">
-                                <select className="sms-select">
-                                    <option value="all" selected>
-                                        全天
-                                    </option>
-                                    <option value="window">指定时段（08:00-22:00）</option>
+                                <div className="resend-schedule">
+                                    <select className="sms-select" value={scheduleType} onChange={(e) => setScheduleType(e.target.value as 'all' | 'window')}>
+                                        <option value="all">全天</option>
+                                        <option value="window">指定时段</option>
+                                    </select>
+                                    {scheduleType === 'window' && (
+                                        <div className="resend-time-range">
+                                            <input
+                                                type="time"
+                                                className="resend-time-input"
+                                                value={windowStart}
+                                                onChange={(e) => setWindowStart(e.target.value)}
+                                            />
+                                            <span className="resend-time-sep">-</span>
+                                            <input
+                                                type="time"
+                                                className="resend-time-input"
+                                                value={windowEnd}
+                                                onChange={(e) => setWindowEnd(e.target.value)}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">
+                                <span className="sms-tooltip-wrap">
+                                    累计阈值
+                                    <span className="sms-tooltip">排队数量达到该值时立即触发补发</span>
+                                </span>
+                            </label>
+                            <div className="sms-form-control">
+                                <div className="resend-number-wrap">
+                                    <input
+                                        type="number"
+                                        className="sms-input"
+                                        min={100}
+                                        step={100}
+                                        value={batchThreshold}
+                                        onChange={(e) => setBatchThreshold(Number(e.target.value))}
+                                    />
+                                    <span className="resend-number-unit">条</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">
+                                <span className="sms-tooltip-wrap">
+                                    最大等待时长
+                                    <span className="sms-tooltip">未达阈值时的最长等待时间，到点也会触发补发</span>
+                                </span>
+                            </label>
+                            <div className="sms-form-control">
+                                <select className="sms-select" value={maxWait} onChange={(e) => setMaxWait(Number(e.target.value))}>
+                                    <option value={5}>5 分钟</option>
+                                    <option value={10}>10 分钟</option>
+                                    <option value={15}>15 分钟</option>
+                                    <option value={30}>30 分钟</option>
+                                    <option value={60}>60 分钟</option>
                                 </select>
                             </div>
                         </div>
