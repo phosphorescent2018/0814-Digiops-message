@@ -124,7 +124,7 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                                 <option value="已送达">已送达</option>
                                 <option value="未送达">未送达</option>
                                 <option value="回执超时">回执超时</option>
-                                <option value="--">--（无回执）</option>
+                                <option value="--">--</option>
                             </select>
                         </div>
                     </div>
