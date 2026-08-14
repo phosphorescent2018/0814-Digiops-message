@@ -2527,6 +2527,11 @@ button {
     font-size: 12px;
 }
 
+.resend-time-placeholder {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
 .resend-terminate-tip {
     margin: 0 0 8px;
     font-size: 15px;

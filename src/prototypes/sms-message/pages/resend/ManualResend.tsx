@@ -135,7 +135,7 @@ export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完�
 };
 
 type ModalType = 'immediate' | 'scheduled' | null;
-type IgnoreBlacklist = 'yes' | 'no';
+type IgnoreBlacklist = 'yes' | 'no' | 'unset';
 
 const MANUAL_COLUMNS: ColumnDef[] = [
     { key: 'batchId', label: '补发批次 ID' },
@@ -158,8 +158,8 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [hitVisible, setHitVisible] = useState(false);
     const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
-    const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('no');
-    const [scheduledTime, setScheduledTime] = useState('2026-08-23 18:00:00');
+    const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('unset');
+    const [scheduledTime, setScheduledTime] = useState('');
     const [validating, setValidating] = useState(false);
     const [validated, setValidated] = useState(false);
     const [verifiedCount, setVerifiedCount] = useState<number | null>(null);
@@ -225,6 +225,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const actualHit = hitCount - Math.round(hitCount * 0.036);
     const timeFormatValid = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(scheduledTime);
     const scheduledTimeValid = timeFormatValid && scheduledTime > nowStr();
+    const scheduledTimeEmpty = modal === 'scheduled' && scheduledTime.trim() === '';
 
     const closeModal = () => {
         setModal(null);
@@ -233,7 +234,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     };
 
     const verifyCount = () => {
-        if (validating) return;
+        if (validating || ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)) return;
         setValidating(true);
         setTimeout(() => {
             setValidating(false);
@@ -403,7 +404,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 className="sms-btn"
                                 onClick={() => {
                                     setModal('scheduled');
-                                    setScheduledTime('2026-08-23 18:00:00');
+                                    setScheduledTime('');
                                 }}
                             >
                                 <Clock size={14} />
@@ -542,7 +543,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                     <div className="resend-time-field">
                                         <input
                                             type="datetime-local"
-                                            className={`sms-input resend-time-input${scheduledTimeValid ? '' : ' error'}`}
+                                            className={`sms-input resend-time-input${!scheduledTimeEmpty && !scheduledTimeValid ? ' error' : ''}`}
                                             value={scheduledTime.slice(0, 16)}
                                             min={nowStr().slice(0, 16)}
                                             onChange={(e) => {
@@ -552,7 +553,10 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                                 setVerifiedCount(null);
                                             }}
                                         />
-                                        {!scheduledTimeValid && (
+                                        {scheduledTimeEmpty && (
+                                            <span className="resend-time-placeholder">请选择补发时间</span>
+                                        )}
+                                        {!scheduledTimeEmpty && !scheduledTimeValid && (
                                             <span className="resend-time-error">补发时间需晚于当前时间（格式：YYYY-MM-DD HH:mm:ss）</span>
                                         )}
                                     </div>
@@ -589,11 +593,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                     </label>
                                 </div>
                             </div>
-                            <div className={`resend-blacklist-tip${ignoreBlacklist === 'yes' ? ' warn' : ''}`}>
-                                {ignoreBlacklist === 'yes'
-                                    ? '所补发用户将含有黑名单用户'
-                                    : '所补发用户将不含有黑名单用户'}
-                            </div>
+                            {ignoreBlacklist !== 'unset' && (
+                                <div className={`resend-blacklist-tip${ignoreBlacklist === 'yes' ? ' warn' : ''}`}>
+                                    {ignoreBlacklist === 'yes'
+                                        ? '所补发用户将含有黑名单用户'
+                                        : '所补发用户将不含有黑名单用户'}
+                                </div>
+                            )}
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发数量</span>
                                 <div className="resend-verify-wrap">
@@ -602,14 +608,27 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             {verifiedCount.toLocaleString()} 条
                                         </span>
                                     ) : (
-                                        <button
-                                            type="button"
-                                            className="sms-btn"
-                                            onClick={verifyCount}
-                                            disabled={validating}
-                                        >
-                                            {validating ? '校验中…' : '点击校验'}
-                                        </button>
+                                        <span className="sms-tooltip-wrap">
+                                            <button
+                                                type="button"
+                                                className="sms-btn"
+                                                onClick={verifyCount}
+                                                disabled={
+                                                    validating ||
+                                                    ignoreBlacklist === 'unset' ||
+                                                    (modal === 'scheduled' && !scheduledTimeValid)
+                                                }
+                                            >
+                                                {validating ? '校验中…' : '点击校验'}
+                                            </button>
+                                            {(ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)) && (
+                                                <span className="sms-tooltip">
+                                                    {ignoreBlacklist === 'unset'
+                                                        ? '请先选择黑名单用户是否发送'
+                                                        : '请先选择晚于当前时间的补发时间'}
+                                                </span>
+                                            )}
+                                        </span>
                                     )}
                                 </div>
                             </div>
@@ -621,7 +640,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <button
                                 type="button"
                                 className="sms-btn sms-btn-primary"
-                                disabled={!validated || (modal === 'scheduled' && !scheduledTimeValid)}
+                                disabled={!validated || ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)}
                                 onClick={confirmFinal}
                             >
                                 确认补发
