@@ -158,6 +158,102 @@ interface CanvasEdge {
 /** 网关类节点：出线自动带对勾/叉子分支标签 */
 const BRANCH_NODE_IDS = ['judge', 'action-judge', 'group-filter'];
 
+/* ================= 默认示例画布（完整链路） ================= */
+
+const PLAN_CANVAS_STORAGE_KEY = 'axhub-plan-canvas:default';
+
+const findNodeDef = (id: string): NodeDef => {
+    const def = ALL_NODES.find((n) => n.id === id);
+    if (!def) {
+        throw new Error(`Unknown node def: ${id}`);
+    }
+    return def;
+};
+
+/** 示例链路：客户群组 → 前置校验判断 → 短信 → 补发控制 → 结束；黑名单分支 → 结束 */
+const DEFAULT_PLAN_NODES: CanvasNode[] = [
+    { id: 'demo-customer-group', def: findNodeDef('customer-group'), x: 30, y: 180, config: null },
+    {
+        id: 'demo-judge',
+        def: findNodeDef('judge'),
+        x: 200,
+        y: 168,
+        config: {
+            gateWayType: 'PRECHECK',
+            precheck: {
+                checks: ['blacklist', 'timeWindow'],
+                windows: [{ start: '09:00', end: '18:00' }],
+                strategy: 'wait',
+            },
+            eventChannel: '短信',
+            recentDay: '30',
+        },
+    },
+    { id: 'demo-sms', def: findNodeDef('sms'), x: 370, y: 180, config: null },
+    {
+        id: 'demo-resend',
+        def: findNodeDef('resend-control'),
+        x: 540,
+        y: 180,
+        config: {
+            triggers: ['submitFail', 'notDelivered', 'receiptTimeout'],
+            maxResend: '3',
+            interval: '30',
+        },
+    },
+    { id: 'demo-end-main', def: findNodeDef('end'), x: 710, y: 180, config: null },
+    { id: 'demo-end-black', def: findNodeDef('end'), x: 248, y: 372, config: null },
+];
+
+const DEFAULT_PLAN_EDGES: CanvasEdge[] = [
+    { id: 'demo-edge-1', from: 'demo-customer-group', to: 'demo-judge', fromPort: 'right', toPort: 'left' },
+    { id: 'demo-edge-2', from: 'demo-judge', to: 'demo-sms', fromPort: 'right', toPort: 'left', expect: 'YES' },
+    { id: 'demo-edge-3', from: 'demo-judge', to: 'demo-end-black', fromPort: 'bottom', toPort: 'top', expect: 'NO' },
+    { id: 'demo-edge-4', from: 'demo-sms', to: 'demo-resend', fromPort: 'right', toPort: 'left' },
+    { id: 'demo-edge-5', from: 'demo-resend', to: 'demo-end-main', fromPort: 'right', toPort: 'left' },
+];
+
+interface PersistedCanvas {
+    nodes: CanvasNode[];
+    edges: CanvasEdge[];
+}
+
+/** 画布数据持久化：节点只存 defId，读回时映射回节点定义（图标组件不能 JSON 序列化） */
+function persistCanvas(nodes: CanvasNode[], edges: CanvasEdge[]) {
+    try {
+        localStorage.setItem(
+            PLAN_CANVAS_STORAGE_KEY,
+            JSON.stringify({
+                nodes: nodes.map((n) => ({ id: n.id, defId: n.def.id, x: n.x, y: n.y, config: n.config })),
+                edges,
+            }),
+        );
+    } catch {
+        // 隐私模式等场景下存储失败时忽略，画布仍可正常编辑
+    }
+}
+
+function loadPersistedCanvas(): PersistedCanvas | null {
+    try {
+        const raw = localStorage.getItem(PLAN_CANVAS_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as {
+            nodes?: Array<{ id: string; defId: string; x: number; y: number; config: CanvasNode['config'] }>;
+            edges?: CanvasEdge[];
+        };
+        if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) return null;
+        const nodes: CanvasNode[] = [];
+        for (const item of parsed.nodes) {
+            const def = ALL_NODES.find((n) => n.id === item?.defId);
+            if (!def || typeof item?.x !== 'number' || typeof item?.y !== 'number') continue;
+            nodes.push({ id: String(item.id), def, x: item.x, y: item.y, config: item.config ?? null });
+        }
+        return { nodes, edges: parsed.edges };
+    } catch {
+        return null;
+    }
+}
+
 /* ================= 判断节点配置面板 ================= */
 
 function JudgeSummary({ config }: { config: JudgeConfig }) {
@@ -585,8 +681,9 @@ interface OperationPlanCanvasProps {
 }
 
 export default function OperationPlanCanvas({ planName, onBack, onSaved }: OperationPlanCanvasProps) {
-    const [nodes, setNodes] = useState<CanvasNode[]>([]);
-    const [edges, setEdges] = useState<CanvasEdge[]>([]);
+    const [persistedState] = useState(() => loadPersistedCanvas());
+    const [nodes, setNodes] = useState<CanvasNode[]>(persistedState?.nodes ?? DEFAULT_PLAN_NODES);
+    const [edges, setEdges] = useState<CanvasEdge[]>(persistedState?.edges ?? DEFAULT_PLAN_EDGES);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [name, setName] = useState(planName);
@@ -861,6 +958,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                         type="button"
                         className="sms-btn plan-canvas-save"
                         onClick={() => {
+                            persistCanvas(nodes, edges);
                             setSavedTip(true);
                             if (savedTipTimer.current !== null) {
                                 window.clearTimeout(savedTipTimer.current);
