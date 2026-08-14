@@ -343,7 +343,8 @@ button {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0 16px;
-    margin-bottom: 16px;
+    max-width: 1020px;
+    margin: 0 auto 16px;
 }
 
 .sms-form-item {
@@ -436,6 +437,8 @@ button {
     justify-content: flex-end;
     align-items: center;
     gap: 8px;
+    max-width: 1020px;
+    margin: 0 auto;
     padding-bottom: 16px;
 }
 
@@ -3379,7 +3382,8 @@ button {
 
 .blacklist-search .sms-search-grid {
     grid-template-columns: repeat(4, 1fr);
-    margin-bottom: 12px;
+    max-width: none;
+    margin: 0 0 8px;
 }
 
 .blacklist-search .sms-form-label {
@@ -3396,10 +3400,6 @@ button {
 
 .blacklist-search .sms-search-actions {
     padding-bottom: 8px;
-}
-
-.blacklist-search .sms-search-grid {
-    margin-bottom: 8px;
 }
 
 .blacklist-search-actions {
