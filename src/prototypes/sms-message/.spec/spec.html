@@ -821,7 +821,7 @@
           <h3>GitHub Pages 静态演示部署</h3>
           <ul>
             <li>构建产物为 Axhub 运行时格式（IIFE + <code>window.__AXHUB_DEFINE_COMPONENT__</code> 注册），不能直接作为独立页面打开；部署前执行 <code>node scripts/export-static-preview.mjs sms-message</code> 导出为自包含静态页（index.html + 入口 JS + React/ReactDOM UMD，全部相对路径，GitHub Pages 子路径可用）。</li>
-            <li>仓库已配置 GitHub Actions（<code>.github/workflows/deploy-pages.yml</code>）：push 到 main 自动 <code>npm run build</code> → 导出静态演示页 → 部署 GitHub Pages；演示链接随每次提交自动更新。</li>
+            <li>仓库已配置 GitHub Actions（<code>.github/workflows/deploy-pages.yml</code>）：push 到 main 自动构建短信原型单入口（<code>ENTRY_KEY=prototypes/sms-message</code>，跳过其余 165 个入口，部署约 1–2 分钟）→ 导出静态演示页 → 部署 GitHub Pages；演示链接随每次提交自动更新。</li>
             <li>演示页仅包含原型页面本体（短信 / 补发中心 / 黑名单 / 运营计划管理）；Make 编辑端、规格评审、批注为本地能力，不随 GitHub Pages 部署。</li>
           </ul>
         </section>

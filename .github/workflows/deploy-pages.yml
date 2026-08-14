@@ -31,7 +31,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: npm run build
+      - run: npx vite build
+        env:
+          ENTRY_KEY: prototypes/sms-message
 
       - run: node scripts/export-static-preview.mjs sms-message
 
