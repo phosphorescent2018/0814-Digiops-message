@@ -46,8 +46,12 @@ Review（可选） -> 标注（可选） -> 发布（可选）
    - 用户可能同时开多个 Codex 会话改同一项目：只 `git add` 本会话任务相关的文件，禁止用 `git add -A` 或 `git add .` 兜底；
    - 动手前先 `git status` 检查工作区；发现其他会话的未提交改动时，不覆盖、不包含、不撤销；
    - 共享文件（如 `spec.html`）只追加自己的变更记录，不重写其他会话的段落；提交前再次确认只包含自己的文件。
-8. **提交后自动推送已启用**
+9. **提交后自动推送已启用**
    - 项目已配置 post-commit 钩子（`scripts/git-hooks/post-commit`），本地 commit 成功后会自动 push 到 origin 当前分支并触发 GitHub Pages 部署；提交前确保内容可上线。新克隆后需执行 `git config core.hooksPath scripts/git-hooks` 启用。
+10. **每次 git 提交后必须监控 GitHub Actions 部署**
+   - 每次 git 提交并推送后，必须监控本次提交触发的 GitHub Pages 部署工作流（`gh run list` / `gh run view --log-failed`），直到运行结束，不得提交后不跟踪；
+   - 部署失败时先看失败日志：属基础设施临时故障（如 action 包下载失败）用 `gh run rerun` 重跑；属构建/代码问题则修复后重新提交；
+   - 部署成功后确认演示站已更新（可检查入口 HTML 引用的带版本号资源），并向用户报告部署结果。
 
 ## 产物与规则
 
