@@ -52,6 +52,11 @@ Review（可选） -> 标注（可选） -> 发布（可选）
    - 每次 git 提交并推送后，必须监控本次提交触发的 GitHub Pages 部署工作流（`gh run list` / `gh run view --log-failed`），直到运行结束，不得提交后不跟踪；
    - 部署失败时先看失败日志：属基础设施临时故障（如 action 包下载失败）用 `gh run rerun` 重跑；属构建/代码问题则修复后重新提交；
    - 部署成功后确认演示站已更新（可检查入口 HTML 引用的带版本号资源），并向用户报告部署结果。
+11. **每次 git 提交后必须给 GitHub 打 tag**
+   - 每次提交并推送后，必须为本次提交创建语义化版本 tag（`v<major>.<minor>.<patch>`，当前从 v1.0.0 起步）并推送 `git push origin <tag>`；
+   - 默认每次提交递增 patch（v1.0.0 → v1.0.1 → …）；新增页面或重大交互变更时升 minor；
+   - tag 只标记已推送的 main 提交；多会话并行时先查 `git ls-remote --tags origin` 最新 tag，避免重复或冲突；
+   - 推送 tag 不会触发 GitHub Pages 部署（workflow 仅监听 main 分支 push），第 10 条的部署监控照常执行。
 
 ## 产物与规则
 
