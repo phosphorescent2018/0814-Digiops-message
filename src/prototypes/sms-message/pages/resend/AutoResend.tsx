@@ -258,6 +258,9 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                             <span>2026.8.24 日前的历史短信不参与自动补发</span>
                             <span>本规则默认全局生效，但配置了自动补发组件的运营计划除外</span>
                         </div>
+                        <div className="resend-rule-blacklist-tip">
+                            自动补发默认强制校验黑名单，命中黑名单的用户不进入补发队列
+                        </div>
                     </div>
                     {enabled && <span className="resend-rule-lock-tip">开启状态下规则不可编辑</span>}
                 </div>

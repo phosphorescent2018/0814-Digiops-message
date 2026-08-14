@@ -3237,6 +3237,17 @@ button {
     font-size: 13px;
 }
 
+.resend-rule-blacklist-tip {
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: #fff7e6;
+    color: #fa8c16;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 /* 开关 */
 .resend-switch {
     display: inline-flex;
