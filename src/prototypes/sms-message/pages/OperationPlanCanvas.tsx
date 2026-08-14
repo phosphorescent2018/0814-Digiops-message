@@ -256,41 +256,6 @@ function loadPersistedCanvas(): PersistedCanvas | null {
 
 /* ================= 判断节点配置面板 ================= */
 
-function JudgeSummary({ config }: { config: JudgeConfig }) {
-    if (config.gateWayType === 'PRECHECK') {
-        const p = config.precheck;
-        const parts: string[] = [];
-        if (p.checks.includes('blacklist')) {
-            parts.push('黑名单');
-        }
-        if (p.checks.includes('timeWindow')) {
-            parts.push(`时段 ${p.windows.map((w) => `${w.start}-${w.end}`).join('、')}`);
-        }
-        return <span className="plan-canvas-item-summary">前置校验 · {parts.length ? parts.join(' · ') : '未配置'}</span>;
-    }
-    const names: Record<string, string> = {
-        EVENT: '事件发生',
-        BUSINESS: '业务属性',
-        GROUP: '群组人数',
-    };
-    return <span className="plan-canvas-item-summary">判断 · {names[config.gateWayType] ?? config.gateWayType}</span>;
-}
-
-function ResendControlSummary({ config }: { config: ResendControlConfig }) {
-    const parts: string[] = [];
-    if (config.triggers.includes('submitFail')) {
-        parts.push('发送失败');
-    }
-    if (config.triggers.includes('notDelivered')) {
-        parts.push('未送达');
-    }
-    if (config.triggers.includes('receiptTimeout')) {
-        parts.push('回执超时');
-    }
-    parts.push(`最多${config.maxResend}次`);
-    return <span className="plan-canvas-item-summary">停留至补发完成 · {parts.length ? parts.join(' · ') : '未配置'}</span>;
-}
-
 interface JudgeModalProps {
     initial: JudgeConfig;
     onClose: () => void;
@@ -1120,13 +1085,6 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                     ) : null}
                                 </span>
                                 <span className="plan-canvas-item-label">{node.def.label}</span>
-                                {node.config ? (
-                                    node.def.id === 'judge' ? (
-                                        <JudgeSummary config={node.config as JudgeConfig} />
-                                    ) : node.def.id === 'resend-control' ? (
-                                        <ResendControlSummary config={node.config as ResendControlConfig} />
-                                    ) : null
-                                ) : null}
                                 {selected && (
                                     <button
                                         type="button"
