@@ -1,5 +1,5 @@
 /**
- * 自动补发：规则配置 + 运行统计 + 补发记录
+ * 自动补发：规则配置 + 补发统计 + 补发记录
  */
 import React, { useRef, useState } from 'react';
 import { Save, Check, RefreshCw, Clock, AlertCircle, Eye, Info, Download } from 'lucide-react';
@@ -9,7 +9,7 @@ import ExportModal from '../../components/ExportModal';
 import SearchableSelect from '../../components/SearchableSelect';
 import type { RecordFilter } from './BatchDetail';
 
-/** 运行统计按运营计划筛选：默认全部，各计划数字自洽（合计 = 全部） */
+/** 补发统计按运营计划筛选：默认全部，各计划数字自洽（合计 = 全部） */
 const PLAN_STAT_OPTIONS = [
     { value: 'all', label: '全部运营计划' },
     { value: 'p1', label: 'July2_Acquisition_A_1_8_260810' },
@@ -223,10 +223,10 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                 </div>
             </div>
 
-            {/* 运行统计 */}
+            {/* 补发统计 */}
             <div className="sms-card resend-section resend-stats-card">
                 <div className="resend-stats-head">
-                    <span className="resend-toolbar-title">运行统计</span>
+                    <span className="resend-toolbar-title">补发统计</span>
                     <SearchableSelect
                         options={PLAN_STAT_OPTIONS}
                         value={planFilter}
