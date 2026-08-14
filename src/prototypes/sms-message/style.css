@@ -165,6 +165,12 @@ button {
 
 .sms-menu-sub .sms-menu-item.sms-menu-sub-purple {
     background: #ede7f6;
+    animation: sms-tab-breathe 3s ease-in-out infinite;
+}
+
+.sms-menu-sub .sms-menu-item.sms-menu-sub-purple:hover {
+    animation: none;
+    background: #e3ddf2;
 }
 
 .sms-menu-sub .sms-menu-item.sms-menu-sub-purple.active {
@@ -339,7 +345,8 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .sms-tab.sms-tab-purple {
+    .sms-tab.sms-tab-purple,
+    .sms-menu-sub .sms-menu-item.sms-menu-sub-purple {
         animation: none;
         background: #ede7f6;
     }
