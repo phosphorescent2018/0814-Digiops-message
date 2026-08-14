@@ -6,7 +6,7 @@
  *
  * 输出目录：static-preview/
  *  - index.html：自包含入口（相对路径，任意子路径部署均可用）
- *  - <entryKey>.js：Vite IIFE 构建产物
+ *  - <entryKey>-<version>.js：Vite IIFE 构建产物（文件名携带 git 短提交号，保证每次部署资源 URL 唯一，绕过 CDN 忽略 query 的缓存问题）
  *  - vendor/react.production.min.js / react-dom.production.min.js
  */
 import fs from 'node:fs';
@@ -41,6 +41,7 @@ function getDeployVersion() {
     return String(Date.now());
 }
 const version = getDeployVersion();
+const entryJsName = `${entryKey}-${version}.js`;
 
 const outDir = path.resolve(root, 'static-preview');
 if (path.dirname(outDir) !== root || path.basename(outDir) !== 'static-preview') {
@@ -50,7 +51,7 @@ if (path.dirname(outDir) !== root || path.basename(outDir) !== 'static-preview')
 
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(path.join(outDir, 'vendor'), { recursive: true });
-fs.copyFileSync(jsFile, path.join(outDir, `${entryKey}.js`));
+fs.copyFileSync(jsFile, path.join(outDir, entryJsName));
 fs.copyFileSync(reactUmd, path.join(outDir, 'vendor', 'react.production.min.js'));
 fs.copyFileSync(reactDomUmd, path.join(outDir, 'vendor', 'react-dom.production.min.js'));
 
@@ -74,10 +75,10 @@ const html = `<!doctype html>
       ReactDOM.createRoot(root).render(React.createElement(component));
     };
   </script>
-  <script src="./${entryKey}.js?v=${version}"></script>
+  <script src="./${entryJsName}"></script>
 </body>
 </html>
 `;
 
 fs.writeFileSync(path.join(outDir, 'index.html'), html);
-console.log(`静态演示页已导出：${outDir}（版本 ${version}）`);
+console.log(`静态演示页已导出：${outDir}（${entryJsName}）`);
