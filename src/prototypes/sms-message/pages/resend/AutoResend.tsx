@@ -224,27 +224,27 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
             </div>
 
             {/* 运行统计 */}
-            <div className="resend-stats-header">
-                <span className="resend-detail-section-title resend-stats-title">运行统计</span>
-                <SearchableSelect
-                    options={PLAN_STAT_OPTIONS}
-                    value={planFilter}
-                    onChange={setPlanFilter}
-                    placeholder="全部运营计划"
-                    width={280}
-                />
-            </div>
-            <div className="resend-stat-row">
-                {stats.map((s) => (
-                    <div className="resend-stat-card" key={s.label}>
-                        <div className="resend-stat-main">
+            <div className="sms-card resend-section resend-stats-card">
+                <div className="resend-stats-head">
+                    <span className="resend-toolbar-title">运行统计</span>
+                    <SearchableSelect
+                        options={PLAN_STAT_OPTIONS}
+                        value={planFilter}
+                        onChange={setPlanFilter}
+                        placeholder="全部运营计划"
+                        width={280}
+                    />
+                </div>
+                <div className="resend-stat-row">
+                    {stats.map((s) => (
+                        <div className="resend-stat-card" key={s.label}>
                             <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>
                                 {s.value.toLocaleString()}
                             </div>
                             <div className="resend-stat-label">{s.label}</div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
 
             {/* 规则配置 */}
