@@ -268,9 +268,10 @@ interface JudgeModalProps {
     initial: JudgeConfig;
     onClose: () => void;
     onSave: (config: JudgeConfig) => void;
+    onOpenBlacklist?: () => void;
 }
 
-function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
+function JudgeConfigModal({ initial, onClose, onSave, onOpenBlacklist }: JudgeModalProps) {
     const [draft, setDraft] = useState<JudgeConfig>(() => ({
         gateWayType: initial.gateWayType,
         precheck: {
@@ -411,8 +412,11 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
                                                 <a
                                                     href="#"
                                                     className="plan-canvas-link"
-                                                    onClick={(e) => e.preventDefault()}
-                                                    title="暂未开放，后续再设计"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        onOpenBlacklist?.();
+                                                    }}
+                                                    title="前往短信黑名单页面"
                                                 >
                                                     查看黑名单
                                                 </a>
@@ -655,9 +659,10 @@ interface OperationPlanCanvasProps {
     planName: string;
     onBack: () => void;
     onSaved?: (name: string) => void;
+    onOpenBlacklist?: () => void;
 }
 
-export default function OperationPlanCanvas({ planName, onBack, onSaved }: OperationPlanCanvasProps) {
+export default function OperationPlanCanvas({ planName, onBack, onSaved, onOpenBlacklist }: OperationPlanCanvasProps) {
     const [persistedState] = useState(() => loadPersistedCanvas());
     const [nodes, setNodes] = useState<CanvasNode[]>(persistedState?.nodes ?? DEFAULT_PLAN_NODES);
     const [edges, setEdges] = useState<CanvasEdge[]>(persistedState?.edges ?? DEFAULT_PLAN_EDGES);
@@ -1150,6 +1155,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                     key={editingNode.id}
                     initial={editingNode.config as JudgeConfig}
                     onClose={() => setEditingId(null)}
+                    onOpenBlacklist={onOpenBlacklist}
                     onSave={(config) => {
                         setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
                         setEditingId(null);

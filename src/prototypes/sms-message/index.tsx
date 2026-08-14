@@ -35,7 +35,12 @@ export default function SmsMessage() {
         <>
           <Layout activePage={page} onNavigate={setPage}>
               {page === 'plan' ? (
-                  <OperationPlanPage />
+                  <OperationPlanPage
+                      onOpenBlacklist={() => {
+                          setPage('sms');
+                          setActiveTab('blacklist');
+                      }}
+                  />
               ) : (
                   <>
                       <h1 className="sms-page-title">短信</h1>

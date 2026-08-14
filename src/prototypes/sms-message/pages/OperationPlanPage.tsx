@@ -58,7 +58,7 @@ function buildPages(current: number, total: number): (number | 'ellipsis')[] {
     return pages;
 }
 
-export default function OperationPlanPage() {
+export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist?: () => void }) {
     const [tab, setTab] = useState<'manage' | 'summary'>('manage');
     const [collapsed, setCollapsed] = useState(true);
     const [page, setPage] = useState(1);
@@ -84,6 +84,7 @@ export default function OperationPlanPage() {
                 key={canvasCtx.planId ?? `new-${canvasCtx.name}`}
                 planName={canvasCtx.name}
                 onBack={() => setCanvasCtx(null)}
+                onOpenBlacklist={onOpenBlacklist}
                 onSaved={(savedName) => {
                     if (canvasCtx.mode === 'new') {
                         const now = new Date();
