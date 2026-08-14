@@ -28,7 +28,7 @@ interface LayoutProps {
     onNavigate?: (page: AppPage) => void;
 }
 
-export type AppPage = 'sms' | 'plan';
+export type AppPage = 'sms' | 'plan' | 'blacklist';
 
 interface MenuChild {
     label: string;
@@ -47,7 +47,7 @@ const MENU: MenuItem[] = [
     {
         icon: Users,
         label: '用户管理',
-        children: ['用户标签', '客户分组', '用户列表', '导入导出'],
+        children: ['用户标签', '客户分组', '用户列表', '导入导出', { label: '黑名单', page: 'blacklist' }],
     },
     {
         icon: CalendarRange,
@@ -89,43 +89,48 @@ function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?:
                 <span className="sms-logo-text">mindigital GLOBAL</span>
             </div>
             <nav className="sms-menu">
-                {MENU.map((item) => (
-                    <div key={item.label}>
-                        <div
-                            className={`sms-menu-item${item.page && activePage === item.page ? ' active' : ''}${
-                                item.children ? ` open${expanded[item.label] ? ' expanded' : ''}` : ''
-                            }`}
-                            onClick={item.children ? () => toggleMenu(item.label) : undefined}
-                        >
-                            <item.icon className="sms-menu-icon" size={18} strokeWidth={1.8} />
-                            <span>{item.label}</span>
-                            {item.children && (
-                                <ChevronDown className="sms-menu-chevron" size={14} strokeWidth={1.8} />
+                {MENU.map((item) => {
+                    const itemActive = item.page
+                        ? activePage === item.page
+                        : (item.children ?? []).some((c) => typeof c === 'object' && c.page === activePage);
+                    return (
+                        <div key={item.label}>
+                            <div
+                                className={`sms-menu-item${itemActive ? ' active' : ''}${
+                                    item.children ? ` open${expanded[item.label] ? ' expanded' : ''}` : ''
+                                }`}
+                                onClick={item.children ? () => toggleMenu(item.label) : undefined}
+                            >
+                                <item.icon className="sms-menu-icon" size={18} strokeWidth={1.8} />
+                                <span>{item.label}</span>
+                                {item.children && (
+                                    <ChevronDown className="sms-menu-chevron" size={14} strokeWidth={1.8} />
+                                )}
+                            </div>
+                            {item.children && expanded[item.label] && (
+                                <div className="sms-menu-sub">
+                                    {item.children.map((child) => {
+                                        const childLabel = typeof child === 'string' ? child : child.label;
+                                        const childPage = typeof child === 'object' ? child.page : undefined;
+                                        const childActive = childPage ? activePage === childPage : false;
+                                        const purple = childPage === 'sms' || childPage === 'plan';
+                                        return (
+                                            <div
+                                                key={childLabel}
+                                                className={`sms-menu-item${childActive ? ' active' : ''}${
+                                                    purple ? ' sms-menu-sub-purple' : ''
+                                                }`}
+                                                onClick={childPage ? () => onNavigate?.(childPage) : undefined}
+                                            >
+                                                <span>{childLabel}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             )}
                         </div>
-                        {item.children && expanded[item.label] && (
-                            <div className="sms-menu-sub">
-                                {item.children.map((child) => {
-                                    const childLabel = typeof child === 'string' ? child : child.label;
-                                    const childPage = typeof child === 'object' ? child.page : undefined;
-                                    const childActive = childPage ? activePage === childPage : false;
-                                    const purple = childPage === 'sms' || childPage === 'plan';
-                                    return (
-                                        <div
-                                            key={childLabel}
-                                            className={`sms-menu-item${childActive ? ' active' : ''}${
-                                                purple ? ' sms-menu-sub-purple' : ''
-                                            }`}
-                                            onClick={childPage ? () => onNavigate?.(childPage) : undefined}
-                                        >
-                                            <span>{childLabel}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
                 <div className="sms-menu-group-label">其他</div>
                 <div className="sms-menu-item">
                     <BookOpen className="sms-menu-icon" size={18} strokeWidth={1.8} />
@@ -152,6 +157,13 @@ function Header({ activePage }: { activePage: AppPage }) {
                         <span>运营计划管理</span>
                         <span className="sep">/</span>
                         <span style={{ color: '#031938' }}>短信</span>
+                    </>
+                ) : activePage === 'blacklist' ? (
+                    <>
+                        <span className="sep">/</span>
+                        <span>用户管理</span>
+                        <span className="sep">/</span>
+                        <span style={{ color: '#031938' }}>黑名单</span>
                     </>
                 ) : (
                     <>

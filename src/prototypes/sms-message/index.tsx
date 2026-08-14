@@ -10,23 +10,22 @@ import ResendCenter from './pages/ResendCenter';
 import BlacklistPage from './pages/BlacklistPage';
 import OperationPlanPage from './pages/OperationPlanPage';
 import type { RecordFilter } from './pages/resend/BatchDetail';
-import { MessageSquareText, MessageCircle, BarChart3, Send, Ban } from 'lucide-react';
+import { MessageSquareText, MessageCircle, BarChart3, Send } from 'lucide-react';
 import './style.css';
 import { AnnotationViewer, type AnnotationSourceDocument } from '@axhub/annotation';
 import annotationSourceDocument from './annotation-source.json';
 
-type TabKey = 'template' | 'record' | 'report' | 'resend' | 'blacklist';
+type TabKey = 'template' | 'record' | 'report' | 'resend';
 
 const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'template', label: '模版', icon: MessageSquareText },
     { key: 'record', label: '发送记录', icon: MessageCircle },
     { key: 'report', label: '报表', icon: BarChart3 },
     { key: 'resend', label: '补发中心', icon: Send },
-    { key: 'blacklist', label: '黑名单', icon: Ban },
 ];
 
 /** 本次新增 / 增强的功能 Tab：淡紫色背景标记 */
-const PURPLE_TABS: TabKey[] = ['record', 'resend', 'blacklist'];
+const PURPLE_TABS: TabKey[] = ['record', 'resend'];
 
 export default function SmsMessage() {
     // 与 UAT 一致：默认激活「发送记录」
@@ -39,11 +38,13 @@ export default function SmsMessage() {
           <Layout activePage={page} onNavigate={setPage}>
               {page === 'plan' ? (
                   <OperationPlanPage
-                      onOpenBlacklist={() => {
-                          setPage('sms');
-                          setActiveTab('blacklist');
-                      }}
+                      onOpenBlacklist={() => setPage('blacklist')}
                   />
+              ) : page === 'blacklist' ? (
+                  <>
+                      <h1 className="sms-page-title">黑名单</h1>
+                      <BlacklistPage />
+                  </>
               ) : (
                   <>
                       <h1 className="sms-page-title">短信</h1>
@@ -75,7 +76,6 @@ export default function SmsMessage() {
                               }}
                           />
                       )}
-                      {activeTab === 'blacklist' && <BlacklistPage />}
                   </>
               )}
           </Layout>
