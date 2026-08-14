@@ -991,7 +991,7 @@ export default function BlacklistPage() {
 
             <div className="blacklist-stat-row">
                 {stats.map((s) => (
-                    <div className="resend-stat-card" key={s.label}>
+                    <div className="blacklist-stat-card" key={s.label}>
                         <div className="resend-stat-main">
                             <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
                             <div className="resend-stat-label">{s.label}</div>
