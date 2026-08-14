@@ -6,7 +6,23 @@ import { Save, Check, RefreshCw, Clock, AlertCircle, Eye, Info, Download } from 
 import AutoBatchDetail, { AUTO_BATCH_STATUS_CLASS, type AutoBatchRow } from './AutoBatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
 import ExportModal from '../../components/ExportModal';
+import SearchableSelect from '../../components/SearchableSelect';
 import type { RecordFilter } from './BatchDetail';
+
+/** 运行统计按运营计划筛选：默认全部，各计划数字自洽（合计 = 全部） */
+const PLAN_STAT_OPTIONS = [
+    { value: 'all', label: '全部运营计划' },
+    { value: 'p1', label: 'July2_Acquisition_A_1_8_260810' },
+    { value: 'p2', label: '新客激活活动' },
+    { value: 'p3', label: '逾期提醒-账单催收' },
+];
+
+const PLAN_STATS: Record<string, { total: number; success: number; fail: number; pending: number }> = {
+    all: { total: 12846, success: 9214, fail: 2536, pending: 1096 },
+    p1: { total: 5120, success: 3860, fail: 1020, pending: 240 },
+    p2: { total: 4318, success: 2975, fail: 1120, pending: 223 },
+    p3: { total: 3408, success: 2379, fail: 396, pending: 633 },
+};
 
 const AUTO_BATCHES: AutoBatchRow[] = [
     {
@@ -98,6 +114,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     const [refreshing, setRefreshing] = useState(false);
     const [visibleCols, setVisibleCols] = useState<string[]>(AUTO_COLUMNS.map((c) => c.key));
     const [exportVisible, setExportVisible] = useState(false);
+    const [planFilter, setPlanFilter] = useState('all');
     const toastTimer = useRef<number | null>(null);
 
     const toggleCol = (key: string, checked: boolean) => {
@@ -157,11 +174,12 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
         setSwitchModal(null);
     };
 
+    const planStat = PLAN_STATS[planFilter];
     const stats = [
-        { label: '累计补发', value: 12846, tone: '' },
-        { label: '补发成功', value: 9214, tone: 'success' },
-        { label: '补发失败', value: 2536, tone: 'danger' },
-        { label: '待确认', value: 1096, tone: 'info' },
+        { label: '累计补发', value: planStat.total, tone: '' },
+        { label: '补发成功', value: planStat.success, tone: 'success' },
+        { label: '补发失败', value: planStat.fail, tone: 'danger' },
+        { label: '待确认', value: planStat.pending, tone: 'info' },
         { label: '队列中', value: enabled ? 11 : 0, tone: 'warn' },
     ];
 
@@ -206,6 +224,16 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
             </div>
 
             {/* 运行统计 */}
+            <div className="resend-stats-header">
+                <span className="resend-detail-section-title resend-stats-title">运行统计</span>
+                <SearchableSelect
+                    options={PLAN_STAT_OPTIONS}
+                    value={planFilter}
+                    onChange={setPlanFilter}
+                    placeholder="全部运营计划"
+                    width={280}
+                />
+            </div>
             <div className="resend-stat-row">
                 {stats.map((s) => (
                     <div className="resend-stat-card" key={s.label}>
