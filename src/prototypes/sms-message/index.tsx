@@ -25,6 +25,9 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'blacklist', label: '黑名单', icon: Ban },
 ];
 
+/** 本次新增 / 增强的功能 Tab：淡紫色背景标记 */
+const PURPLE_TABS: TabKey[] = ['record', 'resend', 'blacklist'];
+
 export default function SmsMessage() {
     // 与 UAT 一致：默认激活「发送记录」
     const [activeTab, setActiveTab] = useState<TabKey>('record');
@@ -48,7 +51,9 @@ export default function SmsMessage() {
                           {TABS.map((tab) => (
                               <div
                                   key={tab.key}
-                                  className={`sms-tab${activeTab === tab.key ? ' active' : ''}`}
+                                  className={`sms-tab${activeTab === tab.key ? ' active' : ''}${
+                                      PURPLE_TABS.includes(tab.key) ? ' sms-tab-purple' : ''
+                                  }`}
                                   onClick={() => {
                                       setRecordFilter(null);
                                       setActiveTab(tab.key);

@@ -316,6 +316,16 @@ button {
     border-radius: 3px 3px 0 0;
 }
 
+/* 本次新增 / 增强的功能 Tab：淡紫色背景（发送记录 / 补发中心 / 黑名单） */
+.sms-tab.sms-tab-purple {
+    background: #ede7f6;
+    border-radius: 8px 8px 0 0;
+}
+
+.sms-tab.sms-tab-purple:hover {
+    background: #e3ddf2;
+}
+
 .sms-tab-icon {
     width: 20px;
     height: 20px;
