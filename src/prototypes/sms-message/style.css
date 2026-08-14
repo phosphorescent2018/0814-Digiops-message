@@ -346,7 +346,9 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
     .sms-tab.sms-tab-purple,
-    .sms-menu-sub .sms-menu-item.sms-menu-sub-purple {
+    .sms-menu-sub .sms-menu-item.sms-menu-sub-purple,
+    .sms-input.sms-control-purple,
+    .sms-select.sms-control-purple {
         animation: none;
         background: #ede7f6;
     }
@@ -447,10 +449,19 @@ button {
 .sms-select.sms-control-purple {
     background-color: #ede7f6;
     border-color: #d8c8ef;
+    animation: sms-tab-breathe 3s ease-in-out infinite;
+}
+
+.sms-input.sms-control-purple:hover,
+.sms-select.sms-control-purple:hover {
+    animation: none;
+    background-color: #e3ddf2;
 }
 
 .sms-input.sms-control-purple:focus,
 .sms-select.sms-control-purple:focus {
+    animation: none;
+    background-color: #ede7f6;
     border-color: #b79fe0;
 }
 

@@ -736,6 +736,11 @@
                   <td data-label="用户决策或变更">运营计划管理「计划管理」筛选区新增「存在补发控制」下拉（是 / 否，与存在延时器一致），置于收起部分（存在延时器之后），控件背景淡紫色与补发批次 ID 一致</td>
                   <td data-label="对当前原型的影响">筛选字段由 9 个增至 10 个；展开态 3 列 10 字段，收起默认隐藏第 3 行字段；renderSelect 支持 className 透传</td>
                 </tr>
+                <tr>
+                  <td data-label="日期">2026-08-14</td>
+                  <td data-label="用户决策或变更">淡紫色控件（补发批次 ID、送达状态、存在补发控制）背景改为呼吸灯动画（白 ↔ 淡紫，3s 循环，复用 sms-tab-breathe）</td>
+                  <td data-label="对当前原型的影响">sms-control-purple 增加动画；hover / focus 时暂停动画固定淡紫；reduced-motion 停用</td>
+                </tr>
               </tbody>
             </table>
           </div>
