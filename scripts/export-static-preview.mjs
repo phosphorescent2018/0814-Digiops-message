@@ -1,0 +1,67 @@
+/**
+ * 导出单个原型入口为自包含静态演示页（GitHub Pages 部署用）。
+ *
+ * 用法：node scripts/export-static-preview.mjs [entryKey]
+ * 默认 entryKey = sms-message
+ *
+ * 输出目录：static-preview/
+ *  - index.html：自包含入口（相对路径，任意子路径部署均可用）
+ *  - <entryKey>.js：Vite IIFE 构建产物
+ *  - vendor/react.production.min.js / react-dom.production.min.js
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const entryKey = process.argv[2] || 'sms-message';
+const jsFile = path.join(root, 'dist', 'prototypes', `${entryKey}.js`);
+
+if (!fs.existsSync(jsFile)) {
+    console.error(`未找到构建产物：${jsFile}\n请先执行 npm run build`);
+    process.exit(1);
+}
+
+const reactUmd = path.join(root, 'node_modules', 'react', 'umd', 'react.production.min.js');
+const reactDomUmd = path.join(root, 'node_modules', 'react-dom', 'umd', 'react-dom.production.min.js');
+if (!fs.existsSync(reactUmd) || !fs.existsSync(reactDomUmd)) {
+    console.error('未找到 React / ReactDOM UMD 文件，请确认依赖已安装');
+    process.exit(1);
+}
+
+const outDir = path.resolve(root, 'static-preview');
+if (path.dirname(outDir) !== root || path.basename(outDir) !== 'static-preview') {
+    console.error('输出目录校验失败，终止导出');
+    process.exit(1);
+}
+
+fs.rmSync(outDir, { recursive: true, force: true });
+fs.mkdirSync(path.join(outDir, 'vendor'), { recursive: true });
+fs.copyFileSync(jsFile, path.join(outDir, `${entryKey}.js`));
+fs.copyFileSync(reactUmd, path.join(outDir, 'vendor', 'react.production.min.js'));
+fs.copyFileSync(reactDomUmd, path.join(outDir, 'vendor', 'react-dom.production.min.js'));
+
+const html = `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>短信管理 - 原型演示</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script>
+    window.__AXHUB_DEFINE_COMPONENT__ = function (component) {
+      var root = document.getElementById('root');
+      ReactDOM.createRoot(root).render(React.createElement(component));
+    };
+  </script>
+  <script src="./${entryKey}.js"></script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(outDir, 'index.html'), html);
+console.log(`静态演示页已导出：${outDir}`);

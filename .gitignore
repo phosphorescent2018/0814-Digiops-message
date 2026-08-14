@@ -8,6 +8,7 @@ lerna-debug.log*
 
 # Build outputs
 dist/
+static-preview/
 !vendor/**/dist/
 !vendor/**/dist/**
 *.tsbuildinfo
