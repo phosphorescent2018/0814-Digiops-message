@@ -232,7 +232,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                         value={planFilter}
                         onChange={setPlanFilter}
                         placeholder="全部运营计划"
-                        width={280}
+                        width={220}
                     />
                 </div>
                 <div className="resend-stat-row">

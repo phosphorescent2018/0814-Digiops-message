@@ -2032,7 +2032,8 @@ button {
 .resend-stats-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 12px;
     padding-bottom: 14px;
     border-bottom: 1px solid var(--border-soft);
 }
@@ -3595,7 +3596,38 @@ button {
 }
 
 .blacklist-col-actions {
-    width: 120px;
+    width: 176px;
+}
+
+.blacklist-col-check {
+    width: 44px;
+    text-align: center;
+}
+
+.blacklist-checkbox {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.blacklist-batch-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    background: #f7f8fc;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.blacklist-batch-count {
+    font-weight: 600;
+    color: var(--text-main);
 }
 
 .blacklist-phone {

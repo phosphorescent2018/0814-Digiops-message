@@ -313,24 +313,31 @@ function BlacklistTable({
     filters,
     onAdd,
     onImport,
-    onRemove,
     onDetail,
     onExport,
+    onToast,
+    onExportSelected,
 }: {
     filters: BlacklistFilter | null;
     onAdd: () => void;
     onImport: () => void;
-    onRemove: (row: BlacklistRow) => void;
     onDetail: (row: BlacklistRow) => void;
     onExport: () => void;
+    onToast: (text: string, warn?: boolean) => void;
+    onExportSelected: (count: number) => void;
 }) {
     const [page, setPage] = useState(1);
+    const [rows, setRows] = useState<BlacklistRow[]>(blacklistRows);
+    const [selected, setSelected] = useState<Set<number>>(new Set());
+    const [removeTarget, setRemoveTarget] = useState<BlacklistRow | null>(null);
+    const [toggleTarget, setToggleTarget] = useState<BlacklistRow | null>(null);
+    const [batchAction, setBatchAction] = useState<null | 'enable' | 'disable' | 'remove'>(null);
     const filteredRows = useMemo(() => {
-        if (!filters) return blacklistRows;
+        if (!filters) return rows;
         const phone = filters.phone.trim().toLowerCase();
         const startDate = filters.startDate;
         const endDate = filters.endDate;
-        return blacklistRows.filter((row) => {
+        return rows.filter((row) => {
             if (phone && !row.phone.toLowerCase().includes(phone)) return false;
             if (filters.businessId && row.businessId !== filters.businessId) return false;
             if (filters.status === '生效中' && row.status !== 'active') return false;
@@ -340,14 +347,82 @@ function BlacklistTable({
             if (endDate && date > endDate) return false;
             return true;
         });
-    }, [filters]);
+    }, [filters, rows]);
 
     useEffect(() => {
         setPage(1);
     }, [filteredRows]);
 
-    const rows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const pageRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+
+    const pageRowIndexes = pageRows.map((r) => r.index);
+    const pageAllChecked = pageRowIndexes.length > 0 && pageRowIndexes.every((i) => selected.has(i));
+
+    const togglePageSelect = () => {
+        setSelected((prev) => {
+            const next = new Set(prev);
+            if (pageAllChecked) {
+                pageRowIndexes.forEach((i) => next.delete(i));
+            } else {
+                pageRowIndexes.forEach((i) => next.add(i));
+            }
+            return next;
+        });
+    };
+
+    const toggleRowSelect = (index: number) => {
+        setSelected((prev) => {
+            const next = new Set(prev);
+            if (next.has(index)) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+    };
+
+    const handleToggleConfirm = () => {
+        if (!toggleTarget) return;
+        setRows((prev) =>
+            prev.map((r) => (r.index === toggleTarget.index ? { ...r, status: r.status === 'active' ? 'expired' : 'active' } : r))
+        );
+        onToast(toggleTarget.status === 'active' ? '已失效，该号码暂停拦截' : '已生效，恢复拦截');
+        setToggleTarget(null);
+    };
+
+    const handleRemoveConfirm = () => {
+        if (!removeTarget) return;
+        setRows((prev) => prev.filter((r) => r.index !== removeTarget.index));
+        setSelected((prev) => {
+            const next = new Set(prev);
+            next.delete(removeTarget.index);
+            return next;
+        });
+        onToast('已移除');
+        setRemoveTarget(null);
+    };
+
+    const handleBatchConfirm = () => {
+        if (!batchAction) return;
+        const count = selected.size;
+        if (batchAction === 'remove') {
+            setRows((prev) => prev.filter((r) => !selected.has(r.index)));
+            onToast(`已移除 ${count} 条`);
+        } else {
+            setRows((prev) =>
+                prev.map((r) =>
+                    selected.has(r.index)
+                        ? { ...r, status: batchAction === 'enable' ? 'active' : 'expired' }
+                        : r
+                )
+            );
+            onToast(batchAction === 'enable' ? `已生效 ${count} 条` : `已失效 ${count} 条`);
+        }
+        setSelected(new Set());
+        setBatchAction(null);
+    };
 
     return (
         <div className="sms-card sms-table-card blacklist-card">
@@ -362,16 +437,47 @@ function BlacklistTable({
                         <Plus size={14} />
                         新增黑名单
                     </button>
+                    {selected.size > 0 && (
+                        <button type="button" className="sms-btn" onClick={() => onExportSelected(selected.size)}>
+                            <Download size={14} />
+                            导出选中 {selected.size} 条
+                        </button>
+                    )}
                     <button type="button" className="sms-btn sms-btn-primary" onClick={onExport}>
                         <Download size={14} />
                         导出
                     </button>
                 </div>
             </div>
+            {selected.size > 0 && (
+                <div className="blacklist-batch-bar">
+                    <span className="blacklist-batch-count">已选 {selected.size} 条</span>
+                    <button type="button" className="sms-btn" onClick={() => setBatchAction('enable')}>
+                        批量生效
+                    </button>
+                    <button type="button" className="sms-btn" onClick={() => setBatchAction('disable')}>
+                        批量失效
+                    </button>
+                    <button type="button" className="sms-btn resend-danger-btn" onClick={() => setBatchAction('remove')}>
+                        批量移除
+                    </button>
+                    <button type="button" className="sms-action-link" onClick={() => setSelected(new Set())}>
+                        清空选择
+                    </button>
+                </div>
+            )}
             <div className="sms-table-wrap">
                 <table className="sms-table blacklist-table">
                     <thead>
                         <tr>
+                            <th className="blacklist-col-check">
+                                <input
+                                    type="checkbox"
+                                    className="blacklist-checkbox"
+                                    checked={pageAllChecked}
+                                    onChange={togglePageSelect}
+                                />
+                            </th>
                             <th className="blacklist-col-index">序号</th>
                             <th className="blacklist-col-phone">手机号码</th>
                             <th className="blacklist-col-business">BusinessID</th>
@@ -384,15 +490,23 @@ function BlacklistTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.length === 0 ? (
+                        {pageRows.length === 0 ? (
                             <tr>
-                                <td className="blacklist-empty" colSpan={9}>
+                                <td className="blacklist-empty" colSpan={10}>
                                     暂无数据
                                 </td>
                             </tr>
                         ) : (
-                            rows.map((row) => (
+                            pageRows.map((row) => (
                                 <tr key={row.index}>
+                                <td className="blacklist-col-check">
+                                    <input
+                                        type="checkbox"
+                                        className="blacklist-checkbox"
+                                        checked={selected.has(row.index)}
+                                        onChange={() => toggleRowSelect(row.index)}
+                                    />
+                                </td>
                                 <td className="blacklist-col-index">{row.index}</td>
                                 <td className="blacklist-col-phone">
                                     <span className="blacklist-phone">{row.phone}</span>
@@ -431,10 +545,23 @@ function BlacklistTable({
                                     <button type="button" className="sms-action-link" onClick={() => onDetail(row)}>
                                         查看
                                     </button>
+                                    {row.status === 'active' ? (
+                                        <button
+                                            type="button"
+                                            className="sms-action-link sms-action-danger"
+                                            onClick={() => setToggleTarget(row)}
+                                        >
+                                            失效
+                                        </button>
+                                    ) : (
+                                        <button type="button" className="sms-action-link" onClick={() => setToggleTarget(row)}>
+                                            生效
+                                        </button>
+                                    )}
                                     <button
                                         type="button"
                                         className="sms-action-link sms-action-danger"
-                                        onClick={() => onRemove(row)}
+                                        onClick={() => setRemoveTarget(row)}
                                     >
                                         移除
                                     </button>
@@ -479,6 +606,20 @@ function BlacklistTable({
                     <option value={50}>50 条/页</option>
                 </select>
             </div>
+            {removeTarget && (
+                <RemoveModal row={removeTarget} onClose={() => setRemoveTarget(null)} onConfirm={handleRemoveConfirm} />
+            )}
+            {toggleTarget && (
+                <ToggleModal row={toggleTarget} onClose={() => setToggleTarget(null)} onConfirm={handleToggleConfirm} />
+            )}
+            {batchAction && (
+                <BatchModal
+                    action={batchAction}
+                    count={selected.size}
+                    onClose={() => setBatchAction(null)}
+                    onConfirm={handleBatchConfirm}
+                />
+            )}
         </div>
     );
 }
@@ -626,7 +767,7 @@ function ImportModal({ onClose }: { onClose: () => void }) {
     );
 }
 
-function RemoveModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
+function RemoveModal({ row, onClose, onConfirm }: { row: BlacklistRow; onClose: () => void; onConfirm: () => void }) {
     return (
         <div className="sms-mask" onClick={onClose}>
             <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
@@ -643,8 +784,88 @@ function RemoveModal({ row, onClose }: { row: BlacklistRow; onClose: () => void 
                     <button type="button" className="sms-btn" onClick={onClose}>
                         取消
                     </button>
-                    <button type="button" className="sms-btn resend-danger-btn" onClick={onClose}>
+                    <button type="button" className="sms-btn resend-danger-btn" onClick={onConfirm}>
                         确认移除
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ToggleModal({ row, onClose, onConfirm }: { row: BlacklistRow; onClose: () => void; onConfirm: () => void }) {
+    const isDisable = row.status === 'active';
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">{isDisable ? '失效黑名单' : '恢复生效'}</div>
+                <div className="sms-modal-body">
+                    <div className="resend-danger-text">
+                        确认将 <b>{row.phone}</b> {isDisable ? '失效' : '恢复生效'} 吗？
+                    </div>
+                    <div className="blacklist-remove-tip">
+                        {isDisable
+                            ? '失效后该号码将暂停参与拦截，名单保留，可随时恢复生效。'
+                            : '生效后将参与人工补发、自动补发及运营计划的拦截校验。'}
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button
+                        type="button"
+                        className={`sms-btn ${isDisable ? 'resend-danger-btn' : 'sms-btn-primary'}`}
+                        onClick={onConfirm}
+                    >
+                        {isDisable ? '确认失效' : '确认生效'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function BatchModal({
+    action,
+    count,
+    onClose,
+    onConfirm,
+}: {
+    action: 'enable' | 'disable' | 'remove';
+    count: number;
+    onClose: () => void;
+    onConfirm: () => void;
+}) {
+    const config = {
+        enable: { title: '批量生效', tip: '恢复后将参与人工补发、自动补发及运营计划的拦截校验。' },
+        disable: { title: '批量失效', tip: '失效后暂停拦截，名单保留，可随时恢复生效。' },
+        remove: {
+            title: '批量移除',
+            tip: '移除后需重新导入才能恢复，历史拦截记录仍保留。',
+        },
+    }[action];
+    const isRemove = action === 'remove';
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">{config.title}</div>
+                <div className="sms-modal-body">
+                    <div className="resend-danger-text">
+                        确认对选中的 <b>{count}</b> 条黑名单执行{isRemove ? '移除' : action === 'enable' ? '生效' : '失效'}吗？
+                    </div>
+                    <div className="blacklist-remove-tip">{config.tip}</div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button
+                        type="button"
+                        className={`sms-btn ${isRemove ? 'resend-danger-btn' : 'sms-btn-primary'}`}
+                        onClick={onConfirm}
+                    >
+                        确认{config.title.slice(2)}
                     </button>
                 </div>
             </div>
@@ -721,7 +942,6 @@ export default function BlacklistPage() {
     const [exportVisible, setExportVisible] = useState(false);
     const [addVisible, setAddVisible] = useState(false);
     const [importVisible, setImportVisible] = useState(false);
-    const [removeTarget, setRemoveTarget] = useState<BlacklistRow | null>(null);
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
     const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
     const [applied, setApplied] = useState<BlacklistFilter | null>(null);
@@ -791,9 +1011,13 @@ export default function BlacklistPage() {
                     filters={applied}
                     onAdd={() => setAddVisible(true)}
                     onImport={() => setImportVisible(true)}
-                    onRemove={(row) => setRemoveTarget(row)}
                     onDetail={(row) => setDetailTarget(row)}
                     onExport={() => setExportVisible(true)}
+                    onToast={showToast}
+                    onExportSelected={(count) => {
+                        setExportVisible(true);
+                        showToast(`已导出选中的 ${count} 条`);
+                    }}
                 />
             </div>
 
@@ -802,7 +1026,6 @@ export default function BlacklistPage() {
             )}
             {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
-            {removeTarget && <RemoveModal row={removeTarget} onClose={() => setRemoveTarget(null)} />}
             {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
             {toast && (
                 <div className={`resend-toast${toast.warn ? ' warn' : ''}`}>
