@@ -3343,6 +3343,20 @@ button {
     }
 }
 
+/* 宽屏（≥1680px）：筛选区 3 列升级为 4 列，减少全屏时的左右留白 */
+@media (min-width: 1680px) {
+    .sms-search-grid,
+    .resend-filter-grid {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: min(1400px, calc(100vw - 420px));
+    }
+
+    .sms-search-actions,
+    .resend-filter-last-row {
+        max-width: min(1400px, calc(100vw - 420px));
+    }
+}
+
 /* ================================================================
   黑名单
    ================================================================ */

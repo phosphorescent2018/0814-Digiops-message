@@ -1,7 +1,7 @@
 /**
  * 人工补发：条件筛选 → 命中汇总（导出/定时/立即补发）→ 批次补发记录
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp } from 'lucide-react';
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
@@ -150,6 +150,8 @@ const MANUAL_COLUMNS: ColumnDef[] = [
 
 export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
+    // 宽屏（≥1680px）时筛选区升级为 4 列，grid 展示 8 个字段 + 末行路径标记
+    const [isWide, setIsWide] = useState(() => window.matchMedia('(min-width: 1680px)').matches);
     const [filterCollapsed, setFilterCollapsed] = useState(false);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
@@ -169,6 +171,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [detailBatch, setDetailBatch] = useState<BatchRow | null>(null);
     const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
     const [exportVisible, setExportVisible] = useState(false);
+
+    useEffect(() => {
+        const mq = window.matchMedia('(min-width: 1680px)');
+        const onChange = (e: MediaQueryListEvent) => setIsWide(e.matches);
+        mq.addEventListener('change', onChange);
+        return () => mq.removeEventListener('change', onChange);
+    }, []);
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -278,7 +287,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 </div>
                 <form ref={formRef}>
                     <div className="resend-filter-grid">
-                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : 9).map((label) => (
+                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : isWide ? 8 : 9).map((label) => (
                             <div className="sms-form-item" key={label}>
                                 <label className="sms-form-label">{label}</label>
                                 <div className="sms-form-control">
