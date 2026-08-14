@@ -3850,11 +3850,20 @@ button {
     align-items: center;
 }
 
+.blacklist-expire-item .sms-form-label {
+    align-self: flex-start;
+    margin-top: -6px;
+}
+
 .blacklist-expire-label {
     margin: 0 6px;
     color: var(--text-secondary);
     font-size: 13px;
     white-space: nowrap;
+}
+
+.blacklist-expire-label:first-child {
+    margin-left: 0;
 }
 
 .blacklist-expire-date {

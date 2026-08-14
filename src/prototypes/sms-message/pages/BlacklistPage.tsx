@@ -684,7 +684,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
                             />
                         </div>
                     </div>
-                    <div className="sms-form-item">
+                    <div className="sms-form-item blacklist-expire-item">
                         <label className="sms-form-label">
                             <span className="blacklist-required">*</span>有效期
                         </label>
