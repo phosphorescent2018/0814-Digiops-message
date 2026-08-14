@@ -27,3 +27,15 @@ Axhub Make Client 适合把想法、业务流程、界面方案和设计系统�
 ## Local Runtime Data
 
 ACP 助手会把每个原型自己的对话缓存写入 `src/prototypes/<prototype-id>/.spec/acp/`。这个目录只用于本机侧边栏运行态，不应提交到 Git，也不应进入导出或发布产物。
+
+## Git 自动推送（提交即发布）
+
+仓库内置 post-commit 钩子：本地 `git commit` 成功后会自动推送到 `origin` 当前分支，并触发 GitHub Actions 重新构建部署演示站。
+
+新克隆本仓库后执行一次启用：
+
+```bash
+git config core.hooksPath scripts/git-hooks
+```
+
+如果自动推送失败，提交仍保留在本地，按提示手动执行 `git push` 即可。

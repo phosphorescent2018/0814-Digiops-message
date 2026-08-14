@@ -42,6 +42,8 @@ Review（可选） -> 标注（可选） -> 发布（可选）
    - 每次 git 提交前，必须同步迭代对应原型 `src/prototypes/<prototype-id>/.spec/spec.html` 的「附录：技术实现说明」、文件结构与已知限制，保持规格与代码一致；提交信息中注明规格已同步。
 7. **每个更新都必须 git 提交**
    - 无论改动大小（文案、样式、逻辑、规格、资源），每轮完成并自测后都要立即 git 提交，不得留到后续批量处理；提交信息简要记录本次更新内容。
+8. **提交后自动推送已启用**
+   - 项目已配置 post-commit 钩子（`scripts/git-hooks/post-commit`），本地 commit 成功后会自动 push 到 origin 当前分支并触发 GitHub Pages 部署；提交前确保内容可上线。新克隆后需执行 `git config core.hooksPath scripts/git-hooks` 启用。
 
 ## 产物与规则
 
