@@ -67,8 +67,8 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
         null,
     );
 
-    const renderSelect = (placeholder = '请选择', options?: string[]) => (
-        <select className="sms-select placeholder" defaultValue="">
+    const renderSelect = (placeholder = '请选择', options?: string[], className = '') => (
+        <select className={`sms-select placeholder${className ? ` ${className}` : ''}`} defaultValue="">
             <option value="">{placeholder}</option>
             {options?.map((opt) => (
                 <option key={opt} value={opt}>
@@ -181,6 +181,10 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
                                     <div className="sms-form-item">
                                         <label className="sms-form-label">存在延时器</label>
                                         <div className="sms-form-control">{renderSelect(undefined, ['是', '否'])}</div>
+                                    </div>
+                                    <div className="sms-form-item">
+                                        <label className="sms-form-label">存在补发控制</label>
+                                        <div className="sms-form-control">{renderSelect(undefined, ['是', '否'], 'sms-control-purple')}</div>
                                     </div>
                                     <div className="sms-form-item">
                                         <label className="sms-form-label">操作人</label>
