@@ -542,29 +542,37 @@ function BlacklistTable({
                                     </span>
                                 </td>
                                 <td className="blacklist-col-actions">
-                                    <button type="button" className="sms-action-link" onClick={() => onDetail(row)}>
-                                        查看
-                                    </button>
+                                    <BlacklistTooltip text="查看该名单详情">
+                                        <button type="button" className="sms-action-link" onClick={() => onDetail(row)}>
+                                            查看
+                                        </button>
+                                    </BlacklistTooltip>
                                     {row.status === 'active' ? (
+                                        <BlacklistTooltip text="失效该名单">
+                                            <button
+                                                type="button"
+                                                className="sms-action-link sms-action-danger"
+                                                onClick={() => setToggleTarget(row)}
+                                            >
+                                                失效
+                                            </button>
+                                        </BlacklistTooltip>
+                                    ) : (
+                                        <BlacklistTooltip text="生效该名单">
+                                            <button type="button" className="sms-action-link" onClick={() => setToggleTarget(row)}>
+                                                生效
+                                            </button>
+                                        </BlacklistTooltip>
+                                    )}
+                                    <BlacklistTooltip text="在黑名单列表中移除">
                                         <button
                                             type="button"
                                             className="sms-action-link sms-action-danger"
-                                            onClick={() => setToggleTarget(row)}
+                                            onClick={() => setRemoveTarget(row)}
                                         >
-                                            失效
+                                            移除
                                         </button>
-                                    ) : (
-                                        <button type="button" className="sms-action-link" onClick={() => setToggleTarget(row)}>
-                                            生效
-                                        </button>
-                                    )}
-                                    <button
-                                        type="button"
-                                        className="sms-action-link sms-action-danger"
-                                        onClick={() => setRemoveTarget(row)}
-                                    >
-                                        移除
-                                    </button>
+                                    </BlacklistTooltip>
                                 </td>
                                 </tr>
                             ))
