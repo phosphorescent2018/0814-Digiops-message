@@ -1016,13 +1016,19 @@ export default function BlacklistPage() {
                     onToast={showToast}
                     onExportSelected={(count) => {
                         setExportVisible(true);
-                        showToast(`已导出选中的 ${count} 条`);
                     }}
                 />
             </div>
 
             {exportVisible && (
-                <ExportModal visible hideFormat defaultName="黑名单_20260813" onClose={() => setExportVisible(false)} />
+                <ExportModal
+                    visible
+                    hideFormat
+                    requireName
+                    defaultName="黑名单_20260813"
+                    onClose={() => setExportVisible(false)}
+                    onConfirm={() => showToast('导出成功')}
+                />
             )}
             {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
