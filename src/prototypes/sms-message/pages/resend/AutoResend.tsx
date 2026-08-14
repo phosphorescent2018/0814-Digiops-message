@@ -17,11 +17,11 @@ const PLAN_STAT_OPTIONS = [
     { value: 'p3', label: '逾期提醒-账单催收' },
 ];
 
-const PLAN_STATS: Record<string, { total: number; success: number; fail: number; pending: number }> = {
-    all: { total: 12846, success: 9214, fail: 2536, pending: 1096 },
-    p1: { total: 5120, success: 3860, fail: 1020, pending: 240 },
-    p2: { total: 4318, success: 2975, fail: 1120, pending: 223 },
-    p3: { total: 3408, success: 2379, fail: 396, pending: 633 },
+const PLAN_STATS: Record<string, { total: number; success: number; fail: number; pending: number; queued: number }> = {
+    all: { total: 12846, success: 9214, fail: 2536, pending: 1096, queued: 11 },
+    p1: { total: 5120, success: 3860, fail: 1020, pending: 240, queued: 5 },
+    p2: { total: 4318, success: 2975, fail: 1120, pending: 223, queued: 3 },
+    p3: { total: 3408, success: 2379, fail: 396, pending: 633, queued: 3 },
 };
 
 const AUTO_BATCHES: AutoBatchRow[] = [
@@ -180,7 +180,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
         { label: '补发成功', value: planStat.success, tone: 'success' },
         { label: '补发失败', value: planStat.fail, tone: 'danger' },
         { label: '待确认', value: planStat.pending, tone: 'info' },
-        { label: '队列中', value: enabled ? 11 : 0, tone: 'warn' },
+        { label: '队列中', value: enabled ? planStat.queued : 0, tone: 'warn' },
     ];
 
     return (
