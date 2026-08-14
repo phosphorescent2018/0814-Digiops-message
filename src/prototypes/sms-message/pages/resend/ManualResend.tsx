@@ -171,6 +171,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [detailBatch, setDetailBatch] = useState<BatchRow | null>(null);
     const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
     const [exportVisible, setExportVisible] = useState(false);
+    const [hasFilter, setHasFilter] = useState(false);
 
     useEffect(() => {
         const mq = window.matchMedia('(min-width: 1680px)');
@@ -188,8 +189,20 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         setTimeout(() => setToast(''), 2200);
     };
 
+    /** 判断筛选区是否至少填写了一项条件（排除空串与占位“请选择”） */
+    const checkHasFilter = () => {
+        const form = formRef.current;
+        if (!form) return false;
+        return Array.from(form.elements).some((el) => {
+            if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+                return el.value.trim() !== '';
+            }
+            return false;
+        });
+    };
+
     const query = () => {
-        if (querying) return;
+        if (querying || !hasFilter) return;
         setQuerying(true);
         setTimeout(() => {
             setQuerying(false);
@@ -205,6 +218,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
 
     const reset = () => {
         formRef.current?.reset();
+        setHasFilter(false);
         setHitVisible(false);
         showToast('筛选条件已重置');
     };
@@ -285,7 +299,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 <div className="resend-section-title">
                     <span>条件筛选</span>
                 </div>
-                <form ref={formRef}>
+                <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
                         {FIELD_LABELS.slice(0, filterCollapsed ? 6 : isWide ? 8 : 9).map((label) => (
                             <div className="sms-form-item" key={label}>
@@ -301,9 +315,9 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             <span>结束日期</span>
                                         </div>
                                     ) : label === '手机号码' || label === '路径标记' ? (
-                                        <input className="sms-input" placeholder="请输入" />
+                                        <input className="sms-input" placeholder="请输入" name={label} />
                                     ) : (
-                                        <select className="sms-select placeholder">
+                                        <select className="sms-select placeholder" name={label}>
                                             <option value="">请选择</option>
                                             {label === 'BusinessID' && <option value="MTN_UG_Account_id">MTN_UG_Account_id</option>}
                                             {label === '发送状态' && (
@@ -339,7 +353,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <div className="sms-form-item">
                                 <label className="sms-form-label">路径标记</label>
                                 <div className="sms-form-control">
-                                    <input className="sms-input" placeholder="请输入" />
+                                    <input className="sms-input" placeholder="请输入" name="路径标记" />
                                 </div>
                             </div>
                         )}
@@ -348,14 +362,22 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 <RotateCcw size={14} />
                                 重置
                             </button>
-                            <button type="button" className="sms-btn sms-btn-primary" onClick={query} disabled={querying}>
-                                {querying ? '查询中…' : (
-                                    <>
-                                        <Search size={14} />
-                                        查询
-                                    </>
-                                )}
-                            </button>
+                            <span className="sms-tooltip-wrap">
+                                <button
+                                    type="button"
+                                    className="sms-btn sms-btn-primary"
+                                    onClick={query}
+                                    disabled={querying || !hasFilter}
+                                >
+                                    {querying ? '查询中…' : (
+                                        <>
+                                            <Search size={14} />
+                                            查询
+                                        </>
+                                    )}
+                                </button>
+                                {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
+                            </span>
                             <button
                                 type="button"
                                 className="sms-btn sms-btn-link"
