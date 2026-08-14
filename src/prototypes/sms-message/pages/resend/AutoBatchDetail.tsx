@@ -8,7 +8,7 @@ import type { RecordFilter } from './BatchDetail';
 
 export interface AutoBatchRow {
     batchId: string;
-    status: '待执行' | '执行中' | '已完成' | '已终止' | '失败';
+    status: '待执行' | '执行中' | '已完成' | '已终止' | '失败' | '部分失败';
     startTime: string;
     endTime: string;
     systemVerifiedCount: number | null;
@@ -24,6 +24,7 @@ export const AUTO_BATCH_STATUS_CLASS: Record<string, string> = {
     已完成: 'sms-status-success',
     已终止: 'sms-status-unknown',
     失败: 'sms-status-fail',
+    部分失败: 'sms-status-warning',
 };
 
 interface AutoBatchDetailProps {
@@ -78,7 +79,7 @@ export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoB
             ? Math.min((batch.systemVerifiedCount / batch.queuedCount) * 100, 100)
             : null;
 
-    const canExport = status === '已完成' || status === '已终止' || status === '失败';
+    const canExport = status === '已完成' || status === '已终止' || status === '失败' || status === '部分失败';
     const hasExecutionData = status !== '待执行';
 
     const refresh = () => {
@@ -228,6 +229,11 @@ export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoB
                                     批次失败：系统异常，执行中断于 {batch.endTime}
                                 </div>
                             )}
+                            {status === '部分失败' && (
+                                <div className="resend-fail-banner">
+                                    批次部分失败：系统异常，执行中断于 {batch.endTime}，已完成部分发送
+                                </div>
+                            )}
                             {status === '已终止' && (
                                 <div className="resend-fail-banner resend-fail-banner-grey">
                                     该批次因关闭自动补发被中断于 {batch.endTime}，已发送部分保留统计
@@ -289,6 +295,7 @@ export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoB
                         {status === '已完成' && '批次已执行完成'}
                         {status === '已终止' && '该批次因关闭自动补发被中断'}
                         {status === '失败' && '批次执行失败'}
+                        {status === '部分失败' && '批次执行中断，已完成部分发送'}
                     </span>
                     <div className="resend-drawer-actions">
                         {status === '执行中' && (

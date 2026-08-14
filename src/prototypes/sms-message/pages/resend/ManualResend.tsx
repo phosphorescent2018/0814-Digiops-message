@@ -117,6 +117,7 @@ export const STATUS_CLASS: Record<string, string> = {
     已完成: 'sms-status-success',
     已终止: 'sms-status-unknown',
     失败: 'sms-status-fail',
+    部分失败: 'sms-status-warning',
 };
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -126,9 +127,9 @@ const nowStr = () => {
 };
 
 /** 按计划时间与当前时间动态计算批次状态 */
-export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' => {
+export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' | '部分失败' => {
     if (b.isTerminated) return '已终止';
-    if (b.isFailed) return '失败';
+    if (b.isFailed) return (b.systemVerifiedCount ?? 0) > 0 ? '部分失败' : '失败';
     if (b.mode === '定时补发' && b.scheduledTime > nowStr()) return '待执行';
     if (b.endTime !== '—') return '已完成';
     return '执行中';

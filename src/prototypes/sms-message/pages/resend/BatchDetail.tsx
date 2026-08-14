@@ -127,7 +127,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
             : null;
 
     const canTerminate = status === '待执行' || status === '执行中';
-    const canExport = status === '已完成' || status === '已终止' || status === '失败';
+    const canExport = status === '已完成' || status === '已终止' || status === '失败' || status === '部分失败';
 
     const refresh = () => {
         setRefreshing(true);
@@ -289,9 +289,14 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                     </span>
                                 </div>
                             </div>
-                            {batch.isFailed && (
+                            {status === '失败' && (
                                 <div className="resend-fail-banner">
                                     批次失败：通道异常，执行中断于 {batch.endTime}
+                                </div>
+                            )}
+                            {status === '部分失败' && (
+                                <div className="resend-fail-banner">
+                                    批次部分失败：通道异常，执行中断于 {batch.endTime}，已完成部分发送
                                 </div>
                             )}
                             {status === '已终止' && (
@@ -361,6 +366,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                         {status === '已完成' && '批次已执行完成'}
                         {status === '已终止' && '批次已手动终止'}
                         {status === '失败' && '批次执行失败'}
+                        {status === '部分失败' && '批次执行中断，已完成部分发送'}
                     </span>
                     <div className="resend-drawer-actions">
                         {status === '执行中' && (

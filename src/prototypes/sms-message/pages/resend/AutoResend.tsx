@@ -80,6 +80,17 @@ const AUTO_BATCHES: AutoBatchRow[] = [
         source: '全局规则',
         createdAt: '2026-08-12 22:14:00',
     },
+    {
+        batchId: 'A20260812006',
+        status: '部分失败',
+        startTime: '2026-08-12 23:00:00',
+        endTime: '2026-08-12 23:01:05',
+        systemVerifiedCount: 486,
+        queuedCount: 500,
+        triggerReasons: ['发送失败', '回执超时'],
+        source: '全局规则',
+        createdAt: '2026-08-12 22:59:30',
+    },
 ];
 
 const AUTO_COLUMNS: ColumnDef[] = [
