@@ -810,6 +810,12 @@ button {
     border: 1px solid #ffd591;
 }
 
+.sms-status-warning {
+    background: #fff7e6;
+    color: #fa8c16;
+    border: 1px solid #ffd591;
+}
+
 /* 送达状态 hover 气泡提示 */
 .sms-tooltip-wrap {
     position: relative;
@@ -3846,8 +3852,10 @@ button {
 }
 
 .blacklist-expire-inline {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
 .blacklist-expire-item .sms-form-label {
@@ -3855,15 +3863,16 @@ button {
     margin-top: -6px;
 }
 
+.blacklist-expire-field {
+    display: inline-flex;
+    align-items: center;
+}
+
 .blacklist-expire-label {
-    margin: 0 6px;
+    margin-right: 8px;
     color: var(--text-secondary);
     font-size: 13px;
     white-space: nowrap;
-}
-
-.blacklist-expire-label:first-child {
-    margin-left: 0;
 }
 
 .blacklist-expire-date {
