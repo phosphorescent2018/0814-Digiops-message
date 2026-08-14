@@ -473,12 +473,15 @@ function BlacklistTable({
                     <thead>
                         <tr>
                             <th className="blacklist-col-check">
-                                <input
-                                    type="checkbox"
-                                    className="blacklist-checkbox"
-                                    checked={pageAllChecked}
-                                    onChange={togglePageSelect}
-                                />
+                                <label className="blacklist-check">
+                                    <input
+                                        type="checkbox"
+                                        className="blacklist-checkbox"
+                                        checked={pageAllChecked}
+                                        onChange={togglePageSelect}
+                                    />
+                                    <span className="blacklist-checkmark" />
+                                </label>
                             </th>
                             <th className="blacklist-col-index">序号</th>
                             <th className="blacklist-col-phone">手机号码</th>
@@ -502,12 +505,15 @@ function BlacklistTable({
                             pageRows.map((row) => (
                                 <tr key={row.index}>
                                 <td className="blacklist-col-check">
-                                    <input
-                                        type="checkbox"
-                                        className="blacklist-checkbox"
-                                        checked={selected.has(row.index)}
-                                        onChange={() => toggleRowSelect(row.index)}
-                                    />
+                                    <label className="blacklist-check">
+                                        <input
+                                            type="checkbox"
+                                            className="blacklist-checkbox"
+                                            checked={selected.has(row.index)}
+                                            onChange={() => toggleRowSelect(row.index)}
+                                        />
+                                        <span className="blacklist-checkmark" />
+                                    </label>
                                 </td>
                                 <td className="blacklist-col-index">{row.index}</td>
                                 <td className="blacklist-col-phone">

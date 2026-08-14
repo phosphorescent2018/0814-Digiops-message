@@ -723,8 +723,8 @@
                 </tr>
                 <tr>
                   <td data-label="日期">2026-08-14</td>
-                  <td data-label="用户决策或变更">黑名单复选框改为自定义样式：appearance:none + 白底灰边圆角方框，选中蓝色底 + 白色对勾；修复浏览器原生 checkbox 渲染的多余圆点</td>
-                  <td data-label="对当前原型的影响">blacklist-checkbox 样式重写（含 hover、checked 态）；表头全选与行内复选统一</td>
+                  <td data-label="用户决策或变更">黑名单复选框改为完全自定义结构：隐藏原生 input + span 绘制（白底灰边圆角方框，选中蓝色底 + 白色对勾），彻底消除浏览器原生 checkbox 渲染的多余圆点</td>
+                  <td data-label="对当前原型的影响">表头全选与行内复选统一为 label.blacklist-check + span.blacklist-checkmark 结构；原生 input opacity 0 隐藏</td>
                 </tr>
                 <tr>
                   <td data-label="日期">2026-08-14</td>
