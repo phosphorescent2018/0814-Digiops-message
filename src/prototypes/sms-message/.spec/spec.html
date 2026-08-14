@@ -726,6 +726,11 @@
                   <td data-label="用户决策或变更">黑名单复选框改为自定义样式：appearance:none + 白底灰边圆角方框，选中蓝色底 + 白色对勾；修复浏览器原生 checkbox 渲染的多余圆点</td>
                   <td data-label="对当前原型的影响">blacklist-checkbox 样式重写（含 hover、checked 态）；表头全选与行内复选统一</td>
                 </tr>
+                <tr>
+                  <td data-label="日期">2026-08-14</td>
+                  <td data-label="用户决策或变更">黑名单选中行后，工具栏不再同时展示「导出」与「导出选中 N 条」：选中时隐藏原导出按钮，仅保留「导出选中 N 条」；清空选择后恢复「导出」</td>
+                  <td data-label="对当前原型的影响">工具栏「导出」按钮增加 selected.size === 0 条件；批量操作条不变</td>
+                </tr>
               </tbody>
             </table>
           </div>

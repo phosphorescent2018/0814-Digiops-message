@@ -443,10 +443,12 @@ function BlacklistTable({
                             导出选中 {selected.size} 条
                         </button>
                     )}
-                    <button type="button" className="sms-btn sms-btn-primary" onClick={onExport}>
-                        <Download size={14} />
-                        导出
-                    </button>
+                    {selected.size === 0 && (
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={onExport}>
+                            <Download size={14} />
+                            导出
+                        </button>
+                    )}
                 </div>
             </div>
             {selected.size > 0 && (
