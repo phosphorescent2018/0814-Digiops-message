@@ -2,7 +2,7 @@
  * 黑名单：名单库资产管理
  * 供人工补发（提交前可选手动过滤）、自动补发（默认强制校验）、运营计划前置校验（可选配置）使用
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
     Download,
@@ -13,6 +13,7 @@ import {
     Calendar,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     ArrowRight,
     Info,
     CheckCircle2,
@@ -22,6 +23,91 @@ import { blacklistRows, type BlacklistRow } from '../mockData';
 import ExportModal from '../components/ExportModal';
 
 const PAGE_SIZE = 10;
+
+interface BlacklistFilter {
+    phone: string;
+    businessId: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+}
+
+const EMPTY_FILTER: BlacklistFilter = { phone: '', businessId: '', status: '', startDate: '', endDate: '' };
+
+/** 轻量下拉：无「请选择」占位选项，未选时仅显示灰色提示 */
+function BlacklistSelect({
+    value,
+    onChange,
+    placeholder,
+    options,
+}: {
+    value: string;
+    onChange: (v: string) => void;
+    placeholder: string;
+    options: string[];
+}) {
+    const [open, setOpen] = useState(false);
+    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+
+    const toggle = () => {
+        if (open) {
+            setOpen(false);
+            return;
+        }
+        const rect = triggerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        setPos({ top: Math.round(rect.bottom + 4), left: Math.round(rect.left) });
+        setOpen(true);
+    };
+
+    useEffect(() => {
+        if (!open) return;
+        const onDocMouseDown = (e: MouseEvent) => {
+            const pop = document.querySelector('.blacklist-select-pop');
+            const trigger = triggerRef.current;
+            if (pop && !pop.contains(e.target as Node) && trigger && !trigger.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', onDocMouseDown);
+        return () => document.removeEventListener('mousedown', onDocMouseDown);
+    }, [open]);
+
+    return (
+        <div className="blacklist-select-wrap">
+            <div
+                ref={triggerRef}
+                className={`blacklist-select${value ? ' has-value' : ''}`}
+                onClick={toggle}
+                role="button"
+                tabIndex={0}
+            >
+                <span>{value || placeholder}</span>
+                <ChevronDown size={13} />
+            </div>
+            {open &&
+                pos &&
+                createPortal(
+                    <div className="blacklist-select-pop" style={{ top: pos.top, left: pos.left }}>
+                        {options.map((opt) => (
+                            <div
+                                key={opt}
+                                className={`blacklist-select-option${opt === value ? ' selected' : ''}`}
+                                onClick={() => {
+                                    onChange(opt);
+                                    setOpen(false);
+                                }}
+                            >
+                                {opt}
+                            </div>
+                        ))}
+                    </div>,
+                    document.body
+                )}
+        </div>
+    );
+}
 
 /** 状态 hover 提示 */
 function BlacklistTooltip({ text, children }: { text: string; children: React.ReactNode }) {
@@ -33,63 +119,83 @@ function BlacklistTooltip({ text, children }: { text: string; children: React.Re
     );
 }
 
-function SearchForm() {
-    const [collapsed, setCollapsed] = useState(false);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-
-    const renderSelect = (placeholder = '请选择', options?: string[]) => (
-        <select className="sms-select placeholder" defaultValue="">
-            <option value="">{placeholder}</option>
-            {options?.map((opt) => (
-                <option key={opt} value={opt}>
-                    {opt}
-                </option>
-            ))}
-        </select>
-    );
-
+function SearchForm({
+    draft,
+    onDraftChange,
+    onQuery,
+    onReset,
+}: {
+    draft: BlacklistFilter;
+    onDraftChange: (patch: Partial<BlacklistFilter>) => void;
+    onQuery: () => void;
+    onReset: () => void;
+}) {
     return (
         <div className="sms-card sms-search blacklist-search">
             <div className="sms-search-grid">
                 <div className="sms-form-item">
                     <label className="sms-form-label">手机号码</label>
                     <div className="sms-form-control">
-                        <input className="sms-input" placeholder="请输入" />
+                        <input
+                            className="sms-input"
+                            placeholder="请输入"
+                            value={draft.phone}
+                            onChange={(e) => onDraftChange({ phone: e.target.value })}
+                        />
+                    </div>
+                </div>
+                <div className="sms-form-item">
+                    <label className="sms-form-label">BusinessID</label>
+                    <div className="sms-form-control">
+                        <BlacklistSelect
+                            value={draft.businessId}
+                            onChange={(v) => onDraftChange({ businessId: v })}
+                            placeholder="请选择"
+                            options={['MTN_UG_Account_id', 'MTN_UG_Product_id']}
+                        />
                     </div>
                 </div>
                 <div className="sms-form-item">
                     <label className="sms-form-label">状态</label>
-                    <div className="sms-form-control">{renderSelect(undefined, ['生效中', '已失效'])}</div>
+                    <div className="sms-form-control">
+                        <BlacklistSelect
+                            value={draft.status}
+                            onChange={(v) => onDraftChange({ status: v })}
+                            placeholder="请选择"
+                            options={['生效中', '已失效']}
+                        />
+                    </div>
                 </div>
-                {!collapsed && (
-                    <div className="sms-form-item">
-                        <label className="sms-form-label">添加日期</label>
-                        <div className="sms-form-control">
-                            <div className="blacklist-filter-date">
-                                <ExpireDatePicker value={startDate} onChange={setStartDate} placeholder="起始日期" />
-                                <span className="blacklist-filter-date-arrow">
-                                    <ArrowRight size={12} />
-                                </span>
-                                <ExpireDatePicker value={endDate} onChange={setEndDate} placeholder="结束日期" />
-                            </div>
+                <div className="sms-form-item">
+                    <label className="sms-form-label">添加日期</label>
+                    <div className="sms-form-control">
+                        <div className="blacklist-filter-date">
+                            <ExpireDatePicker
+                                value={draft.startDate}
+                                onChange={(v) => onDraftChange({ startDate: v })}
+                                placeholder="起始日期"
+                            />
+                            <span className="blacklist-filter-date-arrow">
+                                <ArrowRight size={12} />
+                            </span>
+                            <ExpireDatePicker
+                                value={draft.endDate}
+                                onChange={(v) => onDraftChange({ endDate: v })}
+                                placeholder="结束日期"
+                            />
                         </div>
                     </div>
-                )}
+                </div>
             </div>
             <div className="sms-search-actions blacklist-search-actions">
                 <div className="blacklist-actions-left">
-                    <button type="button" className="sms-btn">
+                    <button type="button" className="sms-btn" onClick={onReset}>
                         <RotateCcw size={14} />
                         重置
                     </button>
-                    <button type="button" className="sms-btn sms-btn-primary">
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onQuery}>
                         <Search size={14} />
                         查询
-                    </button>
-                    <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
-                        {collapsed ? '展开' : '收起'}
-                        <ArrowRight size={14} style={{ transform: collapsed ? 'rotate(-90deg)' : 'rotate(90deg)' }} />
                     </button>
                 </div>
             </div>
@@ -204,12 +310,14 @@ function ExpireDatePicker({
 }
 
 function BlacklistTable({
+    filters,
     onAdd,
     onImport,
     onRemove,
     onDetail,
     onExport,
 }: {
+    filters: BlacklistFilter | null;
     onAdd: () => void;
     onImport: () => void;
     onRemove: (row: BlacklistRow) => void;
@@ -217,8 +325,29 @@ function BlacklistTable({
     onExport: () => void;
 }) {
     const [page, setPage] = useState(1);
-    const rows = blacklistRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-    const totalPages = Math.ceil(blacklistRows.length / PAGE_SIZE);
+    const filteredRows = useMemo(() => {
+        if (!filters) return blacklistRows;
+        const phone = filters.phone.trim().toLowerCase();
+        const startDate = filters.startDate;
+        const endDate = filters.endDate;
+        return blacklistRows.filter((row) => {
+            if (phone && !row.phone.toLowerCase().includes(phone)) return false;
+            if (filters.businessId && row.businessId !== filters.businessId) return false;
+            if (filters.status === '生效中' && row.status !== 'active') return false;
+            if (filters.status === '已失效' && row.status !== 'expired') return false;
+            const date = row.addTime.slice(0, 10);
+            if (startDate && date < startDate) return false;
+            if (endDate && date > endDate) return false;
+            return true;
+        });
+    }, [filters]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [filteredRows]);
+
+    const rows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
 
     return (
         <div className="sms-card sms-table-card blacklist-card">
@@ -255,8 +384,15 @@ function BlacklistTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.map((row) => (
-                            <tr key={row.index}>
+                        {rows.length === 0 ? (
+                            <tr>
+                                <td className="blacklist-empty" colSpan={9}>
+                                    暂无数据
+                                </td>
+                            </tr>
+                        ) : (
+                            rows.map((row) => (
+                                <tr key={row.index}>
                                 <td className="blacklist-col-index">{row.index}</td>
                                 <td className="blacklist-col-phone">
                                     <span className="blacklist-phone">{row.phone}</span>
@@ -303,13 +439,14 @@ function BlacklistTable({
                                         移除
                                     </button>
                                 </td>
-                            </tr>
-                        ))}
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
             <div className="sms-pagination">
-                <span className="sms-pagination-total">共 {blacklistRows.length} 条</span>
+                <span className="sms-pagination-total">共 {filteredRows.length} 条</span>
                 <button
                     type="button"
                     className="sms-page-btn"
@@ -517,9 +654,9 @@ function RemoveModal({ row, onClose }: { row: BlacklistRow; onClose: () => void 
 
 function DetailModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
     const hits = [
-        { time: '2026-08-13 09:32:18', source: '自动补发校验', result: '已拦截，未进入补发队列' },
-        { time: '2026-08-13 08:15:47', source: '运营计划 · 新客激活活动', result: '命中黑名单，流向结束节点' },
-        { time: '2026-08-12 19:04:22', source: '人工补发校验', result: '命中黑名单，未计入可补数量' },
+        { time: '2026-08-13 09:32:18', source: '自动补发校验', result: '已拦截' },
+        { time: '2026-08-13 08:15:47', source: '运营计划 · 运营计划名称', result: '已拦截' },
+        { time: '2026-08-12 19:04:22', source: '人工补发校验', result: '已拦截' },
     ];
 
     return (
@@ -586,6 +723,35 @@ export default function BlacklistPage() {
     const [importVisible, setImportVisible] = useState(false);
     const [removeTarget, setRemoveTarget] = useState<BlacklistRow | null>(null);
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
+    const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
+    const [applied, setApplied] = useState<BlacklistFilter | null>(null);
+    const [toast, setToast] = useState<{ text: string; warn?: boolean } | null>(null);
+
+    const showToast = (text: string, warn = false) => {
+        setToast({ text, warn });
+        window.setTimeout(() => setToast(null), 2200);
+    };
+
+    const handleQuery = () => {
+        const isEmpty =
+            !draft.phone.trim() &&
+            !draft.businessId &&
+            !draft.status &&
+            !draft.startDate &&
+            !draft.endDate;
+        if (isEmpty) {
+            showToast('请至少输入一个查询条件', true);
+            return;
+        }
+        setApplied({ ...draft });
+        showToast('查询完成');
+    };
+
+    const handleReset = () => {
+        setDraft({ ...EMPTY_FILTER });
+        setApplied(null);
+        showToast('筛选条件已重置');
+    };
 
     const stats = [
         { label: '名单总数', value: '12,847', tone: '' },
@@ -615,8 +781,14 @@ export default function BlacklistPage() {
             </div>
 
             <div className="blacklist-section">
-                <SearchForm />
+                <SearchForm
+                    draft={draft}
+                    onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+                    onQuery={handleQuery}
+                    onReset={handleReset}
+                />
                 <BlacklistTable
+                    filters={applied}
                     onAdd={() => setAddVisible(true)}
                     onImport={() => setImportVisible(true)}
                     onRemove={(row) => setRemoveTarget(row)}
@@ -625,11 +797,19 @@ export default function BlacklistPage() {
                 />
             </div>
 
-            {exportVisible && <ExportModal visible defaultName="黑名单_20260813" onClose={() => setExportVisible(false)} />}
+            {exportVisible && (
+                <ExportModal visible hideFormat defaultName="黑名单_20260813" onClose={() => setExportVisible(false)} />
+            )}
             {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
             {removeTarget && <RemoveModal row={removeTarget} onClose={() => setRemoveTarget(null)} />}
             {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
+            {toast && (
+                <div className={`resend-toast${toast.warn ? ' warn' : ''}`}>
+                    {toast.warn ? <Info size={15} /> : <CheckCircle2 size={15} />}
+                    {toast.text}
+                </div>
+            )}
         </div>
     );
 }

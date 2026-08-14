@@ -2,7 +2,7 @@
  * 人工补发：条件筛选 → 命中汇总（导出/定时/立即补发）→ 批次补发记录
  */
 import React, { useState } from 'react';
-import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar } from 'lucide-react';
+import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp } from 'lucide-react';
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
 import ExportModal from '../../components/ExportModal';
@@ -150,6 +150,7 @@ const MANUAL_COLUMNS: ColumnDef[] = [
 
 export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
+    const [filterCollapsed, setFilterCollapsed] = useState(false);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
     const [hitVisible, setHitVisible] = useState(false);
@@ -277,7 +278,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 </div>
                 <form ref={formRef}>
                     <div className="resend-filter-grid">
-                        {FIELD_LABELS.slice(0, 9).map((label) => (
+                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : 9).map((label) => (
                             <div className="sms-form-item" key={label}>
                                 <label className="sms-form-label">{label}</label>
                                 <div className="sms-form-control">
@@ -326,12 +327,14 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         ))}
                     </div>
                     <div className="resend-filter-last-row">
-                        <div className="sms-form-item">
-                            <label className="sms-form-label">路径标记</label>
-                            <div className="sms-form-control">
-                                <input className="sms-input" placeholder="请输入" />
+                        {!filterCollapsed && (
+                            <div className="sms-form-item">
+                                <label className="sms-form-label">路径标记</label>
+                                <div className="sms-form-control">
+                                    <input className="sms-input" placeholder="请输入" />
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="resend-filter-actions">
                             <button type="button" className="sms-btn" onClick={reset}>
                                 <RotateCcw size={14} />
@@ -344,6 +347,14 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                         查询
                                     </>
                                 )}
+                            </button>
+                            <button
+                                type="button"
+                                className="sms-btn sms-btn-link"
+                                onClick={() => setFilterCollapsed(!filterCollapsed)}
+                            >
+                                {filterCollapsed ? '展开' : '收起'}
+                                <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
                             </button>
                         </div>
                     </div>
