@@ -1852,6 +1852,10 @@ button {
     line-height: 1.5;
 }
 
+.plan-canvas-non-slot-tip-gap {
+    margin-bottom: 20px;
+}
+
 .plan-canvas-non-slot-icon {
     flex-shrink: 0;
     color: #1890ff;
