@@ -158,7 +158,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [hitVisible, setHitVisible] = useState(false);
     const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
-    const [step, setStep] = useState<'form' | 'confirm'>('form');
     const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('no');
     const [scheduledTime, setScheduledTime] = useState('2026-08-23 18:00:00');
     const [validating, setValidating] = useState(false);
@@ -229,12 +228,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
 
     const closeModal = () => {
         setModal(null);
-        setStep('form');
-    };
-
-    // 立即/定时补发共用：第一步表单 → 第二步校验确认
-    const openConfirmStep = () => {
-        setStep('confirm');
         setValidated(false);
         setVerifiedCount(null);
     };
@@ -255,7 +248,8 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
         setModal(null);
-        setStep('form');
+        setValidated(false);
+        setVerifiedCount(null);
         const newBatch: BatchRow = {
             id: `20260812${String(100 + batches.length + 1).slice(-3)}`,
             scheduledTime: isImmediate ? nowStr() : scheduledTime,
@@ -409,7 +403,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 className="sms-btn"
                                 onClick={() => {
                                     setModal('scheduled');
-                                    setStep('form');
                                     setScheduledTime('2026-08-23 18:00:00');
                                 }}
                             >
@@ -421,7 +414,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 className="sms-btn sms-btn-primary"
                                 onClick={() => {
                                     setModal('immediate');
-                                    setStep('form');
                                 }}
                             >
                                 <Send size={14} />
@@ -531,7 +523,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             </div>
 
             {/* ============ 补发弹窗①（立即/定时共用）：方式/时间/黑名单 ============ */}
-            {modal !== null && step === 'form' && (
+            {modal !== null && (
                 <div className="sms-mask" onClick={closeModal}>
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">{modal === 'immediate' ? '立即补发' : '定时补发'}</div>
@@ -556,6 +548,8 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             onChange={(e) => {
                                                 const v = e.target.value;
                                                 setScheduledTime(v ? `${v.slice(0, 10)} ${v.slice(11)}:00` : '');
+                                                setValidated(false);
+                                                setVerifiedCount(null);
                                             }}
                                         />
                                         {!scheduledTimeValid && (
@@ -572,7 +566,11 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             type="radio"
                                             name="ignoreBlacklist"
                                             checked={ignoreBlacklist === 'no'}
-                                            onChange={() => setIgnoreBlacklist('no')}
+                                            onChange={() => {
+                                                setIgnoreBlacklist('no');
+                                                setValidated(false);
+                                                setVerifiedCount(null);
+                                            }}
                                         />
                                         否
                                     </label>
@@ -581,46 +579,20 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             type="radio"
                                             name="ignoreBlacklist"
                                             checked={ignoreBlacklist === 'yes'}
-                                            onChange={() => setIgnoreBlacklist('yes')}
+                                            onChange={() => {
+                                                setIgnoreBlacklist('yes');
+                                                setValidated(false);
+                                                setVerifiedCount(null);
+                                            }}
                                         />
                                         是
                                     </label>
                                 </div>
                             </div>
-                        </div>
-                        <div className="sms-modal-actions">
-                            <button type="button" className="sms-btn" onClick={closeModal}>
-                                取消
-                            </button>
-                            <button
-                                type="button"
-                                className="sms-btn sms-btn-primary"
-                                disabled={modal === 'scheduled' && !scheduledTimeValid}
-                                onClick={openConfirmStep}
-                            >
-                                下一步
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ============ 补发弹窗②（立即/定时共用）：校验确认 ============ */}
-            {modal !== null && step === 'confirm' && (
-                <div className="sms-mask" onClick={closeModal}>
-                    <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="sms-modal-header">补发确认</div>
-                        <div className="sms-modal-body">
                             <div className={`resend-blacklist-tip${ignoreBlacklist === 'yes' ? ' warn' : ''}`}>
                                 {ignoreBlacklist === 'yes'
                                     ? '所补发用户将含有黑名单用户'
                                     : '所补发用户将不含有黑名单用户'}
-                            </div>
-                            <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">预计补发时间</span>
-                                <span className="resend-confirm-value">
-                                    {modal === 'immediate' ? '立即执行' : scheduledTime}
-                                </span>
                             </div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发数量</span>
@@ -643,17 +615,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             </div>
                         </div>
                         <div className="sms-modal-actions">
-                            <button
-                                type="button"
-                                className="sms-btn"
-                                onClick={() => setStep('form')}
-                            >
-                                上一步
+                            <button type="button" className="sms-btn" onClick={closeModal}>
+                                取消
                             </button>
                             <button
                                 type="button"
                                 className="sms-btn sms-btn-primary"
-                                disabled={!validated}
+                                disabled={!validated || (modal === 'scheduled' && !scheduledTimeValid)}
                                 onClick={confirmFinal}
                             >
                                 确认补发
@@ -662,6 +630,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     </div>
                 </div>
             )}
+
 
             {/* ============ 终止二次确认弹窗 ============ */}
             {terminateTarget && (
