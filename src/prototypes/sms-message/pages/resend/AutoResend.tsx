@@ -631,6 +631,7 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                 visible={exportVisible}
                 defaultName="自动补发记录_20260813"
                 onClose={() => setExportVisible(false)}
+                hideFormat
             />
         </div>
     );
