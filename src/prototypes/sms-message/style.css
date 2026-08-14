@@ -320,10 +320,29 @@ button {
 .sms-tab.sms-tab-purple {
     background: #ede7f6;
     border-radius: 8px 8px 0 0;
+    animation: sms-tab-breathe 3s ease-in-out infinite;
 }
 
 .sms-tab.sms-tab-purple:hover {
+    animation: none;
     background: #e3ddf2;
+}
+
+@keyframes sms-tab-breathe {
+    0%,
+    100% {
+        background-color: #ffffff;
+    }
+    50% {
+        background-color: #ede7f6;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sms-tab.sms-tab-purple {
+        animation: none;
+        background: #ede7f6;
+    }
 }
 
 .sms-tab-icon {
