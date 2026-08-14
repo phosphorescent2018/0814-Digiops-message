@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entryKey = process.argv[2] || 'sms-message';
@@ -28,6 +29,18 @@ if (!fs.existsSync(reactUmd) || !fs.existsSync(reactDomUmd)) {
     console.error('未找到 React / ReactDOM UMD 文件，请确认依赖已安装');
     process.exit(1);
 }
+
+// 部署版本号：取当前 git 短提交号，作为静态资源缓存失效标识；取不到时回退为时间戳。
+function getDeployVersion() {
+    try {
+        const sha = execSync('git rev-parse --short HEAD', { cwd: root }).toString().trim();
+        if (sha) return sha;
+    } catch {
+        // ignore
+    }
+    return String(Date.now());
+}
+const version = getDeployVersion();
 
 const outDir = path.resolve(root, 'static-preview');
 if (path.dirname(outDir) !== root || path.basename(outDir) !== 'static-preview') {
@@ -46,6 +59,9 @@ const html = `<!doctype html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>短信管理 - 原型演示</title>
 </head>
 <body>
@@ -58,10 +74,10 @@ const html = `<!doctype html>
       ReactDOM.createRoot(root).render(React.createElement(component));
     };
   </script>
-  <script src="./${entryKey}.js"></script>
+  <script src="./${entryKey}.js?v=${version}"></script>
 </body>
 </html>
 `;
 
 fs.writeFileSync(path.join(outDir, 'index.html'), html);
-console.log(`静态演示页已导出：${outDir}`);
+console.log(`静态演示页已导出：${outDir}（版本 ${version}）`);
