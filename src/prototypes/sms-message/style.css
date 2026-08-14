@@ -3852,8 +3852,8 @@ button {
 }
 
 .blacklist-expire-inline {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
     width: 100%;
 }
@@ -3863,16 +3863,10 @@ button {
     margin-top: -6px;
 }
 
-.blacklist-expire-field {
-    display: inline-flex;
-    align-items: center;
-}
-
-.blacklist-expire-label {
-    margin-right: 8px;
-    color: var(--text-secondary);
+.blacklist-expire-arrow {
+    color: var(--text-muted);
     font-size: 13px;
-    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .blacklist-expire-date {

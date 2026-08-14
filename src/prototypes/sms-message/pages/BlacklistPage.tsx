@@ -710,14 +710,9 @@ function AddModal({ onClose }: { onClose: () => void }) {
                                 </label>
                                 {expireType === 'expire' && (
                                     <div className="blacklist-expire-inline">
-                                        <div className="blacklist-expire-field">
-                                            <span className="blacklist-expire-label">开始时间</span>
-                                            <ExpireDatePicker value={expireStart} onChange={setExpireStart} placeholder="选择开始日期" />
-                                        </div>
-                                        <div className="blacklist-expire-field">
-                                            <span className="blacklist-expire-label">结束时间</span>
-                                            <ExpireDatePicker value={expireEnd} onChange={setExpireEnd} placeholder="选择结束日期" />
-                                        </div>
+                                        <ExpireDatePicker value={expireStart} onChange={setExpireStart} placeholder="开始日期" />
+                                        <span className="blacklist-expire-arrow">→</span>
+                                        <ExpireDatePicker value={expireEnd} onChange={setExpireEnd} placeholder="结束日期" />
                                     </div>
                                 )}
                             </div>
