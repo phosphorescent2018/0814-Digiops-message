@@ -354,12 +354,8 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <div className="resend-hit-panel">
                         <div className="resend-hit-summary-text">
                             <span className="resend-hit-text-main">
-                                当前命中 <b>{hitCount.toLocaleString()}</b> 条，黑名单命中{' '}
-                                <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条 · 实际可补{' '}
-                                <b className="resend-hit-text-accent">
-                                    {(hitCount - Math.round(hitCount * 0.036)).toLocaleString()}
-                                </b>{' '}
-                                条，任务执行时将重新校验
+                                当前筛选项下命中 <b>{hitCount.toLocaleString()}</b> 条，其中黑名单命中{' '}
+                                <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条，任务执行时将重新校验
                             </span>
                         </div>
                         <div className="resend-hit-actions">
