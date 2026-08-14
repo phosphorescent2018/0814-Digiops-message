@@ -641,12 +641,16 @@ function BlacklistTable({
 }
 
 function AddModal({ onClose }: { onClose: () => void }) {
-    const [expireType, setExpireType] = useState<'forever' | 'expire'>('forever');
-    const [expireDate, setExpireDate] = useState('');
+    const [expireType, setExpireType] = useState<'forever' | 'expire' | 'unset'>('unset');
+    const [expireStart, setExpireStart] = useState('');
+    const [expireEnd, setExpireEnd] = useState('');
     const [phones, setPhones] = useState('');
     const [businessId, setBusinessId] = useState('');
 
-    const canSubmit = phones.trim() !== '' && businessId.trim() !== '' && (expireType === 'forever' || expireDate !== '');
+    const canSubmit =
+        phones.trim() !== '' &&
+        businessId.trim() !== '' &&
+        (expireType === 'forever' || (expireType === 'expire' && expireStart !== '' && expireEnd !== ''));
 
     return (
         <div className="sms-mask" onClick={onClose}>
@@ -706,7 +710,10 @@ function AddModal({ onClose }: { onClose: () => void }) {
                                 </label>
                                 {expireType === 'expire' && (
                                     <div className="blacklist-expire-inline">
-                                        <ExpireDatePicker value={expireDate} onChange={setExpireDate} />
+                                        <span className="blacklist-expire-label">开始时间</span>
+                                        <ExpireDatePicker value={expireStart} onChange={setExpireStart} placeholder="选择开始日期" />
+                                        <span className="blacklist-expire-label">结束时间</span>
+                                        <ExpireDatePicker value={expireEnd} onChange={setExpireEnd} placeholder="选择结束日期" />
                                     </div>
                                 )}
                             </div>
