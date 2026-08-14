@@ -3,6 +3,9 @@
  */
 import React, { useState } from 'react';
 
+/** 黑名单导出演示用的成功/失败交替计数（模块级，跨弹窗挂载保持；仅 simulateFailure 时使用） */
+let exportFailureCycle = 0;
+
 interface ExportModalProps {
     visible: boolean;
     defaultName: string;
@@ -13,12 +16,27 @@ interface ExportModalProps {
     requireName?: boolean;
     /** 点击确认后回调（用于成功提示等） */
     onConfirm?: () => void;
+    /** 模拟导出失败：成功与失败交替出现，失败时弹窗不关闭并提示错误（黑名单演示用） */
+    simulateFailure?: boolean;
 }
 
-export default function ExportModal({ visible, defaultName, onClose, hideFormat, requireName, onConfirm }: ExportModalProps) {
+export default function ExportModal({ visible, defaultName, onClose, hideFormat, requireName, onConfirm, simulateFailure }: ExportModalProps) {
     const [name, setName] = useState('');
+    const [exportError, setExportError] = useState<string | null>(null);
     if (!visible) return null;
     const canConfirm = !requireName || name.trim() !== '';
+    const handleConfirm = () => {
+        if (requireName && simulateFailure) {
+            exportFailureCycle += 1;
+            if (exportFailureCycle % 2 === 0) {
+                setExportError('导出失败：网络异常，请稍后重试');
+                return;
+            }
+        }
+        setExportError(null);
+        onConfirm?.();
+        onClose();
+    };
     return (
         <div className="sms-mask" onClick={onClose}>
             <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
@@ -32,7 +50,10 @@ export default function ExportModal({ visible, defaultName, onClose, hideFormat,
                                     className="sms-input"
                                     value={name}
                                     placeholder="请输入导出名称"
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => {
+                                        setName(e.target.value);
+                                        setExportError(null);
+                                    }}
                                 />
                             ) : (
                                 <input className="sms-input" defaultValue={defaultName} />
@@ -50,6 +71,7 @@ export default function ExportModal({ visible, defaultName, onClose, hideFormat,
                         </div>
                     )}
                     {hideFormat && <div className="export-format-tip">默认导出为 Excel 文件</div>}
+                    {exportError && <div className="export-error">{exportError}</div>}
                 </div>
                 <div className="sms-modal-actions">
                     <button type="button" className="sms-btn" onClick={onClose}>
@@ -59,10 +81,7 @@ export default function ExportModal({ visible, defaultName, onClose, hideFormat,
                         type="button"
                         className="sms-btn sms-btn-primary"
                         disabled={!canConfirm}
-                        onClick={() => {
-                            onConfirm?.();
-                            onClose();
-                        }}
+                        onClick={handleConfirm}
                     >
                         确定
                     </button>

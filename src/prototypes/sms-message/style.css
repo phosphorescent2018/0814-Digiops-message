@@ -4006,6 +4006,17 @@ button {
     color: #98a1b8;
 }
 
+.export-error {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    color: #cf1322;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 .blacklist-remove-tip {
     margin-top: 10px;
     padding: 10px 12px;

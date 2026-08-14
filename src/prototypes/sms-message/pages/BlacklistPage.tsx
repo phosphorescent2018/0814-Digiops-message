@@ -1025,6 +1025,7 @@ export default function BlacklistPage() {
                     visible
                     hideFormat
                     requireName
+                    simulateFailure
                     defaultName="黑名单_20260813"
                     onClose={() => setExportVisible(false)}
                     onConfirm={() => showToast('导出成功')}
