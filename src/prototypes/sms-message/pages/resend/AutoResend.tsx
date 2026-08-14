@@ -158,10 +158,10 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
     };
 
     const stats = [
-        { label: '今日补发', value: 128, tone: '' },
-        { label: '补发成功', value: 96, tone: 'success' },
-        { label: '补发失败', value: 21, tone: 'danger' },
-        { label: '待确认', value: 11, tone: 'info' },
+        { label: '累计补发', value: 12846, tone: '' },
+        { label: '补发成功', value: 9214, tone: 'success' },
+        { label: '补发失败', value: 2536, tone: 'danger' },
+        { label: '待确认', value: 1096, tone: 'info' },
         { label: '队列中', value: enabled ? 11 : 0, tone: 'warn' },
     ];
 
@@ -210,7 +210,9 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                 {stats.map((s) => (
                     <div className="resend-stat-card" key={s.label}>
                         <div className="resend-stat-main">
-                            <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>{s.value}</div>
+                            <div className={`resend-stat-num resend-stat-${s.tone || 'normal'}`}>
+                                {s.value.toLocaleString()}
+                            </div>
                             <div className="resend-stat-label">{s.label}</div>
                         </div>
                     </div>
