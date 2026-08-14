@@ -135,6 +135,14 @@ const DEFAULT_JUDGE: JudgeConfig = {
     recentDay: '30',
 };
 
+/** 判断节点类型展示名：选了什么就展示什么 */
+const JUDGE_TYPE_NAMES: Record<JudgeConfig['gateWayType'], string> = {
+    EVENT: '事件发生',
+    BUSINESS: '业务属性',
+    GROUP: '群组人数',
+    PRECHECK: '前置校验',
+};
+
 interface CanvasNode {
     id: string;
     def: NodeDef;
@@ -1089,6 +1097,11 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved }: Opera
                                     ) : null}
                                 </span>
                                 <span className="plan-canvas-item-label">{node.def.label}</span>
+                                {node.def.id === 'judge' && node.config && (
+                                    <span className="plan-canvas-item-summary">
+                                        {JUDGE_TYPE_NAMES[(node.config as JudgeConfig).gateWayType]}
+                                    </span>
+                                )}
                                 {selected && (
                                     <button
                                         type="button"
