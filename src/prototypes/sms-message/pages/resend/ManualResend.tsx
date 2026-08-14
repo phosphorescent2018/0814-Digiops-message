@@ -319,7 +319,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                                     <option value="已送达">已送达</option>
                                                     <option value="未送达">未送达</option>
                                                     <option value="回执超时">回执超时</option>
-                                                    <option value="未知">未知</option>
                                                     <option value="--">--（无回执）</option>
                                                 </>
                                             )}

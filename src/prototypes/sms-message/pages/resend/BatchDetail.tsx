@@ -87,7 +87,7 @@ const DETAIL_ROWS: DetailRow[] = [
         phone: 'qO3Vx8yC2sTpR9wLk5eHuA==',
         content: 'Congratulations! You qualify for a Momo Advance limit...',
         sendStatus: '暂无数据',
-        deliveryStatus: '未知',
+        deliveryStatus: '--',
         failReason: '',
     },
 ];
@@ -103,7 +103,6 @@ const DELIVERY_CLASS: Record<string, string> = {
     已送达: 'sms-status-success',
     未送达: 'sms-status-fail',
     回执超时: 'sms-status-timeout',
-    未知: 'sms-status-unknown',
 };
 
 export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords }: BatchDetailProps) {
@@ -150,7 +149,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
         未送达: '#f5222d',
         回执超时: '#fa8c16',
         '--': '#98a1b8',
-        未知: '#8b94a3',
     };
 
     const handleExport = () => {

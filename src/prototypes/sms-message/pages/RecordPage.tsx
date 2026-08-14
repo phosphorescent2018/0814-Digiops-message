@@ -124,7 +124,6 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                                 <option value="已送达">已送达</option>
                                 <option value="未送达">未送达</option>
                                 <option value="回执超时">回执超时</option>
-                                <option value="未知">未知</option>
                                 <option value="--">--（无回执）</option>
                             </select>
                         </div>
@@ -190,7 +189,7 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
         return <span className={`sms-status ${item?.className ?? 'sms-status-unknown'}`}>{item?.text ?? '-'}</span>;
     };
 
-    // 送达状态：历史短信一律 --；失败 --；暂无数据 未知；成功按回执状态展示
+    // 送达状态：历史短信一律 --；失败 --；暂无数据 --；成功按回执状态展示
     const renderDelivery = (row: (typeof recordRows)[number]) => {
         if (row.isHistory || row.notifyStatus === '1') {
             const tip = row.isHistory ? '历史数据，不计算回执' : '发送失败，无回执';
@@ -203,7 +202,7 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
         if (row.notifyStatus === '0') {
             return (
                 <DeliveryTooltip text="发送状态未确认">
-                    <span className="sms-status sms-status-unknown">未知</span>
+                    <span className="sms-dash">--</span>
                 </DeliveryTooltip>
             );
         }

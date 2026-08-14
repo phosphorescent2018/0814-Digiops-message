@@ -40,7 +40,7 @@ const DETAIL_ROWS = [
     { sendStatus: '成功', deliveryStatus: '回执超时' },
     { sendStatus: '失败', deliveryStatus: '--' },
     { sendStatus: '失败', deliveryStatus: '--' },
-    { sendStatus: '暂无数据', deliveryStatus: '未知' },
+    { sendStatus: '暂无数据', deliveryStatus: '--' },
 ];
 
 const SEND_COLORS: Record<string, string> = {
@@ -55,7 +55,6 @@ const DELIVERY_COLORS: Record<string, string> = {
     未送达: '#f5222d',
     回执超时: '#fa8c16',
     '--': '#98a1b8',
-    未知: '#8b94a3',
 };
 
 export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoBatchDetailProps) {
