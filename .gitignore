@@ -146,6 +146,9 @@ temp/
 # Database files (keep directory structure and initial data)
 # assets/database/*.json
 # !assets/database/.gitkeep
+
+# 产品文档（PRD）：本地维护，不同步 GitHub
+PRD-*.md
 !.axhub/make/comments/
 !.axhub/make/comments/**
 !.axhub/make/comment-assets/
