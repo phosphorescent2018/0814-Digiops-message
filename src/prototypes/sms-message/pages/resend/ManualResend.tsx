@@ -706,7 +706,8 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             {/* 导出补发记录 */}
             <ExportModal
                 visible={exportVisible}
-                defaultName="人工补发记录_20260813"
+                defaultName="Transmission Log_20260813"
+                hideFormat
                 onClose={() => setExportVisible(false)}
             />
         </div>
