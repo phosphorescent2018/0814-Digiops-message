@@ -1,5 +1,13 @@
 # Axhub Make Client
 
+## 演示站（GitHub Pages）
+
+**短信触达与补发管理平台高保真原型：**
+
+https://phosphorescent2018.github.io/0814-Digiops-message/
+
+> 链接固定不变；每次提交 `main` 分支后由 GitHub Actions 自动重新构建部署，刷新即可看到最新版本。
+
 Axhub Make Client 是 Axhub Make 的官方项目客户端，用来承载可运行的原型、主题和项目资料。这里的「原型」不是传统线框图，而是接近生产级页面的真实前端实现，可在本地预览、迭代、导出并接入管理端。
 
 ## What It Provides
