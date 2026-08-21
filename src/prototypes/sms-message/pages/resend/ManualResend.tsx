@@ -23,8 +23,6 @@ const FIELD_LABELS = [
     '发送状态',
     '送达状态',
     '补发批次 ID',
-    '补发状态',
-    '路径标记',
 ];
 
 export interface BatchRow {
