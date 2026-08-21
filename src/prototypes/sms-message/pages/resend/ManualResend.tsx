@@ -173,6 +173,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [exportVisible, setExportVisible] = useState(false);
     const [hasFilter, setHasFilter] = useState(false);
     const [batchPage, setBatchPage] = useState(1);
+    const [batchPageSize, setBatchPageSize] = useState(5);
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -479,7 +480,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {batches.slice((batchPage - 1) * 5, batchPage * 5).map((b) => {
+                            {batches.slice((batchPage - 1) * batchPageSize, batchPage * batchPageSize).map((b) => {
                                 const status = computeStatus(b);
                                 const canTerminate = status === '待执行' || status === '执行中';
                                 return (
@@ -538,7 +539,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     >
                         上一页
                     </button>
-                    {Array.from({ length: Math.max(1, Math.ceil(batches.length / 5)) }, (_, i) => (
+                    {Array.from({ length: Math.max(1, Math.ceil(batches.length / batchPageSize)) }, (_, i) => (
                         <button
                             key={i}
                             type="button"
@@ -551,11 +552,23 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <button
                         type="button"
                         className="sms-page-btn"
-                        disabled={batchPage >= Math.max(1, Math.ceil(batches.length / 5))}
+                        disabled={batchPage >= Math.max(1, Math.ceil(batches.length / batchPageSize))}
                         onClick={() => setBatchPage((p) => p + 1)}
                     >
                         下一页
                     </button>
+                    <select
+                        className="sms-page-size"
+                        value={batchPageSize}
+                        onChange={(e) => {
+                            setBatchPageSize(Number(e.target.value));
+                            setBatchPage(1);
+                        }}
+                    >
+                        <option value={5}>5 条/页</option>
+                        <option value={10}>10 条/页</option>
+                        <option value={20}>20 条/页</option>
+                    </select>
                 </div>
             </div>
 
