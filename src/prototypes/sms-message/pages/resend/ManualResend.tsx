@@ -173,6 +173,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [batchPage, setBatchPage] = useState(1);
     const [batchPageSize, setBatchPageSize] = useState(10);
     const [resendStatus, setResendStatus] = useState('');
+    const [activeView, setActiveView] = useState<'filter' | 'records'>('filter');
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -260,6 +261,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
         setBatchPage(1);
+        setActiveView('records');
         setModal(null);
         setValidated(false);
         setVerifiedCount(null);
@@ -301,7 +303,21 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
 
     return (
         <div className="resend-manual">
-            {/* ============ 板块一：条件筛选区 ============ */}
+            <div className="resend-sub-tabs">
+                <div
+                    className={`resend-sub-tab${activeView === 'filter' ? ' active' : ''}`}
+                    onClick={() => setActiveView('filter')}
+                >
+                    条件筛选
+                </div>
+                <div
+                    className={`resend-sub-tab${activeView === 'records' ? ' active' : ''}`}
+                    onClick={() => setActiveView('records')}
+                >
+                    补发记录
+                </div>
+            </div>
+            {activeView === 'filter' && (
             <div className="sms-card resend-section">
                 <div className="resend-section-title">
                     <span>条件筛选</span>
@@ -468,8 +484,9 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <div className="resend-hit-empty">当前条件筛选下无命中</div>
                 )}
             </div>
+            )}
 
-            {/* ============ 板块二：批次补发记录 ============ */}
+            {activeView === 'records' && (
             <div className="sms-card resend-section">
                 <div className="resend-table-toolbar">
                     <div className="resend-section-title">
@@ -609,6 +626,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     </span>
                 </div>
             </div>
+            )}
 
             {/* ============ 补发弹窗①（立即/定时共用）：方式/时间/黑名单 ============ */}
             {modal !== null && (
