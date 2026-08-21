@@ -171,6 +171,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [hasFilter, setHasFilter] = useState(false);
     const [batchPage, setBatchPage] = useState(1);
     const [batchPageSize, setBatchPageSize] = useState(10);
+    const [resendStatus, setResendStatus] = useState('');
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -349,8 +350,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <div className="sms-form-item">
                                 <label className="sms-form-label">补发状态</label>
                                 <div className="sms-form-control">
-                                    <select className="sms-select" name="补发状态">
-                                        <option value="">全部</option>
+                                    <select
+                                        className={`sms-select${resendStatus ? '' : ' placeholder'}`}
+                                        name="补发状态"
+                                        value={resendStatus}
+                                        onChange={(e) => setResendStatus(e.target.value)}
+                                    >
+                                        <option value="">请选择</option>
                                         <option value="未补发过">未补发过</option>
                                         <option value="已补发过">已补发过</option>
                                     </select>

@@ -139,11 +139,11 @@ function SearchForm({
                         <label className="sms-form-label">补发类型</label>
                         <div className="sms-form-control">
                             <select
-                                className="sms-select sms-control-purple"
+                                className={`sms-select sms-control-purple${resendType ? '' : ' placeholder'}`}
                                 value={resendType}
                                 onChange={(e) => onResendTypeChange(e.target.value)}
                             >
-                                <option value="">全部</option>
+                                <option value="">请选择</option>
                                 <option value="原始短信">原始短信</option>
                                 <option value="人工补发">人工补发</option>
                                 <option value="计划内自动补发">计划内自动补发</option>
