@@ -430,12 +430,12 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条，已补发过{' '}
                                 <b>{Math.round(hitCount * 0.02).toLocaleString()}</b> 条（将默认剔除），任务执行时将重新校验
                             </span>
-                        </div>
-                        <div className="resend-hit-actions">
-                            <button type="button" className="resend-link-btn" onClick={viewHitDetail}>
+                            <button type="button" className="resend-link-btn resend-hit-detail-link" onClick={viewHitDetail}>
                                 <ExternalLink size={13} />
                                 查看命中明细
                             </button>
+                        </div>
+                        <div className="resend-hit-actions">
                             <button type="button" className="sms-btn" onClick={() => showToast('命中结果已导出（原型演示）')}>
                                 <Download size={14} />
                                 导出 Excel
@@ -707,7 +707,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                                 setVerifiedCount(null);
                                             }}
                                         />
-                                        发送（强制包含）
+                                        发送
                                     </label>
                                 </div>
                             </div>

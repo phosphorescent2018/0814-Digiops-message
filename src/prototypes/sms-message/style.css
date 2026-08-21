@@ -2398,6 +2398,15 @@ button {
     flex-shrink: 0;
 }
 
+.resend-hit-detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 14px;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
 /* 命中为空 */
 .resend-hit-empty {
     margin-top: 8px;
@@ -2572,6 +2581,7 @@ button {
     font-size: 13px;
     cursor: pointer;
     user-select: none;
+    white-space: nowrap;
 }
 
 .resend-radio-item.checked {
