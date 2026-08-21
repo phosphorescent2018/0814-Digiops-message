@@ -152,7 +152,7 @@ export default function AutoBatchDetail({ batch, onClose, onViewRecords }: AutoB
                             <div className="resend-conditions-box">
                                 触发条件：{batch.triggerReasons.join('、')} · 生效时段：全天 ·
                                 最多补发次数：3 次 · 补发时间间隔：1 小时 · 最大排队数量：1,000 条 ·
-                                批次最长等待：15 分钟
+                                队列最长等待：15 分钟
                             </div>
                         )}
                     </div>
