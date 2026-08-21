@@ -403,8 +403,8 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                             <label className="sms-form-label">
                                 <span className="resend-required">*</span>
                                 <span className="sms-tooltip-wrap">
-                                    批次最长等待
-                                    <span className="sms-tooltip">从该批次第一条短信入队起算，未达最大排队数量时到点也会强制补发</span>
+                                    队列最长等待
+                                    <span className="sms-tooltip">从该队列第一条短信入队起算，未达最大排队数量时到点也会强制补发</span>
                                 </span>
                             </label>
                             <div className="sms-form-control">
