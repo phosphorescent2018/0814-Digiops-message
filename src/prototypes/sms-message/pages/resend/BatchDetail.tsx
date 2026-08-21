@@ -2,7 +2,7 @@
  * 批次详情抽屉：批次信息 / 数量概览 / 执行统计 / 明细表 / 操作
  */
 import React, { useMemo, useState } from 'react';
-import { X, RefreshCw, Ban, ChevronDown, ChevronRight, ExternalLink, Download } from 'lucide-react';
+import { X, RefreshCw, Ban, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
 import { computeStatus, STATUS_CLASS, type BatchRow } from './ManualResend';
 
 interface BatchDetailProps {
@@ -108,7 +108,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
     const status = computeStatus(batch);
     const [showConditions, setShowConditions] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [exported, setExported] = useState(false);
 
     const stats = useMemo(() => {
         const send: Record<string, number> = { 成功: 0, 失败: 0, 暂无数据: 0 };
@@ -126,7 +125,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
             : null;
 
     const canTerminate = status === '待执行' || status === '执行中';
-    const canExport = status === '已完成' || status === '已终止' || status === '失败' || status === '部分失败';
 
     const refresh = () => {
         setRefreshing(true);
@@ -147,12 +145,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
         已送达: '#52c41a',
         回执超时: '#fa8c16',
         '--': '#98a1b8',
-    };
-
-    const handleExport = () => {
-        if (exported) return;
-        setExported(true);
-        setTimeout(() => setExported(false), 2000);
     };
 
     return (
@@ -269,22 +261,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                         <ExternalLink size={13} />
                                         查看发送记录
                                     </button>
-                                    <span className="sms-tooltip-wrap">
-                                        <button
-                                            type="button"
-                                            className="sms-btn"
-                                            onClick={handleExport}
-                                            disabled={!canExport || exported}
-                                        >
-                                            <Download size={14} />
-                                            {exported ? '已导出' : '导出'}
-                                        </button>
-                                        {!canExport && (
-                                            <span className="sms-tooltip">
-                                                待任务结束后可导出
-                                            </span>
-                                        )}
-                                    </span>
                                 </div>
                             </div>
                             {status === '失败' && (

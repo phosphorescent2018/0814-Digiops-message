@@ -139,7 +139,7 @@ function SearchForm({
                         <label className="sms-form-label">补发类型</label>
                         <div className="sms-form-control">
                             <select
-                                className={`sms-select sms-control-purple${resendType ? '' : ' placeholder'}`}
+                                className="sms-select sms-control-purple"
                                 value={resendType}
                                 onChange={(e) => onResendTypeChange(e.target.value)}
                             >

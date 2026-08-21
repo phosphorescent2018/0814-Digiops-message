@@ -23,6 +23,7 @@ const FIELD_LABELS = [
     '发送状态',
     '送达状态',
     '补发批次 ID',
+    '补发状态',
     '路径标记',
 ];
 
@@ -171,6 +172,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
     const [exportVisible, setExportVisible] = useState(false);
     const [hasFilter, setHasFilter] = useState(false);
+    const [batchPage, setBatchPage] = useState(1);
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -241,6 +243,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const confirmFinal = () => {
         if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
+        setBatchPage(1);
         setModal(null);
         setValidated(false);
         setVerifiedCount(null);
@@ -289,7 +292,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 </div>
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
-                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : 10).map((label) => (
+                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : FIELD_LABELS.length).map((label) => (
                             <div className="sms-form-item" key={label}>
                                 <label className="sms-form-label">{label}</label>
                                 <div className="sms-form-control">
@@ -303,11 +306,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             <span>结束日期</span>
                                         </div>
                                     ) : label === '手机号码' || label === '路径标记' || label === '补发批次 ID' ? (
-                                        <input
-                                            className={`sms-input${label === '补发批次 ID' ? ' sms-control-purple' : ''}`}
-                                            placeholder="请输入"
-                                            name={label}
-                                        />
+                                        <input className="sms-input" placeholder="请输入" name={label} />
                                     ) : (
                                         <select className="sms-select placeholder" name={label}>
                                             <option value="">请选择</option>
@@ -344,7 +343,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <div className="sms-form-item">
                                 <label className="sms-form-label">补发状态</label>
                                 <div className="sms-form-control">
-                                    <select className="sms-select placeholder" name="补发状态">
+                                    <select className="sms-select" name="补发状态">
                                         <option value="">全部</option>
                                         <option value="未补发过">未补发过</option>
                                         <option value="已补发过">已补发过</option>
@@ -480,7 +479,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {batches.map((b) => {
+                            {batches.slice((batchPage - 1) * 5, batchPage * 5).map((b) => {
                                 const status = computeStatus(b);
                                 const canTerminate = status === '待执行' || status === '执行中';
                                 return (
@@ -528,6 +527,35 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             })}
                         </tbody>
                     </table>
+                </div>
+                <div className="sms-pagination">
+                    <span className="sms-pagination-total">共 {batches.length} 个批次</span>
+                    <button
+                        type="button"
+                        className="sms-page-btn"
+                        disabled={batchPage === 1}
+                        onClick={() => setBatchPage((p) => p - 1)}
+                    >
+                        上一页
+                    </button>
+                    {Array.from({ length: Math.max(1, Math.ceil(batches.length / 5)) }, (_, i) => (
+                        <button
+                            key={i}
+                            type="button"
+                            className={`sms-page-btn${batchPage === i + 1 ? ' active' : ''}`}
+                            onClick={() => setBatchPage(i + 1)}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                    <button
+                        type="button"
+                        className="sms-page-btn"
+                        disabled={batchPage >= Math.max(1, Math.ceil(batches.length / 5))}
+                        onClick={() => setBatchPage((p) => p + 1)}
+                    >
+                        下一页
+                    </button>
                 </div>
             </div>
 
