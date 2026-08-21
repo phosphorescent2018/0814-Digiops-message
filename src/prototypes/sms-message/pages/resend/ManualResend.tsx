@@ -22,7 +22,6 @@ const FIELD_LABELS = [
     '发送名称',
     '发送状态',
     '送达状态',
-    '补发批次 ID',
 ];
 
 export interface BatchRow {
@@ -338,6 +337,14 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         ))}
                     </div>
                     <div className="resend-filter-last-row">
+                        {!filterCollapsed && (
+                            <div className="sms-form-item">
+                                <label className="sms-form-label">补发批次 ID</label>
+                                <div className="sms-form-control">
+                                    <input className="sms-input" placeholder="请输入" name="补发批次 ID" />
+                                </div>
+                            </div>
+                        )}
                         {!filterCollapsed && (
                             <div className="sms-form-item">
                                 <label className="sms-form-label">补发状态</label>
