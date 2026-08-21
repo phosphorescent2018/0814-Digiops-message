@@ -18,6 +18,8 @@ export interface RecordRow {
     deliveryStatus: string;
     /** 关联补发批次 ID（无批次则无） */
     batchId?: string;
+    /** 补发类型：原始短信 / 人工补发 / 计划内自动补发 */
+    resendType: '原始短信' | '人工补发' | '计划内自动补发';
     /** 是否历史短信（历史短信送达状态一律展示 --） */
     isHistory: boolean;
     solId: string;
@@ -38,6 +40,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '回执中',
         batchId: '20260812003',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -55,6 +58,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '已送达',
         batchId: '20260812003',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -72,6 +76,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '未送达',
         batchId: '20260812002',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -89,6 +94,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '回执超时',
         batchId: '20260812002',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -105,6 +111,7 @@ export const recordRows: RecordRow[] = [
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
         deliveryStatus: '--',
+        resendType: '原始短信',
         isHistory: true,
         solId: '-',
     },
@@ -122,6 +129,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '0',
         deliveryStatus: '--',
         batchId: '20260812004',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -139,6 +147,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '1',
         deliveryStatus: '--',
         batchId: '20260812002',
+        resendType: '人工补发',
         isHistory: false,
         solId: '-',
     },
@@ -156,6 +165,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '回执中',
         batchId: 'A20260813001',
+        resendType: '计划内自动补发',
         isHistory: false,
         solId: '-',
     },
@@ -173,6 +183,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '1',
         deliveryStatus: '--',
         batchId: 'A20260813001',
+        resendType: '计划内自动补发',
         isHistory: false,
         solId: '-',
     },
@@ -190,6 +201,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '已送达',
         batchId: 'A20260813002',
+        resendType: '计划内自动补发',
         isHistory: false,
         solId: '-',
     },
@@ -207,6 +219,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '回执超时',
         batchId: 'A20260813002',
+        resendType: '计划内自动补发',
         isHistory: false,
         solId: '-',
     },

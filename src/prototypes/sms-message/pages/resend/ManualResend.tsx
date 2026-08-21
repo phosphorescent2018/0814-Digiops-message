@@ -347,6 +347,18 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <div className="resend-filter-last-row">
                         {!filterCollapsed && (
                             <div className="sms-form-item">
+                                <label className="sms-form-label">补发状态</label>
+                                <div className="sms-form-control">
+                                    <select className="sms-select placeholder" name="补发状态">
+                                        <option value="">全部</option>
+                                        <option value="未补发过">未补发过</option>
+                                        <option value="已补发过">已补发过</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+                        {!filterCollapsed && (
+                            <div className="sms-form-item">
                                 <label className="sms-form-label">路径标记</label>
                                 <div className="sms-form-control">
                                     <input className="sms-input" placeholder="请输入" name="路径标记" />

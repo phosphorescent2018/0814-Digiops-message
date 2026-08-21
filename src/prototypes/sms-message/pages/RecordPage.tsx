@@ -34,7 +34,15 @@ function DeliveryTooltip({ text, children }: { text: string; children: React.Rea
     );
 }
 
-function SearchForm({ filter }: { filter?: RecordFilter }) {
+function SearchForm({
+    filter,
+    resendType,
+    onResendTypeChange,
+}: {
+    filter?: RecordFilter;
+    resendType: string;
+    onResendTypeChange: (v: string) => void;
+}) {
     const [collapsed, setCollapsed] = useState(false);
 
     const renderSelect = (placeholder = PLACEHOLDER_SELECT, options?: string[], defaultValue?: string) => (
@@ -129,6 +137,21 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
                         </div>
                     </div>
                     <div className="sms-form-item">
+                        <label className="sms-form-label">补发类型</label>
+                        <div className="sms-form-control">
+                            <select
+                                className={`sms-select sms-control-purple${resendType ? '' : ' placeholder'}`}
+                                value={resendType}
+                                onChange={(e) => onResendTypeChange(e.target.value)}
+                            >
+                                <option value="">全部</option>
+                                <option value="原始短信">原始短信</option>
+                                <option value="人工补发">人工补发</option>
+                                <option value="计划内自动补发">计划内自动补发</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
                         <label className="sms-form-label">补发批次 ID</label>
                         <div className="sms-form-control">
                             <input
@@ -170,11 +193,24 @@ function SearchForm({ filter }: { filter?: RecordFilter }) {
     );
 }
 
-function RecordTable({ onExport, filter }: { onExport: () => void; filter?: RecordFilter }) {
+function RecordTable({
+    onExport,
+    filter,
+    resendType,
+}: {
+    onExport: () => void;
+    filter?: RecordFilter;
+    resendType: string;
+}) {
     const [page, setPage] = useState(1);
     const filteredRows = useMemo(
-        () => (filter?.batchId ? recordRows.filter((r) => r.batchId === filter.batchId) : recordRows),
-        [filter?.batchId]
+        () =>
+            recordRows.filter((r) => {
+                if (filter?.batchId && r.batchId !== filter.batchId) return false;
+                if (resendType && r.resendType !== resendType) return false;
+                return true;
+            }),
+        [filter?.batchId, resendType]
     );
     const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
     const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
@@ -347,11 +383,16 @@ function RecordTable({ onExport, filter }: { onExport: () => void; filter?: Reco
 
 export default function RecordPage({ activeKey, filter }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
+    const [resendType, setResendType] = useState('');
 
     return (
         <div>
-            <SearchForm filter={filter} />
-            <RecordTable onExport={() => setExportVisible(true)} filter={filter} />
+            <SearchForm
+                filter={filter}
+                resendType={resendType}
+                onResendTypeChange={setResendType}
+            />
+            <RecordTable onExport={() => setExportVisible(true)} filter={filter} resendType={resendType} />
 
             {exportVisible && (
                 <div className="sms-mask" onClick={() => setExportVisible(false)}>
