@@ -101,12 +101,12 @@ function SearchForm({
             <div className="sms-form-item">
                 <label className="sms-form-label">手机号码</label>
                 <div className="sms-form-control">
-                    <input className="sms-input" placeholder="请输入" />
+                    <input className="sms-input" placeholder="请输入" defaultValue={filter?.phone ?? ''} />
                 </div>
             </div>
             <div className="sms-form-item">
                 <label className="sms-form-label">内容类型</label>
-                <div className="sms-form-control">{renderSelect(undefined, contentTypeOptions.slice(1))}</div>
+                <div className="sms-form-control">{renderSelect(undefined, contentTypeOptions.slice(1), filter?.contentType)}</div>
             </div>
             {!collapsed && (
                 <>
@@ -117,7 +117,7 @@ function SearchForm({
                     <div className="sms-form-item">
                         <label className="sms-form-label">发送状态</label>
                         <div className="sms-form-control">
-                            {renderSelect(undefined, statusOptions.map((s) => s.label))}
+                            {renderSelect(undefined, statusOptions.map((s) => s.label), filter?.sendStatus)}
                         </div>
                     </div>
                     <div className="sms-form-item">
@@ -203,13 +203,20 @@ function RecordTable({
 }) {
     const [page, setPage] = useState(1);
     const filteredRows = useMemo(
-        () =>
-            recordRows.filter((r) => {
+        () => {
+            const statusCodeMap: Record<string, string> = { 成功: '2', 失败: '1', 暂无数据: '0' };
+            return recordRows.filter((r) => {
                 if (filter?.batchId && r.batchId !== filter.batchId) return false;
+                if (filter?.businessId && r.businessId !== filter.businessId) return false;
+                if (filter?.deliveryStatus && r.deliveryStatus !== filter.deliveryStatus) return false;
+                if (filter?.contentType && r.contentType !== filter.contentType) return false;
+                if (filter?.sendStatus && r.notifyStatus !== statusCodeMap[filter.sendStatus]) return false;
+                if (filter?.phone && !r.phone.includes(filter.phone)) return false;
                 if (resendType && r.resendType !== resendType) return false;
                 return true;
-            }),
-        [filter?.batchId, resendType]
+            });
+        },
+        [filter, resendType]
     );
     const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
     const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);

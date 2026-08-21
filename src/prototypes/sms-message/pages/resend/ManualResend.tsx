@@ -249,9 +249,16 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         };
         const filter: RecordFilter = {};
         const businessId = read('BusinessID');
+        const phone = read('手机号码');
+        const contentType = read('内容类型');
+        const sendStatusCode = read('发送状态');
         const deliveryStatus = read('送达状态');
         const batchId = read('补发批次 ID').replace(/^B/, '');
         if (businessId) filter.businessId = businessId;
+        if (phone) filter.phone = phone;
+        if (contentType) filter.contentType = contentType;
+        const sendStatusMap: Record<string, string> = { '2': '成功', '1': '失败', '0': '暂无数据' };
+        if (sendStatusCode && sendStatusMap[sendStatusCode]) filter.sendStatus = sendStatusMap[sendStatusCode];
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
         if (batchId) filter.batchId = batchId;
         onSwitchTab?.('record', filter);

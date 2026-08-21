@@ -16,6 +16,9 @@ export interface RecordFilter {
     sendTimeStart?: string;
     sendTimeEnd?: string;
     businessId?: string;
+    phone?: string;
+    contentType?: string;
+    sendStatus?: string;
     deliveryStatus?: string;
     batchId?: string;
 }
