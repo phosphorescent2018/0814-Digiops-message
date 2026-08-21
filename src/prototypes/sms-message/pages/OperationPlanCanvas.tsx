@@ -112,12 +112,14 @@ interface ResendControlConfig {
     triggers: string[];
     maxResend: string;
     interval: string;
+    window: { start: string; end: string } | null;
 }
 
 const DEFAULT_RESEND_CONTROL: ResendControlConfig = {
     triggers: [],
     maxResend: '3',
     interval: '30',
+    window: null,
 };
 
 /** 判断节点配置：事件类型下拉，支持复用为前置校验 */
@@ -204,9 +206,10 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         x: 540,
         y: 180,
         config: {
-            triggers: ['submitFail', 'notDelivered', 'receiptTimeout'],
+            triggers: ['submitFail', 'receiptTimeout'],
             maxResend: '3',
             interval: '30',
+            window: { start: '09:00', end: '18:00' },
         },
     },
     { id: 'demo-end-main', def: findNodeDef('end'), x: 710, y: 180, config: null },
@@ -537,6 +540,7 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
         triggers: [...initial.triggers],
         maxResend: initial.maxResend,
         interval: initial.interval,
+        window: initial.window ? { ...initial.window } : null,
     }));
 
     const toggleTrigger = (key: string) => {
@@ -628,6 +632,60 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                                     <option value="60">60 分钟</option>
                                     <option value="120">120 分钟</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">允许发送时段</label>
+                            <div className="sms-form-control">
+                                {draft.window ? (
+                                    <div className="plan-canvas-time-row">
+                                        <input
+                                            type="time"
+                                            className="plan-canvas-time-input"
+                                            value={draft.window.start}
+                                            onChange={(e) =>
+                                                setDraft((prev) => ({
+                                                    ...prev,
+                                                    window: { start: e.target.value, end: prev.window!.end },
+                                                }))
+                                            }
+                                        />
+                                        <span className="plan-canvas-time-sep">-</span>
+                                        <input
+                                            type="time"
+                                            className="plan-canvas-time-input"
+                                            value={draft.window.end}
+                                            onChange={(e) =>
+                                                setDraft((prev) => ({
+                                                    ...prev,
+                                                    window: { start: prev.window!.start, end: e.target.value },
+                                                }))
+                                            }
+                                        />
+                                        <button
+                                            type="button"
+                                            className="plan-canvas-time-del"
+                                            title="删除该时段"
+                                            onClick={() => setDraft((prev) => ({ ...prev, window: null }))}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="plan-canvas-time-add"
+                                        onClick={() =>
+                                            setDraft((prev) => ({
+                                                ...prev,
+                                                window: { start: '09:00', end: '18:00' },
+                                            }))
+                                        }
+                                    >
+                                        + 添加时段
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
