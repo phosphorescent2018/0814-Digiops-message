@@ -171,7 +171,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [exportVisible, setExportVisible] = useState(false);
     const [hasFilter, setHasFilter] = useState(false);
     const [batchPage, setBatchPage] = useState(1);
-    const [batchPageSize, setBatchPageSize] = useState(5);
+    const [batchPageSize, setBatchPageSize] = useState(10);
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -535,7 +535,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         disabled={batchPage === 1}
                         onClick={() => setBatchPage((p) => p - 1)}
                     >
-                        上一页
+                        ‹
                     </button>
                     {Array.from({ length: Math.max(1, Math.ceil(batches.length / batchPageSize)) }, (_, i) => (
                         <button
@@ -553,7 +553,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         disabled={batchPage >= Math.max(1, Math.ceil(batches.length / batchPageSize))}
                         onClick={() => setBatchPage((p) => p + 1)}
                     >
-                        下一页
+                        ›
                     </button>
                     <select
                         className="sms-page-size"
@@ -563,10 +563,15 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             setBatchPage(1);
                         }}
                     >
-                        <option value={5}>5 条/页</option>
                         <option value={10}>10 条/页</option>
                         <option value={20}>20 条/页</option>
+                        <option value={50}>50 条/页</option>
                     </select>
+                    <span className="sms-jump">
+                        跳至
+                        <input type="text" defaultValue="" />
+                        页
+                    </span>
                 </div>
             </div>
 
