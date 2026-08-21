@@ -444,7 +444,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <span className="resend-hit-text-main">
                                 当前筛选项下命中 <b>{hitCount.toLocaleString()}</b> 条，其中黑名单命中{' '}
                                 <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条，已补发过{' '}
-                                <b>{Math.round(hitCount * 0.02).toLocaleString()}</b> 条（将默认剔除）
+                                <b>{Math.round(hitCount * 0.02).toLocaleString()}</b> 条
                             </span>
                             <div className="resend-hit-sub">
                                 <span>任务执行时将重新校验</span>
