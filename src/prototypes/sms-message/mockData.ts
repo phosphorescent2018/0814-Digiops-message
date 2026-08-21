@@ -14,7 +14,7 @@ export interface RecordRow {
     content: string;
     sender: string;
     notifyStatus: '0' | '1' | '2';
-    /** 送达状态：回执中 / 已送达 / 未送达 / 回执超时 / --（无回执，含失败、暂无数据、历史） */
+    /** 送达状态：回执中 / 已送达 / 回执超时 / --（无回执，含失败、暂无数据、历史） */
     deliveryStatus: string;
     /** 关联补发批次 ID（无批次则无） */
     batchId?: string;
@@ -74,7 +74,7 @@ export const recordRows: RecordRow[] = [
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
         notifyStatus: '2',
-        deliveryStatus: '未送达',
+        deliveryStatus: '回执超时',
         batchId: '20260812002',
         resendType: '人工补发',
         isHistory: false,

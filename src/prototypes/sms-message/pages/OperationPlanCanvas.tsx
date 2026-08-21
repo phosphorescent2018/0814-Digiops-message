@@ -582,17 +582,9 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                                     <div className="resend-cond-group">
                                         <div className="resend-cond-group-head">
                                             <span className="resend-cond-group-title">回执判定后</span>
-                                            <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
+                                            <span className="resend-cond-group-desc">24 小时内无明确回执</span>
                                         </div>
                                         <div className="resend-cond-options">
-                                            <label className="resend-cond-option">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={draft.triggers.includes('notDelivered')}
-                                                    onChange={() => toggleTrigger('notDelivered')}
-                                                />
-                                                <span className="resend-cond-option-text">未送达</span>
-                                            </label>
                                             <label className="resend-cond-option">
                                                 <input
                                                     type="checkbox"

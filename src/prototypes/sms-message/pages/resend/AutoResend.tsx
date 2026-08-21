@@ -32,7 +32,7 @@ const AUTO_BATCHES: AutoBatchRow[] = [
         endTime: '—',
         systemVerifiedCount: 620,
         queuedCount: 1000,
-        triggerReasons: ['回执超时', '未送达'],
+        triggerReasons: ['回执超时'],
         source: '全局规则',
         createdAt: '2026-08-13 10:01:40',
     },
@@ -54,7 +54,7 @@ const AUTO_BATCHES: AutoBatchRow[] = [
         endTime: '—',
         systemVerifiedCount: null,
         queuedCount: 968,
-        triggerReasons: ['未送达'],
+        triggerReasons: ['回执超时'],
         source: '全局规则',
         createdAt: '2026-08-13 13:50:00',
     },
@@ -302,17 +302,9 @@ export default function AutoResend({ onSwitchTab }: AutoResendProps) {
                                     <div className="resend-cond-group">
                                         <div className="resend-cond-group-head">
                                             <span className="resend-cond-group-title">回执判定后</span>
-                                            <span className="resend-cond-group-desc">未送达或 24 小时内无明确回执</span>
+                                            <span className="resend-cond-group-desc">24 小时内无明确回执</span>
                                         </div>
                                         <div className="resend-cond-options">
-                                            <label className="resend-cond-option">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={conditions.includes('未送达')}
-                                                    onChange={() => toggleCondition('未送达')}
-                                                />
-                                                <span className="resend-cond-option-text">未送达</span>
-                                            </label>
                                             <label className="resend-cond-option">
                                                 <input
                                                     type="checkbox"

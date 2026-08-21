@@ -30,7 +30,7 @@ interface DetailRow {
 }
 
 /**
- * 明细 mock：补发批次只包含新短信（失败 / 未送达 / 回执超时等可补发场景），
+ * 明细 mock：补发批次只包含新短信（失败 / 回执超时等可补发场景），
  * 不含历史短信；送达状态 -- 与发送状态失败数量保持一致。
  */
 const DETAIL_ROWS: DetailRow[] = [
@@ -55,7 +55,7 @@ const DETAIL_ROWS: DetailRow[] = [
         phone: 'tUAH5d+eIqihMk6w7bfD7w==',
         content: 'Congratulations! You qualify for a Momo Advance limit...',
         sendStatus: '成功',
-        deliveryStatus: '未送达',
+        deliveryStatus: '回执超时',
         failReason: '',
     },
     {
@@ -101,7 +101,6 @@ const SEND_STATUS_CLASS: Record<string, string> = {
 const DELIVERY_CLASS: Record<string, string> = {
     回执中: 'sms-status-delivering',
     已送达: 'sms-status-success',
-    未送达: 'sms-status-fail',
     回执超时: 'sms-status-timeout',
 };
 
@@ -146,7 +145,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
     const DELIVERY_COLORS: Record<string, string> = {
         回执中: '#1677ff',
         已送达: '#52c41a',
-        未送达: '#f5222d',
         回执超时: '#fa8c16',
         '--': '#98a1b8',
     };
@@ -214,7 +212,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                         {showConditions && (
                             <div className="resend-conditions-box">
                                 发送时间：2026-08-01 ~ 2026-08-12 · BusinessID：MTN_UG_Account_id ·
-                                送达状态：未送达、回执超时 · 其余条件为空
+                                送达状态：回执超时 · 其余条件为空
                             </div>
                         )}
                     </div>

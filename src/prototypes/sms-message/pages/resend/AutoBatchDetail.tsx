@@ -37,7 +37,7 @@ interface AutoBatchDetailProps {
 const DETAIL_ROWS = [
     { sendStatus: '成功', deliveryStatus: '回执中' },
     { sendStatus: '成功', deliveryStatus: '已送达' },
-    { sendStatus: '成功', deliveryStatus: '未送达' },
+    { sendStatus: '成功', deliveryStatus: '回执超时' },
     { sendStatus: '成功', deliveryStatus: '回执超时' },
     { sendStatus: '失败', deliveryStatus: '--' },
     { sendStatus: '失败', deliveryStatus: '--' },
@@ -53,7 +53,6 @@ const SEND_COLORS: Record<string, string> = {
 const DELIVERY_COLORS: Record<string, string> = {
     回执中: '#1677ff',
     已送达: '#52c41a',
-    未送达: '#f5222d',
     回执超时: '#fa8c16',
     '--': '#98a1b8',
 };
