@@ -308,7 +308,7 @@ export const statusOptions = [
     { value: '0', label: '暂无数据' },
 ];
 
-/** 黑名单：名单库资产，供人工补发 / 自动补发 / 运营计划前置校验使用 */
+/** 黑名单：名单库资产，供人工补发 / 计划内自动补发 / 运营计划前置校验使用 */
 export interface BlacklistRow {
     index: number;
     phone: string;

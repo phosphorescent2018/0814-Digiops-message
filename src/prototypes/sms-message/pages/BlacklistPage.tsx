@@ -1,6 +1,6 @@
 /**
  * 黑名单：名单库资产管理
- * 供人工补发（提交前可选手动过滤）、自动补发（默认强制校验）、运营计划前置校验（可选配置）使用
+ * 供人工补发（提交前可选手动过滤）、计划内自动补发（默认强制校验）、运营计划前置校验（可选配置）使用
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -799,7 +799,7 @@ function RemoveModal({ row, onClose, onConfirm }: { row: BlacklistRow; onClose: 
                         确认移除 <b>{row.phone}</b> 吗？
                     </div>
                     <div className="blacklist-remove-tip">
-                        移除后该号码将不再被黑名单拦截，人工补发、自动补发及运营计划将可能向其发送短信。
+                        移除后该号码将不再被黑名单拦截，人工补发、计划内自动补发及运营计划将可能向其发送短信。
                     </div>
                 </div>
                 <div className="sms-modal-actions">
@@ -828,7 +828,7 @@ function ToggleModal({ row, onClose, onConfirm }: { row: BlacklistRow; onClose: 
                     <div className="blacklist-remove-tip">
                         {isDisable
                             ? '失效后该号码将暂停参与拦截，名单保留，可随时恢复生效。'
-                            : '生效后将参与人工补发、自动补发及运营计划的拦截校验。'}
+                            : '生效后将参与人工补发、计划内自动补发及运营计划的拦截校验。'}
                     </div>
                 </div>
                 <div className="sms-modal-actions">
@@ -860,7 +860,7 @@ function BatchModal({
     onConfirm: () => void;
 }) {
     const config = {
-        enable: { title: '批量生效', tip: '恢复后将参与人工补发、自动补发及运营计划的拦截校验。' },
+        enable: { title: '批量生效', tip: '恢复后将参与人工补发、计划内自动补发及运营计划的拦截校验。' },
         disable: { title: '批量失效', tip: '失效后暂停拦截，名单保留，可随时恢复生效。' },
         remove: {
             title: '批量移除',
@@ -897,7 +897,7 @@ function BatchModal({
 
 function DetailModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
     const hits = [
-        { time: '2026-08-13 09:32:18', source: '自动补发校验', result: '已拦截' },
+        { time: '2026-08-13 09:32:18', source: '计划内自动补发校验', result: '已拦截' },
         { time: '2026-08-13 08:15:47', source: '运营计划 · 运营计划名称', result: '已拦截' },
         { time: '2026-08-12 19:04:22', source: '人工补发校验', result: '已拦截' },
     ];
@@ -1007,7 +1007,7 @@ export default function BlacklistPage() {
             <div className="blacklist-tip">
                 <Info size={14} />
                 <span>
-                    人工补发可选手动过滤，自动补发默认强制校验，支持在运营计划画布中配置。
+                    人工补发可选手动过滤，计划内自动补发默认强制校验，支持在运营计划画布中配置。
                 </span>
             </div>
 
