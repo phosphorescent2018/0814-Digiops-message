@@ -1,7 +1,7 @@
 /**
  * 人工补发：条件筛选 → 命中汇总（导出/定时/立即补发）→ 批次补发记录
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp } from 'lucide-react';
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
@@ -22,6 +22,7 @@ const FIELD_LABELS = [
     '发送名称',
     '发送状态',
     '送达状态',
+    '补发批次 ID',
     '路径标记',
 ];
 
@@ -151,8 +152,6 @@ const MANUAL_COLUMNS: ColumnDef[] = [
 
 export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
-    // 宽屏（≥1680px）时筛选区升级为 4 列，grid 展示 8 个字段 + 末行路径标记
-    const [isWide, setIsWide] = useState(() => window.matchMedia('(min-width: 1680px)').matches);
     const [filterCollapsed, setFilterCollapsed] = useState(false);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
@@ -172,13 +171,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
     const [exportVisible, setExportVisible] = useState(false);
     const [hasFilter, setHasFilter] = useState(false);
-
-    useEffect(() => {
-        const mq = window.matchMedia('(min-width: 1680px)');
-        const onChange = (e: MediaQueryListEvent) => setIsWide(e.matches);
-        mq.addEventListener('change', onChange);
-        return () => mq.removeEventListener('change', onChange);
-    }, []);
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -297,7 +289,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 </div>
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
-                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : isWide ? 8 : 9).map((label) => (
+                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : 10).map((label) => (
                             <div className="sms-form-item" key={label}>
                                 <label className="sms-form-label">{label}</label>
                                 <div className="sms-form-control">
@@ -310,8 +302,12 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             <span className="arrow">→</span>
                                             <span>结束日期</span>
                                         </div>
-                                    ) : label === '手机号码' || label === '路径标记' ? (
-                                        <input className="sms-input" placeholder="请输入" name={label} />
+                                    ) : label === '手机号码' || label === '路径标记' || label === '补发批次 ID' ? (
+                                        <input
+                                            className={`sms-input${label === '补发批次 ID' ? ' sms-control-purple' : ''}`}
+                                            placeholder="请输入"
+                                            name={label}
+                                        />
                                     ) : (
                                         <select className="sms-select placeholder" name={label}>
                                             <option value="">请选择</option>

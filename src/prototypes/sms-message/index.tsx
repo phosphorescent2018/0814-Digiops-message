@@ -21,7 +21,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'template', label: '模版', icon: MessageSquareText },
     { key: 'record', label: '发送记录', icon: MessageCircle },
     { key: 'report', label: '报表', icon: BarChart3 },
-    { key: 'resend', label: '补发中心', icon: Send },
+    { key: 'resend', label: '人工补发', icon: Send },
 ];
 
 /** 本次新增 / 增强的功能 Tab：淡紫色背景标记 */
