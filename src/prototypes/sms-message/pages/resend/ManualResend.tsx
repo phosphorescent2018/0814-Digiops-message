@@ -438,7 +438,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             <div className="sms-card resend-section">
                 <div className="resend-table-toolbar">
                     <div className="resend-section-title">
-                        <span>人工补发记录</span>
+                        <span>补发记录</span>
                         <span className="resend-section-sub">共 {batches.length} 个批次</span>
                     </div>
                     <div className="resend-table-toolbar-actions">
