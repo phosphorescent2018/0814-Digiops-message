@@ -2,7 +2,7 @@
  * 人工补发：条件筛选 → 命中汇总（导出/定时/立即补发）→ 批次补发记录
  */
 import React, { useState } from 'react';
-import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp } from 'lucide-react';
+import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp, ExternalLink } from 'lucide-react';
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
 import ExportModal from '../../components/ExportModal';
@@ -157,6 +157,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
     const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('unset');
+    const [includeResent, setIncludeResent] = useState<'no' | 'yes'>('no');
     const [scheduledTime, setScheduledTime] = useState('');
     const [validating, setValidating] = useState(false);
     const [validated, setValidated] = useState(false);
@@ -237,6 +238,22 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             setValidated(true);
             showToast('校验完成，已获取最新补发数量');
         }, 800);
+    };
+
+    /** 查看命中明细：跳转发送记录页并带入当前筛选条件 */
+    const viewHitDetail = () => {
+        const read = (name: string) => {
+            const el = formRef.current?.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`);
+            return el?.value ?? '';
+        };
+        const filter: RecordFilter = {};
+        const businessId = read('BusinessID');
+        const deliveryStatus = read('送达状态');
+        const batchId = read('补发批次 ID').replace(/^B/, '');
+        if (businessId) filter.businessId = businessId;
+        if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
+        if (batchId) filter.batchId = batchId;
+        onSwitchTab?.('record', filter);
     };
 
     const confirmFinal = () => {
@@ -415,6 +432,10 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             </span>
                         </div>
                         <div className="resend-hit-actions">
+                            <button type="button" className="resend-link-btn" onClick={viewHitDetail}>
+                                <ExternalLink size={13} />
+                                查看命中明细
+                            </button>
                             <button type="button" className="sms-btn" onClick={() => showToast('命中结果已导出（原型演示）')}>
                                 <Download size={14} />
                                 导出 Excel
@@ -656,6 +677,37 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             }}
                                         />
                                         是
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="resend-confirm-row">
+                                <span className="resend-confirm-label">已补发过的短信</span>
+                                <div className="resend-radio-group">
+                                    <label className={`resend-radio-item${includeResent === 'no' ? ' checked' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="includeResent"
+                                            checked={includeResent === 'no'}
+                                            onChange={() => {
+                                                setIncludeResent('no');
+                                                setValidated(false);
+                                                setVerifiedCount(null);
+                                            }}
+                                        />
+                                        不发送
+                                    </label>
+                                    <label className={`resend-radio-item${includeResent === 'yes' ? ' checked' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="includeResent"
+                                            checked={includeResent === 'yes'}
+                                            onChange={() => {
+                                                setIncludeResent('yes');
+                                                setValidated(false);
+                                                setVerifiedCount(null);
+                                            }}
+                                        />
+                                        发送（强制包含）
                                     </label>
                                 </div>
                             </div>
