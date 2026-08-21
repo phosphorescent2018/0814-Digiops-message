@@ -213,6 +213,25 @@ function RecordTable({
     );
     const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
     const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
+    /** 计划内自动补发序号：按发送时间排序，用于「补发类型」列展示第 N 次 */
+    const resendSeqMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        filteredRows
+            .filter((r) => r.resendType === '计划内自动补发')
+            .sort((a, b) => a.sendTime.localeCompare(b.sendTime))
+            .forEach((r, i) => {
+                map[`${r.index}-${r.sendTime}`] = i + 1;
+            });
+        return map;
+    }, [filteredRows]);
+
+    const renderResendType = (row: (typeof recordRows)[number]) => {
+        if (row.resendType === '计划内自动补发') {
+            const seq = resendSeqMap[`${row.index}-${row.sendTime}`];
+            return `计划内自动补发·第 ${seq} 次`;
+        }
+        return row.resendType;
+    };
 
     const renderStatus = (status: string) => {
         const statusMap: Record<string, { className: string; text: string }> = {
@@ -290,6 +309,7 @@ function RecordTable({
                             <th className="sms-col-sender">发送名称</th>
                             <th className="sms-col-status">发送状态</th>
                             <th className="sms-record-col-delivery">送达状态</th>
+                            <th className="sms-record-col-resend-type">补发类型</th>
                             <th className="sms-record-col-batch">补发批次 ID</th>
                             <th className="sms-col-sol">路径标记</th>
                         </tr>
@@ -320,6 +340,7 @@ function RecordTable({
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
                                 <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
+                                <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
                                 <td>
                                     {row.batchId ? (
                                         row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`

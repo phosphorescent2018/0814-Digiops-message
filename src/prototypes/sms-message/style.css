@@ -744,6 +744,10 @@ button {
     width: 90px;
 }
 
+.sms-record-table .sms-record-col-resend-type {
+    width: 150px;
+}
+
 .sms-cell {
     display: inline-block;
     max-width: 100%;
