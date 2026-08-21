@@ -2407,6 +2407,15 @@ button {
     vertical-align: middle;
 }
 
+.resend-hit-sub {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
 /* 命中为空 */
 .resend-hit-empty {
     margin-top: 8px;

@@ -444,12 +444,15 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <span className="resend-hit-text-main">
                                 当前筛选项下命中 <b>{hitCount.toLocaleString()}</b> 条，其中黑名单命中{' '}
                                 <b>{Math.round(hitCount * 0.036).toLocaleString()}</b> 条，已补发过{' '}
-                                <b>{Math.round(hitCount * 0.02).toLocaleString()}</b> 条（将默认剔除），任务执行时将重新校验
+                                <b>{Math.round(hitCount * 0.02).toLocaleString()}</b> 条（将默认剔除）
                             </span>
-                            <button type="button" className="resend-link-btn resend-hit-detail-link" onClick={viewHitDetail}>
-                                <ExternalLink size={13} />
-                                查看命中明细
-                            </button>
+                            <div className="resend-hit-sub">
+                                <span>任务执行时将重新校验</span>
+                                <button type="button" className="resend-link-btn" onClick={viewHitDetail}>
+                                    <ExternalLink size={13} />
+                                    查看命中明细
+                                </button>
+                            </div>
                         </div>
                         <div className="resend-hit-actions">
                             <button type="button" className="sms-btn" onClick={() => showToast('命中结果已导出（原型演示）')}>
