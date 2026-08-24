@@ -468,7 +468,7 @@ function BlacklistTable({
                     </button>
                 </div>
             )}
-            <div className="sms-table-wrap">
+            <div className="sms-table-wrap blacklist-table-wrap">
                 <table className="sms-table blacklist-table">
                     <thead>
                         <tr>

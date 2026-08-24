@@ -3843,6 +3843,27 @@ button {
     white-space: nowrap;
 }
 
+.blacklist-table-wrap {
+    position: relative;
+    overflow: visible;
+}
+
+.blacklist-table-wrap .blacklist-col-actions,
+.blacklist-table-wrap .blacklist-col-status {
+    position: relative;
+    overflow: visible;
+    z-index: 20;
+}
+
+.blacklist-table-wrap .sms-tooltip-wrap {
+    position: relative;
+    z-index: 30;
+}
+
+.blacklist-table-wrap .sms-tooltip {
+    z-index: 40;
+}
+
 .blacklist-table th {
     background: #fafafa;
     color: var(--text-secondary);
