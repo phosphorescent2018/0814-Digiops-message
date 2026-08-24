@@ -408,7 +408,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             <div className="sms-form-item">
                                 <label className="sms-form-label">送达状态</label>
                                 <div className="sms-form-control">
-                                    <select className="sms-select placeholder" name="送达状态">
+                                    <select className="sms-select sms-control-purple placeholder" name="送达状态">
                                         <option value="">请选择</option>
                                         <option value="回执中">回执中</option>
                                         <option value="已送达">已送达</option>
