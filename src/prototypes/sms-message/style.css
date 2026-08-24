@@ -2936,9 +2936,9 @@ button {
 .resend-log-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-height: 32px;
-    padding: 6px 12px;
+    gap: 24px;
+    min-height: 44px;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--border-soft);
     white-space: nowrap;
     overflow: hidden;
