@@ -2366,15 +2366,6 @@ button {
     min-width: 0;
 }
 
-/* 两页筛选区：标签统一 120px，控件撑满列尾（与发送记录一致） */
-.resend-filter-grid .sms-form-label,
-.resend-filter-grid .sms-form-label {
-    width: 120px;
-    text-align: left;
-    padding-right: 6px;
-    flex-shrink: 0;
-}
-
 .resend-filter-last-row .sms-form-label {
     width: auto;
     text-align: left;
