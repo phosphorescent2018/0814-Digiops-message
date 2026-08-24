@@ -326,9 +326,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             </div>
             {activeView === 'filter' && (
             <div className="sms-card resend-section">
-                <div className="resend-section-title">
-                    <span>条件筛选</span>
-                </div>
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
                         {FIELD_LABELS.slice(0, filterCollapsed ? 6 : FIELD_LABELS.length).map((label) => (
