@@ -435,36 +435,36 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 </div>
                             </div>
                         )}
-                    </div>
-                    <div className="sms-search-actions">
-                        <button type="button" className="sms-btn" onClick={reset}>
-                            <RotateCcw size={14} />
-                            重置
-                        </button>
-                        <span className="sms-tooltip-wrap">
+                        <div className="resend-filter-actions">
+                            <button type="button" className="sms-btn" onClick={reset}>
+                                <RotateCcw size={14} />
+                                重置
+                            </button>
+                            <span className="sms-tooltip-wrap">
+                                <button
+                                    type="button"
+                                    className="sms-btn sms-btn-primary"
+                                    onClick={query}
+                                    disabled={querying || !hasFilter}
+                                >
+                                    {querying ? '查询中…' : (
+                                        <>
+                                            <Search size={14} />
+                                            查询
+                                        </>
+                                    )}
+                                </button>
+                                {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
+                            </span>
                             <button
                                 type="button"
-                                className="sms-btn sms-btn-primary"
-                                onClick={query}
-                                disabled={querying || !hasFilter}
+                                className="sms-btn sms-btn-link"
+                                onClick={() => setFilterCollapsed(!filterCollapsed)}
                             >
-                                {querying ? '查询中…' : (
-                                    <>
-                                        <Search size={14} />
-                                        查询
-                                    </>
-                                )}
+                                {filterCollapsed ? '展开' : '收起'}
+                                <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
                             </button>
-                            {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
-                        </span>
-                        <button
-                            type="button"
-                            className="sms-btn sms-btn-link"
-                            onClick={() => setFilterCollapsed(!filterCollapsed)}
-                        >
-                            {filterCollapsed ? '展开' : '收起'}
-                            <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
-                        </button>
+                        </div>
                     </div>
                 </form>
 

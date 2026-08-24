@@ -192,20 +192,20 @@ function SearchForm({
                         </div>
                     </>
                 )}
-            </div>
-            <div className="sms-search-actions">
-                <button type="button" className="sms-btn">
-                    <RotateCcw size={14} />
-                    重置
-                </button>
-                <button type="button" className="sms-btn sms-btn-primary">
-                    <Search size={14} />
-                    查询
-                </button>
-                <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
-                    {collapsed ? '展开' : '收起'}
-                    <ChevronUp size={14} style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} />
-                </button>
+                <div className="resend-filter-actions">
+                    <button type="button" className="sms-btn">
+                        <RotateCcw size={14} />
+                        重置
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary">
+                        <Search size={14} />
+                        查询
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
+                        {collapsed ? '展开' : '收起'}
+                        <ChevronUp size={14} style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} />
+                    </button>
+                </div>
             </div>
         </div>
     );
