@@ -1028,7 +1028,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 </div>
                             </div>
                             <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">已补发过的短信</span>
+                                <span className="resend-confirm-label">已补发短信是否发送</span>
                                 <div className="resend-radio-group">
                                     <label className={`resend-radio-item${includeResent === 'no' ? ' checked' : ''}`}>
                                         <input
@@ -1041,7 +1041,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 setVerifiedCount(null);
                                             }}
                                         />
-                                        不发送
+                                        否
                                     </label>
                                     <label className={`resend-radio-item${includeResent === 'yes' ? ' checked' : ''}`}>
                                         <input
@@ -1054,7 +1054,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 setVerifiedCount(null);
                                             }}
                                         />
-                                        发送
+                                        是
                                     </label>
                                 </div>
                             </div>
@@ -1094,7 +1094,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                     {ignoreBlacklist === 'unset'
                                                         ? '请先选择黑名单用户是否发送'
                                                         : includeResent === 'unset'
-                                                            ? '请先选择已补发过的短信'
+                                                            ? '请先选择已补发短信是否发送'
                                                             : '请先选择晚于当前时间的补发时间'}
                                                 </span>
                                             )}
