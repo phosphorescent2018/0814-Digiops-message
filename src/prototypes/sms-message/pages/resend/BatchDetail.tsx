@@ -354,11 +354,16 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                         <span className="resend-log-event">
                                             <strong>{event.actorName} {event.eventType}</strong>
                                         </span>
-                                        <span className="resend-log-status">
-                                            {event.fromStatus
-                                                ? `${event.fromStatus} → ${event.toStatus}`
-                                                : `— → ${event.toStatus}`}
-                                        </span>
+                                        {event.fromStatus ? (
+                                            <span className="resend-log-status">
+                                                {event.fromStatus} → {event.toStatus}
+                                            </span>
+                                        ) : (
+                                            <span className="resend-log-status sms-tooltip-wrap">
+                                                <span>— → {event.toStatus}</span>
+                                                <span className="sms-tooltip">创建前无批次状态</span>
+                                            </span>
+                                        )}
                                     </div>
                                 ))}
                             </div>

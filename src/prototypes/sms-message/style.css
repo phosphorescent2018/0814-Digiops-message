@@ -2974,6 +2974,10 @@ button {
     text-overflow: ellipsis;
 }
 
+.resend-log-status.sms-tooltip-wrap {
+    overflow: visible;
+}
+
 .resend-log-empty {
     padding: 16px;
     border: 1px dashed var(--border-soft);
