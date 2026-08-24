@@ -330,7 +330,10 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
                         {FIELD_LABELS.slice(0, filterCollapsed ? 6 : FIELD_LABELS.length).map((label) => (
-                            <div className="sms-form-item" key={label}>
+                            <div
+                                className={`sms-form-item${label === '发送时间' ? ' sms-filter-time-item' : ''}`}
+                                key={label}
+                            >
                                 <label className="sms-form-label">{label}</label>
                                 <div className="sms-form-control">
                                     {label === '发送时间' ? (
