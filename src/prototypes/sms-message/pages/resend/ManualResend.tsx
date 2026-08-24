@@ -358,16 +358,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
             {activeView === 'filter' && (
             <div className="sms-card resend-section">
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
-                    <div className="resend-filter-collapse">
-                        <button
-                            type="button"
-                            className="sms-btn sms-btn-link"
-                            onClick={() => setFilterCollapsed(!filterCollapsed)}
-                        >
-                            {filterCollapsed ? '展开' : '收起'}
-                            <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
-                        </button>
-                    </div>
                     <div className="resend-filter-grid">
                         {FIELD_LABELS.slice(0, filterCollapsed ? 2 : FIELD_LABELS.length).map((label) => (
                             <div
@@ -506,7 +496,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 <RotateCcw size={14} />
                                 重置
                             </button>
-                            <span className="sms-tooltip-wrap">
+                        <span className="sms-tooltip-wrap">
                                 <button
                                     type="button"
                                     className="sms-btn sms-btn-primary"
@@ -520,9 +510,17 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                         </>
                                     )}
                                 </button>
-                                {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
-                            </span>
-                        </div>
+                            {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
+                        </span>
+                        <button
+                            type="button"
+                            className="sms-btn sms-btn-link"
+                            onClick={() => setFilterCollapsed(!filterCollapsed)}
+                        >
+                            {filterCollapsed ? '展开' : '收起'}
+                            <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
+                        </button>
+                    </div>
                     </div>
                 </form>
 

@@ -139,12 +139,6 @@ function SearchForm({
 
     return (
         <div className="sms-card sms-search">
-            <div className="sms-search-collapse">
-                <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
-                    {collapsed ? '展开' : '收起'}
-                    <ChevronUp size={14} style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} />
-                </button>
-            </div>
             <div className="sms-search-grid">
                 {fields}
             </div>
@@ -210,6 +204,10 @@ function SearchForm({
                     <button type="button" className="sms-btn sms-btn-primary">
                         <Search size={14} />
                         查询
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-link" onClick={() => setCollapsed(!collapsed)}>
+                        {collapsed ? '展开' : '收起'}
+                        <ChevronUp size={14} style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }} />
                     </button>
                 </div>
             </div>
