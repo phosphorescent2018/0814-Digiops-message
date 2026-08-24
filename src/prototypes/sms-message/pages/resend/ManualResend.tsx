@@ -486,7 +486,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             <label className="sms-form-label">补发状态</label>
                             <div className="sms-form-control">
                                 <select
-                                    className={`sms-select${resendStatus ? '' : ' placeholder'}`}
+                                    className={`sms-select sms-control-purple${resendStatus ? '' : ' placeholder'}`}
                                     name="补发状态"
                                     value={resendStatus}
                                     onChange={(e) => setResendStatus(e.target.value)}

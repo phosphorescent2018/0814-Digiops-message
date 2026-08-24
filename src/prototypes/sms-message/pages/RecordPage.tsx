@@ -189,7 +189,7 @@ function SearchForm({
                     <label className="sms-form-label">补发状态</label>
                     <div className="sms-form-control">
                         <select
-                            className={`sms-select${filter?.resendStatus ? '' : ' placeholder'}`}
+                            className={`sms-select sms-control-purple${filter?.resendStatus ? '' : ' placeholder'}`}
                             defaultValue={filter?.resendStatus ?? ''}
                         >
                             <option value="">请选择</option>
