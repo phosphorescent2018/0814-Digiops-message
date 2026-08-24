@@ -259,6 +259,7 @@ export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完�
 
 type ModalType = 'immediate' | 'scheduled' | null;
 type IgnoreBlacklist = 'yes' | 'no' | 'unset';
+type IncludeResent = 'yes' | 'no' | 'unset';
 
 const MANUAL_COLUMNS: ColumnDef[] = [
     { key: 'batchId', label: '补发批次 ID' },
@@ -280,7 +281,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
     const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('unset');
-    const [includeResent, setIncludeResent] = useState<'no' | 'yes'>('no');
+    const [includeResent, setIncludeResent] = useState<IncludeResent>('unset');
     const [scheduledTime, setScheduledTime] = useState('');
     const [validating, setValidating] = useState(false);
     const [validated, setValidated] = useState(false);
@@ -351,14 +352,33 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const scheduledTimeValid = timeFormatValid && scheduledTime > nowStr();
     const scheduledTimeEmpty = modal === 'scheduled' && scheduledTime.trim() === '';
 
-    const closeModal = () => {
-        setModal(null);
+    const resetResendForm = () => {
+        setIgnoreBlacklist('unset');
+        setIncludeResent('unset');
+        setScheduledTime('');
         setValidated(false);
         setVerifiedCount(null);
     };
 
+    const openResendModal = (type: Exclude<ModalType, null>) => {
+        resetResendForm();
+        setModal(type);
+    };
+
+    const closeModal = () => {
+        setModal(null);
+        resetResendForm();
+    };
+
     const verifyCount = () => {
-        if (validating || ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)) return;
+        if (
+            validating ||
+            ignoreBlacklist === 'unset' ||
+            includeResent === 'unset' ||
+            (modal === 'scheduled' && !scheduledTimeValid)
+        ) {
+            return;
+        }
         setValidating(true);
         setTimeout(() => {
             setValidating(false);
@@ -394,7 +414,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     };
 
     const confirmFinal = () => {
-        if (!validated || verifiedCount === null) return;
+        if (!validated || verifiedCount === null || includeResent === 'unset') return;
         const isImmediate = modal === 'immediate';
         const submitTime = nowStr();
         const newId = `20260812${String(100 + batches.length + 1).slice(-3)}`;
@@ -414,6 +434,9 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         setModal(null);
         setValidated(false);
         setVerifiedCount(null);
+        setIgnoreBlacklist('unset');
+        setIncludeResent('unset');
+        setScheduledTime('');
         const newBatch: BatchRow = {
             id: newId,
             scheduledTime: isImmediate ? submitTime : scheduledTime,
@@ -703,8 +726,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 type="button"
                                 className="sms-btn"
                                 onClick={() => {
-                                    setModal('scheduled');
-                                    setScheduledTime('');
+                                    openResendModal('scheduled');
                                 }}
                             >
                                 <Clock size={14} />
@@ -714,7 +736,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 type="button"
                                 className="sms-btn sms-btn-primary"
                                 onClick={() => {
-                                    setModal('immediate');
+                                    openResendModal('immediate');
                                 }}
                             >
                                 <Send size={14} />
@@ -1055,16 +1077,21 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 disabled={
                                                     validating ||
                                                     ignoreBlacklist === 'unset' ||
+                                                    includeResent === 'unset' ||
                                                     (modal === 'scheduled' && !scheduledTimeValid)
                                                 }
                                             >
                                                 {validating ? '校验中…' : '点击校验'}
                                             </button>
-                                            {(ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)) && (
+                                            {(ignoreBlacklist === 'unset' ||
+                                                includeResent === 'unset' ||
+                                                (modal === 'scheduled' && !scheduledTimeValid)) && (
                                                 <span className="sms-tooltip">
                                                     {ignoreBlacklist === 'unset'
                                                         ? '请先选择黑名单用户是否发送'
-                                                        : '请先选择晚于当前时间的补发时间'}
+                                                        : includeResent === 'unset'
+                                                            ? '请先选择已补发过的短信'
+                                                            : '请先选择晚于当前时间的补发时间'}
                                                 </span>
                                             )}
                                         </span>
@@ -1079,7 +1106,12 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             <button
                                 type="button"
                                 className="sms-btn sms-btn-primary"
-                                disabled={!validated || ignoreBlacklist === 'unset' || (modal === 'scheduled' && !scheduledTimeValid)}
+                                disabled={
+                                    !validated ||
+                                    ignoreBlacklist === 'unset' ||
+                                    includeResent === 'unset' ||
+                                    (modal === 'scheduled' && !scheduledTimeValid)
+                                }
                                 onClick={confirmFinal}
                             >
                                 确认补发
