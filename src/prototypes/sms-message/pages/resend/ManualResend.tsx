@@ -814,9 +814,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                 </div>
                 <div className="sms-card resend-section">
                     <div className="resend-table-toolbar">
-                    <div className="resend-section-title">
-                        <span>补发记录</span>
-                    </div>
                     <div className="resend-table-toolbar-actions">
                         <button type="button" className="sms-btn sms-btn-primary" onClick={() => setExportVisible(true)}>
                             <Download size={14} />
