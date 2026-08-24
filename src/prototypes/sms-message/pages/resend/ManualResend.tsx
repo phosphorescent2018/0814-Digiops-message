@@ -328,12 +328,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             <div className="sms-card resend-section">
                 <div className="resend-section-title">
                     <span>条件筛选</span>
-                    <span className="resend-static-filter" title="人工补发范围固定为原始短信，补发短信不参与人工补发">
-                        <span className="resend-static-filter-label">补发类型</span>
-                        <select className="resend-static-filter-select" disabled value="原始短信">
-                            <option value="原始短信">原始短信</option>
-                        </select>
-                    </span>
                 </div>
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
@@ -384,6 +378,21 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         ))}
                     </div>
                     <div className="resend-filter-last-row">
+                        {!filterCollapsed && (
+                            <div className="sms-form-item">
+                                <label className="sms-form-label">补发类型</label>
+                                <div className="sms-form-control">
+                                    <select
+                                        className="resend-static-filter-select"
+                                        disabled
+                                        value="原始短信"
+                                        title="人工补发范围固定为原始短信，补发短信不参与人工补发"
+                                    >
+                                        <option value="原始短信">原始短信</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                         {!filterCollapsed && (
                             <div className="sms-form-item">
                                 <label className="sms-form-label">补发批次 ID</label>
