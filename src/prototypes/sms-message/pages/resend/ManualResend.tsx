@@ -950,7 +950,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">{modal === 'immediate' ? '立即补发' : '定时补发'}</div>
                         <div className="sms-modal-body">
-                            <div className="resend-required-tip">带 * 为必填项</div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发方式</span>
                                 <span className="resend-confirm-value">
