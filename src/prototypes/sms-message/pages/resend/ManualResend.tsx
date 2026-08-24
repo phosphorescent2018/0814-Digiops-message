@@ -153,7 +153,7 @@ const MANUAL_COLUMNS: ColumnDef[] = [
 
 export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
-    const [filterCollapsed, setFilterCollapsed] = useState(false);
+    const [filterCollapsed, setFilterCollapsed] = useState(true);
     const [querying, setQuerying] = useState(false);
     const [hitCount, setHitCount] = useState(1284);
     const [hitVisible, setHitVisible] = useState(false);
@@ -369,7 +369,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                         </button>
                     </div>
                     <div className="resend-filter-grid">
-                        {FIELD_LABELS.slice(0, filterCollapsed ? 6 : FIELD_LABELS.length).map((label) => (
+                        {FIELD_LABELS.slice(0, filterCollapsed ? 2 : FIELD_LABELS.length).map((label) => (
                             <div
                                 className={`sms-form-item${label === '发送时间' ? ' sms-filter-time-item' : ''}`}
                                 key={label}
@@ -446,6 +446,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                         ))}
                     </div>
                     <div className="resend-filter-last-row">
+                        {!filterCollapsed && (
+                            <>
                         <div className="sms-form-item">
                             <label className="sms-form-label">补发类型</label>
                             <div className="sms-form-control">
@@ -497,6 +499,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 </select>
                             </div>
                         </div>
+                            </>
+                        )}
                         <div className="resend-filter-actions">
                             <button type="button" className="sms-btn" onClick={reset}>
                                 <RotateCcw size={14} />

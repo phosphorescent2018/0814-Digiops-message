@@ -45,7 +45,7 @@ function SearchForm({
     resendType: string;
     onResendTypeChange: (v: string) => void;
 }) {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
 
     const renderSelect = (placeholder = PLACEHOLDER_SELECT, options?: string[], defaultValue?: string) => (
         <select
@@ -92,26 +92,26 @@ function SearchForm({
                 <label className="sms-form-label">BusinessID</label>
                 <div className="sms-form-control">{renderSelect('', undefined, filter?.businessId)}</div>
             </div>
-            <div className="sms-form-item">
-                <label className="sms-form-label">计划名称</label>
-                <div className="sms-form-control">{renderSelect()}</div>
-            </div>
-            <div className="sms-form-item">
-                <label className="sms-form-label">用户分组</label>
-                <div className="sms-form-control">{renderSelect()}</div>
-            </div>
-            <div className="sms-form-item">
-                <label className="sms-form-label">手机号码</label>
-                <div className="sms-form-control">
-                    <input className="sms-input" placeholder="请输入" defaultValue={filter?.phone ?? ''} />
-                </div>
-            </div>
-            <div className="sms-form-item">
-                <label className="sms-form-label">内容类型</label>
-                <div className="sms-form-control">{renderSelect(undefined, contentTypeOptions.slice(1), filter?.contentType)}</div>
-            </div>
             {!collapsed && (
                 <>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">计划名称</label>
+                        <div className="sms-form-control">{renderSelect()}</div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">用户分组</label>
+                        <div className="sms-form-control">{renderSelect()}</div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">手机号码</label>
+                        <div className="sms-form-control">
+                            <input className="sms-input" placeholder="请输入" defaultValue={filter?.phone ?? ''} />
+                        </div>
+                    </div>
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">内容类型</label>
+                        <div className="sms-form-control">{renderSelect(undefined, contentTypeOptions.slice(1), filter?.contentType)}</div>
+                    </div>
                     <div className="sms-form-item">
                         <label className="sms-form-label">发送名称</label>
                         <div className="sms-form-control">{renderSelect()}</div>
@@ -149,6 +149,8 @@ function SearchForm({
                 {fields}
             </div>
             <div className="resend-filter-last-row">
+                {!collapsed && (
+                <>
                 <div className="sms-form-item">
                     <label className="sms-form-label">补发类型</label>
                     <div className="sms-form-control">
@@ -198,6 +200,8 @@ function SearchForm({
                         </select>
                     </div>
                 </div>
+                </>
+                )}
                 <div className="resend-filter-actions">
                     <button type="button" className="sms-btn">
                         <RotateCcw size={14} />
