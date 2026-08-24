@@ -308,7 +308,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [recordEnd, setRecordEnd] = useState('');
     const [recordStatus, setRecordStatus] = useState('');
     const [recordBatchId, setRecordBatchId] = useState('');
-    const exportDefaultName = `${recordBatchId.trim() || '补发记录'}_${todayStr()}`;
+    const exportBatchId = recordBatchId.trim().replace(/^B/i, '') || BATCHES[0]?.id || '补发记录';
+    const exportDefaultName = `${exportBatchId}_${todayStr()}`;
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
