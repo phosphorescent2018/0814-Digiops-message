@@ -110,6 +110,7 @@ const DEFAULT_PRECHECK: PrecheckConfig = {
 /** 补发控制配置 */
 interface ResendControlConfig {
     triggers: string[];
+    checks: string[];
     maxResend: string;
     interval: string;
     window: { start: string; end: string } | null;
@@ -117,6 +118,7 @@ interface ResendControlConfig {
 
 const DEFAULT_RESEND_CONTROL: ResendControlConfig = {
     triggers: [],
+    checks: [],
     maxResend: '',
     interval: '',
     window: null,
@@ -207,6 +209,7 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         y: 180,
         config: {
             triggers: ['submitFail', 'receiptTimeout'],
+            checks: ['blacklist', 'timeWindow'],
             maxResend: '3',
             interval: '30',
             window: { start: '09:00', end: '18:00' },
@@ -257,7 +260,18 @@ function loadPersistedCanvas(): PersistedCanvas | null {
         for (const item of parsed.nodes) {
             const def = ALL_NODES.find((n) => n.id === item?.defId);
             if (!def || typeof item?.x !== 'number' || typeof item?.y !== 'number') continue;
-            nodes.push({ id: String(item.id), def, x: item.x, y: item.y, config: item.config ?? null });
+            let config = item.config ?? null;
+            if (config && def.id === 'resend-control') {
+                const resendConfig = config as Partial<ResendControlConfig>;
+                config = {
+                    triggers: Array.isArray(resendConfig.triggers) ? resendConfig.triggers : [],
+                    checks: Array.isArray(resendConfig.checks) ? resendConfig.checks : [],
+                    maxResend: resendConfig.maxResend ?? '',
+                    interval: resendConfig.interval ?? '',
+                    window: resendConfig.window ?? null,
+                };
+            }
+            nodes.push({ id: String(item.id), def, x: item.x, y: item.y, config });
         }
         return { nodes, edges: parsed.edges };
     } catch {
@@ -555,9 +569,13 @@ interface ResendControlModalProps {
 function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlModalProps) {
     const [draft, setDraft] = useState<ResendControlConfig>(() => ({
         triggers: [...initial.triggers],
+        checks: [...(initial.checks ?? [])],
         maxResend: initial.maxResend,
         interval: initial.interval,
-        window: initial.window ? { ...initial.window } : null,
+        window:
+            initial.checks?.includes('timeWindow') && initial.window
+                ? { ...initial.window }
+                : null,
     }));
 
     const toggleTrigger = (key: string) => {
@@ -567,10 +585,25 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
         });
     };
 
+    const toggleCheck = (key: string) => {
+        setDraft((prev) => {
+            const has = prev.checks.includes(key);
+            const checks = has ? prev.checks.filter((c) => c !== key) : [...prev.checks, key];
+            return {
+                ...prev,
+                checks,
+                window: checks.includes('timeWindow') ? prev.window : null,
+            };
+        });
+    };
+
     const triggersMissing = draft.triggers.length === 0;
-    const windowMissing = !draft.window || !draft.window.start || !draft.window.end;
+    const checksMissing = draft.checks.length === 0;
+    const timeWindowSelected = draft.checks.includes('timeWindow');
+    const windowMissing =
+        timeWindowSelected && (!draft.window || !draft.window.start || !draft.window.end);
     const resendSaveDisabled =
-        triggersMissing || !draft.maxResend || !draft.interval || windowMissing;
+        triggersMissing || checksMissing || !draft.maxResend || !draft.interval || windowMissing;
 
     return (
         <div className="sms-mask" onClick={onClose}>
@@ -628,6 +661,35 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                             </div>
                         </div>
 
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">
+                                <span className="resend-required">*</span>校验项
+                            </label>
+                            <div className="sms-form-control">
+                                <div className="resend-cond-options">
+                                    <label className="resend-cond-option">
+                                        <input
+                                            type="checkbox"
+                                            checked={draft.checks.includes('blacklist')}
+                                            onChange={() => toggleCheck('blacklist')}
+                                        />
+                                        <span className="resend-cond-option-text">黑名单校验</span>
+                                    </label>
+                                    <label className="resend-cond-option">
+                                        <input
+                                            type="checkbox"
+                                            checked={draft.checks.includes('timeWindow')}
+                                            onChange={() => toggleCheck('timeWindow')}
+                                        />
+                                        <span className="resend-cond-option-text">发送时段校验</span>
+                                    </label>
+                                </div>
+                                {checksMissing && (
+                                    <div className="plan-canvas-time-error">请至少选择一个校验项</div>
+                                )}
+                            </div>
+                        </div>
+
                         <div className="sms-form-item">
                             <label className="sms-form-label">
                                 <span className="resend-required">*</span>最大补发次数
@@ -672,64 +734,66 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                             </div>
                         </div>
 
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">
-                                <span className="resend-required">*</span>允许发送时段
-                            </label>
-                            <div className="sms-form-control">
-                                {draft.window ? (
-                                    <div className="plan-canvas-time-row">
-                                        <input
-                                            type="time"
-                                            className="plan-canvas-time-input"
-                                            value={draft.window.start}
-                                            onChange={(e) =>
-                                                setDraft((prev) => ({
-                                                    ...prev,
-                                                    window: { start: e.target.value, end: prev.window!.end },
-                                                }))
-                                            }
-                                        />
-                                        <span className="plan-canvas-time-sep">-</span>
-                                        <input
-                                            type="time"
-                                            className="plan-canvas-time-input"
-                                            value={draft.window.end}
-                                            onChange={(e) =>
-                                                setDraft((prev) => ({
-                                                    ...prev,
-                                                    window: { start: prev.window!.start, end: e.target.value },
-                                                }))
-                                            }
-                                        />
+                        {timeWindowSelected && (
+                            <div className="sms-form-item plan-canvas-time-item">
+                                <label className="sms-form-label">
+                                    <span className="resend-required">*</span>允许发送时段
+                                </label>
+                                <div className="sms-form-control">
+                                    {draft.window ? (
+                                        <div className="plan-canvas-time-row">
+                                            <input
+                                                type="time"
+                                                className="plan-canvas-time-input"
+                                                value={draft.window.start}
+                                                onChange={(e) =>
+                                                    setDraft((prev) => ({
+                                                        ...prev,
+                                                        window: { start: e.target.value, end: prev.window!.end },
+                                                    }))
+                                                }
+                                            />
+                                            <span className="plan-canvas-time-sep">-</span>
+                                            <input
+                                                type="time"
+                                                className="plan-canvas-time-input"
+                                                value={draft.window.end}
+                                                onChange={(e) =>
+                                                    setDraft((prev) => ({
+                                                        ...prev,
+                                                        window: { start: prev.window!.start, end: e.target.value },
+                                                    }))
+                                                }
+                                            />
+                                            <button
+                                                type="button"
+                                                className="plan-canvas-time-del"
+                                                title="删除该时段"
+                                                onClick={() => setDraft((prev) => ({ ...prev, window: null }))}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ) : (
                                         <button
                                             type="button"
-                                            className="plan-canvas-time-del"
-                                            title="删除该时段"
-                                            onClick={() => setDraft((prev) => ({ ...prev, window: null }))}
+                                            className="plan-canvas-time-add"
+                                            onClick={() =>
+                                                setDraft((prev) => ({
+                                                    ...prev,
+                                                    window: { start: '', end: '' },
+                                                }))
+                                            }
                                         >
-                                            ×
+                                            + 添加时段
                                         </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        className="plan-canvas-time-add"
-                                        onClick={() =>
-                                            setDraft((prev) => ({
-                                                ...prev,
-                                                window: { start: '', end: '' },
-                                            }))
-                                        }
-                                    >
-                                        + 添加时段
-                                    </button>
-                                )}
-                                {windowMissing && (
-                                    <div className="plan-canvas-time-error">请完整填写允许发送时段</div>
-                                )}
+                                    )}
+                                    {windowMissing && (
+                                        <div className="plan-canvas-time-error">请完整填写允许发送时段</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
                 <div className="sms-modal-actions">
