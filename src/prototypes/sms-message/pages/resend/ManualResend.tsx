@@ -20,8 +20,8 @@ const FIELD_LABELS = [
     '手机号码',
     '内容类型',
     '发送名称',
-    '发送状态',
-    '送达状态',
+    '补发批次 ID',
+    '路径标记',
 ];
 
 export interface BatchRow {
@@ -392,9 +392,28 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                         )}
                         {!filterCollapsed && (
                             <div className="sms-form-item">
-                                <label className="sms-form-label">补发批次 ID</label>
+                                <label className="sms-form-label">发送状态</label>
                                 <div className="sms-form-control">
-                                    <input className="sms-input" placeholder="请输入" name="补发批次 ID" />
+                                    <select className="sms-select placeholder" name="发送状态">
+                                        <option value="">请选择</option>
+                                        <option value="2">成功</option>
+                                        <option value="1">失败</option>
+                                        <option value="0">暂无数据</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+                        {!filterCollapsed && (
+                            <div className="sms-form-item">
+                                <label className="sms-form-label">送达状态</label>
+                                <div className="sms-form-control">
+                                    <select className="sms-select placeholder" name="送达状态">
+                                        <option value="">请选择</option>
+                                        <option value="回执中">回执中</option>
+                                        <option value="已送达">已送达</option>
+                                        <option value="回执超时">回执超时</option>
+                                        <option value="--">--</option>
+                                    </select>
                                 </div>
                             </div>
                         )}
@@ -412,14 +431,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                         <option value="未补发过">未补发过</option>
                                         <option value="已补发过">已补发过</option>
                                     </select>
-                                </div>
-                            </div>
-                        )}
-                        {!filterCollapsed && (
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">路径标记</label>
-                                <div className="sms-form-control">
-                                    <input className="sms-input" placeholder="请输入" name="路径标记" />
                                 </div>
                             </div>
                         )}
