@@ -261,6 +261,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         if (sendStatusCode && sendStatusMap[sendStatusCode]) filter.sendStatus = sendStatusMap[sendStatusCode];
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
         if (batchId) filter.batchId = batchId;
+        if (resendStatus) filter.resendStatus = resendStatus;
         onSwitchTab?.('record', filter);
     };
 

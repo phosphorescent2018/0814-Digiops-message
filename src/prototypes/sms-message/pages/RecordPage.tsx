@@ -212,6 +212,7 @@ function RecordTable({
                 if (filter?.contentType && r.contentType !== filter.contentType) return false;
                 if (filter?.sendStatus && r.notifyStatus !== statusCodeMap[filter.sendStatus]) return false;
                 if (filter?.phone && !r.phone.includes(filter.phone)) return false;
+                if (filter?.resendStatus && r.resendStatus !== filter.resendStatus) return false;
                 if (resendType && r.resendType !== resendType) return false;
                 return true;
             });
@@ -417,6 +418,12 @@ export default function RecordPage({ activeKey, filter }: RecordPageProps) {
                 resendType={resendType}
                 onResendTypeChange={setResendType}
             />
+            {filter?.resendStatus && (
+                <div className="record-applied-filter">
+                    <span className="record-applied-label">已带入筛选</span>
+                    <span className="record-applied-tag">补发状态：{filter.resendStatus}</span>
+                </div>
+            )}
             <RecordTable onExport={() => setExportVisible(true)} filter={filter} resendType={resendType} />
 
             {exportVisible && (

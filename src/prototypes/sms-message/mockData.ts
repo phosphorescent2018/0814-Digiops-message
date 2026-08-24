@@ -20,6 +20,8 @@ export interface RecordRow {
     batchId?: string;
     /** 补发类型：原始短信 / 人工补发 / 计划内自动补发 */
     resendType: '原始短信' | '人工补发' | '计划内自动补发';
+    /** 补发状态（仅原始短信有意义）：未补发过 / 已补发过 */
+    resendStatus?: '未补发过' | '已补发过';
     /** 是否历史短信（历史短信送达状态一律展示 --） */
     isHistory: boolean;
     solId: string;
@@ -112,6 +114,7 @@ export const recordRows: RecordRow[] = [
         notifyStatus: '2',
         deliveryStatus: '--',
         resendType: '原始短信',
+        resendStatus: '未补发过',
         isHistory: true,
         solId: '-',
     },
@@ -222,6 +225,23 @@ export const recordRows: RecordRow[] = [
         resendType: '计划内自动补发',
         isHistory: false,
         solId: '-',
+    },
+    {
+        index: 12,
+        sendTime: '2026-08-13 09:35:00',
+        businessId: 'MTN_UG_Account_id',
+        planName: '逾期提醒-账单催收',
+        groupName: '-',
+        phone: 'qO3Vx8yC2sTpR9wLk5eHuA==',
+        contentType: '服务类',
+        content: "Y'ello! Your MoMo Advance payment is due...",
+        sender: 'MOMOADVANCE',
+        notifyStatus: '1',
+        deliveryStatus: '--',
+        isHistory: false,
+        solId: '-',
+        resendType: '原始短信',
+        resendStatus: '已补发过',
     },
 ];
 

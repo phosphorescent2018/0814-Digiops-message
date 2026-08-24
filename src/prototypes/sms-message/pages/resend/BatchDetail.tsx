@@ -21,6 +21,7 @@ export interface RecordFilter {
     sendStatus?: string;
     deliveryStatus?: string;
     batchId?: string;
+    resendStatus?: string;
 }
 
 interface DetailRow {
