@@ -22,6 +22,10 @@ const FIELD_LABELS = [
     '发送名称',
     '补发批次 ID',
     '路径标记',
+    '补发类型',
+    '发送状态',
+    '送达状态',
+    '补发状态',
 ];
 
 export interface BatchRow {
@@ -328,6 +332,16 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             {activeView === 'filter' && (
             <div className="sms-card resend-section">
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
+                    <div className="resend-filter-collapse">
+                        <button
+                            type="button"
+                            className="sms-btn sms-btn-link"
+                            onClick={() => setFilterCollapsed(!filterCollapsed)}
+                        >
+                            {filterCollapsed ? '展开' : '收起'}
+                            <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
+                        </button>
+                    </div>
                     <div className="resend-filter-grid">
                         {FIELD_LABELS.slice(0, filterCollapsed ? 6 : FIELD_LABELS.length).map((label) => (
                             <div
@@ -345,6 +359,26 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                             <span className="arrow">→</span>
                                             <span>结束日期</span>
                                         </div>
+                                    ) : label === '补发类型' ? (
+                                        <select
+                                            className="resend-static-filter-select"
+                                            disabled
+                                            value="原始短信"
+                                            title="人工补发范围固定为原始短信，补发短信不参与人工补发"
+                                        >
+                                            <option value="原始短信">原始短信</option>
+                                        </select>
+                                    ) : label === '补发状态' ? (
+                                        <select
+                                            className={`sms-select${resendStatus ? '' : ' placeholder'}`}
+                                            name="补发状态"
+                                            value={resendStatus}
+                                            onChange={(e) => setResendStatus(e.target.value)}
+                                        >
+                                            <option value="">请选择</option>
+                                            <option value="未补发过">未补发过</option>
+                                            <option value="已补发过">已补发过</option>
+                                        </select>
                                     ) : label === '手机号码' || label === '路径标记' || label === '补发批次 ID' ? (
                                         <input className="sms-input" placeholder="请输入" name={label} />
                                     ) : (
@@ -366,6 +400,13 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                                     <option value="--">--</option>
                                                 </>
                                             )}
+                                            {label === '发送状态' && (
+                                                <>
+                                                    <option value="2">成功</option>
+                                                    <option value="1">失败</option>
+                                                    <option value="0">暂无数据</option>
+                                                </>
+                                            )}
                                             {label === '内容类型' && (
                                                 <>
                                                     <option value="营销类">营销类</option>
@@ -377,68 +418,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 </div>
                             </div>
                         ))}
-                    </div>
-                    <div className="resend-filter-last-row">
-                        {!filterCollapsed && (
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">补发类型</label>
-                                <div className="sms-form-control">
-                                    <select
-                                        className="resend-static-filter-select"
-                                        disabled
-                                        value="原始短信"
-                                        title="人工补发范围固定为原始短信，补发短信不参与人工补发"
-                                    >
-                                        <option value="原始短信">原始短信</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-                        {!filterCollapsed && (
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">发送状态</label>
-                                <div className="sms-form-control">
-                                    <select className="sms-select placeholder" name="发送状态">
-                                        <option value="">请选择</option>
-                                        <option value="2">成功</option>
-                                        <option value="1">失败</option>
-                                        <option value="0">暂无数据</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-                        {!filterCollapsed && (
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">送达状态</label>
-                                <div className="sms-form-control">
-                                    <select className="sms-select sms-control-purple placeholder" name="送达状态">
-                                        <option value="">请选择</option>
-                                        <option value="回执中">回执中</option>
-                                        <option value="已送达">已送达</option>
-                                        <option value="回执超时">回执超时</option>
-                                        <option value="--">--</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-                        {!filterCollapsed && (
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">补发状态</label>
-                                <div className="sms-form-control">
-                                    <select
-                                        className={`sms-select${resendStatus ? '' : ' placeholder'}`}
-                                        name="补发状态"
-                                        value={resendStatus}
-                                        onChange={(e) => setResendStatus(e.target.value)}
-                                    >
-                                        <option value="">请选择</option>
-                                        <option value="未补发过">未补发过</option>
-                                        <option value="已补发过">已补发过</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-                        <div className="resend-filter-actions">
+                        <div className="sms-filter-grid-actions">
                             <button type="button" className="sms-btn" onClick={reset}>
                                 <RotateCcw size={14} />
                                 重置
@@ -459,14 +439,6 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 </button>
                                 {!hasFilter && <span className="sms-tooltip">请至少选择一项筛选条件</span>}
                             </span>
-                            <button
-                                type="button"
-                                className="sms-btn sms-btn-link"
-                                onClick={() => setFilterCollapsed(!filterCollapsed)}
-                            >
-                                {filterCollapsed ? '展开' : '收起'}
-                                <ChevronUp size={14} style={{ transform: filterCollapsed ? 'rotate(180deg)' : 'none' }} />
-                            </button>
                         </div>
                     </div>
                 </form>

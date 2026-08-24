@@ -2373,14 +2373,24 @@ button {
     flex-shrink: 0;
 }
 
-.sms-filter-time-item .sms-form-label {
-    width: 62px;
-    text-align: left;
-    padding-right: 6px;
-}
-
 .resend-filter-actions {
     margin-left: auto;
+}
+
+.resend-filter-collapse,
+.sms-search-collapse {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 1020px;
+    margin: 0 auto 4px;
+}
+
+.sms-filter-grid-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    grid-column: span 2;
 }
 
 /* 人工补发：查询后命中信息（筛选卡片内展开） */
