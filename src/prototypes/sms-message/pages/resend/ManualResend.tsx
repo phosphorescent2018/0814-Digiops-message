@@ -963,6 +963,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                     <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="sms-modal-header">{modal === 'immediate' ? '立即补发' : '定时补发'}</div>
                         <div className="sms-modal-body">
+                            <div className="resend-required-tip">带 * 为必填项</div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发方式</span>
                                 <span className="resend-confirm-value">
@@ -970,7 +971,10 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 </span>
                             </div>
                             <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">预计补发时间</span>
+                                <span className="resend-confirm-label">
+                                    {modal === 'scheduled' && <span className="resend-required">*</span>}
+                                    预计补发时间
+                                </span>
                                 {modal === 'immediate' ? (
                                     <span className="resend-confirm-value">立即执行</span>
                                 ) : (
@@ -997,7 +1001,9 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 )}
                             </div>
                             <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">黑名单用户是否发送</span>
+                                <span className="resend-confirm-label">
+                                    <span className="resend-required">*</span>黑名单用户是否发送
+                                </span>
                                 <div className="resend-radio-group">
                                     <label className={`resend-radio-item${ignoreBlacklist === 'no' ? ' checked' : ''}`}>
                                         <input
@@ -1028,7 +1034,9 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 </div>
                             </div>
                             <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">已补发短信是否发送</span>
+                                <span className="resend-confirm-label">
+                                    <span className="resend-required">*</span>已补发短信是否发送
+                                </span>
                                 <div className="resend-radio-group">
                                     <label className={`resend-radio-item${includeResent === 'no' ? ' checked' : ''}`}>
                                         <input

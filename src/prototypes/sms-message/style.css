@@ -2565,6 +2565,12 @@ button {
     font-size: 14px;
 }
 
+.resend-required-tip {
+    margin-bottom: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
 .resend-confirm-value {
     color: var(--text-main);
     font-size: 14px;
