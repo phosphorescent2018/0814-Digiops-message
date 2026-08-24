@@ -2358,7 +2358,7 @@ button {
 .resend-filter-last-row .sms-form-item {
     flex: 1;
     min-width: 0;
-    max-width: 329px;
+    max-width: 209px;
 }
 
 .resend-filter-grid .sms-form-control,
@@ -2366,10 +2366,10 @@ button {
     min-width: 0;
 }
 
-/* 人工补发筛选区：标签自适应宽度 + 左对齐，控件紧跟并撑满列尾 */
+/* 两页筛选区：标签统一 120px，控件撑满列尾（与发送记录一致） */
 .resend-filter-grid .sms-form-label,
 .resend-filter-last-row .sms-form-label {
-    width: auto;
+    width: 120px;
     text-align: left;
     padding-right: 6px;
     flex-shrink: 0;
