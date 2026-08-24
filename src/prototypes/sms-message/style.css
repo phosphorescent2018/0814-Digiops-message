@@ -3057,16 +3057,14 @@ button {
     width: 100%;
 }
 
-.resend-record-range input[type="date"] {
+.resend-record-range .blacklist-date-picker {
     flex: 1;
     min-width: 0;
-    height: 32px;
-    padding: 0 8px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 13px;
-    color: var(--text-main);
-    background: #fff;
+}
+
+.resend-record-range .blacklist-expire-date {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .resend-record-range .arrow {

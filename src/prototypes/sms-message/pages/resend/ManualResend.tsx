@@ -6,6 +6,7 @@ import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, Ch
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
 import ExportModal from '../../components/ExportModal';
+import DatePicker from '../../components/DatePicker';
 import type { RecordFilter } from './BatchDetail';
 
 interface ManualResendProps {
@@ -574,15 +575,16 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
             )}
 
             {activeView === 'records' && (
+            <>
             <div className="sms-card resend-section">
                     <div className="resend-record-filter">
                         <div className="sms-form-item">
                             <label className="sms-form-label">补发时间</label>
                             <div className="sms-form-control">
                                 <div className="resend-record-range">
-                                    <input type="date" value={recordStart} onChange={(e) => setRecordStart(e.target.value)} />
+                                    <DatePicker value={recordStart} onChange={setRecordStart} placeholder="开始日期" />
                                     <span className="arrow">→</span>
-                                    <input type="date" value={recordEnd} onChange={(e) => setRecordEnd(e.target.value)} />
+                                    <DatePicker value={recordEnd} onChange={setRecordEnd} placeholder="结束日期" />
                                 </div>
                             </div>
                         </div>
@@ -632,6 +634,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             </button>
                         </div>
                     </div>
+                </div>
+                <div className="sms-card resend-section">
                     <div className="resend-table-toolbar">
                     <div className="resend-section-title">
                         <span>补发记录</span>
@@ -770,6 +774,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                     </span>
                 </div>
             </div>
+            </>
             )}
 
             {/* ============ 补发弹窗①（立即/定时共用）：方式/时间/黑名单 ============ */}
