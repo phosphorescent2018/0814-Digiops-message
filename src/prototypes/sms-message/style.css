@@ -2930,7 +2930,7 @@ button {
     flex-direction: column;
     border: 1px solid var(--border-soft);
     border-radius: 6px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .resend-log-item {
@@ -2941,7 +2941,7 @@ button {
     padding: 10px 14px;
     border-bottom: 1px solid var(--border-soft);
     white-space: nowrap;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .resend-log-item:last-child {
@@ -2970,12 +2970,12 @@ button {
     min-width: 0;
     color: var(--text-secondary);
     font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
 }
 
-.resend-log-status.sms-tooltip-wrap {
-    overflow: visible;
+.resend-log-dash {
+    display: inline-flex;
+    align-items: center;
 }
 
 .resend-log-empty {
