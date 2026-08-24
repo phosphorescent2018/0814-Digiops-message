@@ -32,12 +32,36 @@ export interface BatchRow {
     scheduledTime: string;
     endTime: string;
     mode: '立即补发' | '定时补发';
+    submitTime: string;
     isTerminated: boolean;
     isFailed: boolean;
     /** 提交校验数量：提交时用户校验的补发数量 */
     userVerifiedCount: number;
     /** 实际发送数量：实际执行了发送动作的条数（含单条提交失败）；待执行时为 null */
     systemVerifiedCount: number | null;
+    /** 批次动态事件：用户操作与系统自动状态流转统一记录 */
+    events: BatchEvent[];
+}
+
+export type BatchActorType = 'USER' | 'SYSTEM';
+
+export type BatchEventType =
+    | '创建批次'
+    | '开始执行'
+    | '分批校验'
+    | '执行完成'
+    | '执行异常'
+    | '终止批次';
+
+export interface BatchEvent {
+    id: string;
+    happenTime: string;
+    actorType: BatchActorType;
+    actorName: string;
+    eventType: BatchEventType;
+    fromStatus?: string;
+    toStatus: string;
+    remark?: string;
 }
 
 const BATCHES: BatchRow[] = [
@@ -46,70 +70,294 @@ const BATCHES: BatchRow[] = [
         scheduledTime: '2026-08-12 14:35:12',
         endTime: '—',
         mode: '立即补发',
+        submitTime: '2026-08-12 14:34:50',
         isTerminated: false,
         isFailed: false,
         userVerifiedCount: 1284,
         systemVerifiedCount: 620,
+        events: [
+            {
+                id: '20260812003-e001',
+                happenTime: '2026-08-12 14:34:50',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '执行中',
+                remark: '提交立即补发',
+            },
+            {
+                id: '20260812003-e002',
+                happenTime: '2026-08-12 14:35:12',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '立即任务启动',
+            },
+            {
+                id: '20260812003-e003',
+                happenTime: '2026-08-12 14:36:02',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '分批校验',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '校验通过并发送，累计 620 条',
+            },
+        ],
     },
     {
         id: '20260812002',
         scheduledTime: '2026-08-12 13:00:00',
         endTime: '2026-08-12 13:04:52',
         mode: '定时补发',
+        submitTime: '2026-08-12 12:55:34',
         isTerminated: false,
         isFailed: false,
         userVerifiedCount: 860,
         systemVerifiedCount: 842,
+        events: [
+            {
+                id: '20260812002-e001',
+                happenTime: '2026-08-12 12:55:34',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '待执行',
+                remark: '提交定时补发',
+            },
+            {
+                id: '20260812002-e002',
+                happenTime: '2026-08-12 13:00:00',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '待执行',
+                toStatus: '执行中',
+                remark: '定时任务到点',
+            },
+            {
+                id: '20260812002-e003',
+                happenTime: '2026-08-12 13:04:52',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '执行完成',
+                fromStatus: '执行中',
+                toStatus: '已完成',
+                remark: '所有应发短信完成发送动作，实际发送 842 条',
+            },
+        ],
     },
     {
         id: '20260812001',
         scheduledTime: '2026-08-12 09:26:33',
         endTime: '2026-08-12 09:31:18',
         mode: '立即补发',
+        submitTime: '2026-08-12 09:26:15',
         isTerminated: true,
         isFailed: false,
         userVerifiedCount: 512,
         systemVerifiedCount: 352,
+        events: [
+            {
+                id: '20260812001-e001',
+                happenTime: '2026-08-12 09:26:15',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '执行中',
+                remark: '提交立即补发',
+            },
+            {
+                id: '20260812001-e002',
+                happenTime: '2026-08-12 09:26:33',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '立即任务启动',
+            },
+            {
+                id: '20260812001-e003',
+                happenTime: '2026-08-12 09:27:20',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '分批校验',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '校验通过并发送，累计 352 条',
+            },
+            {
+                id: '20260812001-e004',
+                happenTime: '2026-08-12 09:31:18',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '终止批次',
+                fromStatus: '执行中',
+                toStatus: '已终止',
+                remark: '用户手动终止',
+            },
+        ],
     },
     {
         id: '20260811007',
         scheduledTime: '2026-08-11 20:15:40',
         endTime: '2026-08-11 20:22:03',
         mode: '定时补发',
+        submitTime: '2026-08-11 20:15:10',
         isTerminated: false,
         isFailed: false,
         userVerifiedCount: 2035,
         systemVerifiedCount: 2018,
+        events: [
+            {
+                id: '20260811007-e001',
+                happenTime: '2026-08-11 20:15:10',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '待执行',
+                remark: '提交定时补发',
+            },
+            {
+                id: '20260811007-e002',
+                happenTime: '2026-08-11 20:15:40',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '待执行',
+                toStatus: '执行中',
+                remark: '定时任务到点',
+            },
+            {
+                id: '20260811007-e003',
+                happenTime: '2026-08-11 20:22:03',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '执行完成',
+                fromStatus: '执行中',
+                toStatus: '已完成',
+                remark: '所有应发短信完成发送动作，实际发送 2,018 条',
+            },
+        ],
     },
     {
         id: '20260823001',
-        scheduledTime: '2026-08-23 18:00:00',
+        scheduledTime: '2026-08-30 18:00:00',
         endTime: '—',
         mode: '定时补发',
+        submitTime: '2026-08-23 17:55:45',
         isTerminated: false,
         isFailed: false,
         userVerifiedCount: 968,
         systemVerifiedCount: null,
+        events: [
+            {
+                id: '20260823001-e001',
+                happenTime: '2026-08-23 17:55:45',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '待执行',
+                remark: '提交定时补发，等待执行',
+            },
+        ],
     },
     {
         id: '20260812004',
         scheduledTime: '2026-08-12 15:01:00',
         endTime: '2026-08-12 15:01:20',
         mode: '立即补发',
+        submitTime: '2026-08-12 15:00:40',
         isTerminated: false,
         isFailed: true,
         userVerifiedCount: 300,
         systemVerifiedCount: 0,
+        events: [
+            {
+                id: '20260812004-e001',
+                happenTime: '2026-08-12 15:00:40',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '执行中',
+                remark: '提交立即补发',
+            },
+            {
+                id: '20260812004-e002',
+                happenTime: '2026-08-12 15:01:00',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '立即任务启动',
+            },
+            {
+                id: '20260812004-e003',
+                happenTime: '2026-08-12 15:01:20',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '执行异常',
+                fromStatus: '执行中',
+                toStatus: '失败',
+                remark: '系统异常，启动前失败，实际发送数量 0',
+            },
+        ],
     },
     {
         id: '20260812005',
         scheduledTime: '2026-08-12 15:30:00',
         endTime: '2026-08-12 15:31:12',
         mode: '立即补发',
+        submitTime: '2026-08-12 15:29:50',
         isTerminated: false,
         isFailed: true,
         userVerifiedCount: 1500,
         systemVerifiedCount: 620,
+        events: [
+            {
+                id: '20260812005-e001',
+                happenTime: '2026-08-12 15:29:50',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '执行中',
+                remark: '提交立即补发',
+            },
+            {
+                id: '20260812005-e002',
+                happenTime: '2026-08-12 15:30:00',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '立即任务启动',
+            },
+            {
+                id: '20260812005-e003',
+                happenTime: '2026-08-12 15:30:40',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '分批校验',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '校验通过并发送，累计 620 条',
+            },
+            {
+                id: '20260812005-e004',
+                happenTime: '2026-08-12 15:31:12',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '执行异常',
+                fromStatus: '执行中',
+                toStatus: '部分失败',
+                remark: '系统异常，执行中中断，已完成部分发送',
+            },
+        ],
     },
 ];
 
@@ -127,6 +375,8 @@ const nowStr = () => {
     const d = new Date();
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
+
+const CURRENT_OPERATOR = 'bohua';
 
 /** 按计划时间与当前时间动态计算批次状态 */
 export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' | '部分失败' => {
@@ -168,6 +418,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [toast, setToast] = useState('');
     const [terminateTarget, setTerminateTarget] = useState<BatchRow | null>(null);
     const [terminating, setTerminating] = useState(false);
+    const [terminateReason, setTerminateReason] = useState('');
     const [batches, setBatches] = useState<BatchRow[]>(BATCHES);
     const [detailBatch, setDetailBatch] = useState<BatchRow | null>(null);
     const [visibleCols, setVisibleCols] = useState<string[]>(MANUAL_COLUMNS.map((c) => c.key));
@@ -275,20 +526,47 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const confirmFinal = () => {
         if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
+        const submitTime = nowStr();
+        const newId = `20260812${String(100 + batches.length + 1).slice(-3)}`;
+        const newEvents: BatchEvent[] = [
+            {
+                id: `${newId}-e001`,
+                happenTime: submitTime,
+                actorType: 'USER',
+                actorName: CURRENT_OPERATOR,
+                eventType: '创建批次',
+                toStatus: isImmediate ? '执行中' : '待执行',
+                remark: isImmediate ? '提交立即补发' : '提交定时补发',
+            },
+        ];
+        if (isImmediate) {
+            newEvents.push({
+                id: `${newId}-e002`,
+                happenTime: submitTime,
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '执行中',
+                toStatus: '执行中',
+                remark: '立即任务启动',
+            });
+        }
         setBatchPage(1);
         setActiveView('records');
         setModal(null);
         setValidated(false);
         setVerifiedCount(null);
         const newBatch: BatchRow = {
-            id: `20260812${String(100 + batches.length + 1).slice(-3)}`,
-            scheduledTime: isImmediate ? nowStr() : scheduledTime,
+            id: newId,
+            scheduledTime: isImmediate ? submitTime : scheduledTime,
             endTime: '—',
             mode: isImmediate ? '立即补发' : '定时补发',
+            submitTime,
             isTerminated: false,
             isFailed: false,
             userVerifiedCount: verifiedCount,
             systemVerifiedCount: isImmediate ? verifiedCount : null,
+            events: newEvents,
         };
         setBatches((prev) => [newBatch, ...prev]);
         // 提交后清空筛选条件、隐藏命中面板，回到初始状态
@@ -320,22 +598,39 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         }
     }, [incomingBatchId]);
 
+    const openTerminate = (batch: BatchRow) => {
+        setTerminateReason('');
+        setTerminateTarget(batch);
+    };
+
     const confirmTerminate = () => {
-        if (!terminateTarget || terminating) return;
+        const target = terminateTarget;
+        if (!target || terminating) return;
         setTerminating(true);
+        const stopTime = nowStr();
+        const beforeStatus = computeStatus(target);
+        const terminateEvent: BatchEvent = {
+            id: `${target.id}-${Date.now()}`,
+            happenTime: stopTime,
+            actorType: 'USER',
+            actorName: CURRENT_OPERATOR,
+            eventType: '终止批次',
+            fromStatus: beforeStatus,
+            toStatus: '已终止',
+            remark: terminateReason.trim() || '用户手动终止',
+        };
+        const applyTerminate = (b: BatchRow) =>
+            b.id === target.id
+                ? { ...b, isTerminated: true, endTime: stopTime, events: [...b.events, terminateEvent] }
+                : b;
         setTimeout(() => {
-            setBatches((prev) =>
-                prev.map((b) =>
-                    b.id === terminateTarget.id ? { ...b, isTerminated: true, endTime: nowStr() } : b
-                )
-            );
-            // 同步更新抽屉中的批次快照
-            setDetailBatch((prev) =>
-                prev && prev.id === terminateTarget.id ? { ...prev, isTerminated: true, endTime: nowStr() } : prev
-            );
+            setBatches((prev) => prev.map(applyTerminate));
+            // 同步更新抽屉中的批次快照，避免事件列表仍停留在终止前
+            setDetailBatch((prev) => (prev && prev.id === target.id ? applyTerminate(prev) : prev));
             setTerminating(false);
             setTerminateTarget(null);
-            showToast(`补发批次 ${terminateTarget.id} 已终止`);
+            setTerminateReason('');
+            showToast(`补发批次 ${target.id} 已终止`);
         }, 600);
     };
 
@@ -641,7 +936,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                     <div className="resend-table-toolbar">
                     <div className="resend-section-title">
                         <span>补发记录</span>
-                        <span className="resend-section-sub">共 {filteredBatches.length} 个批次</span>
                     </div>
                     <div className="resend-table-toolbar-actions">
                         <button type="button" className="sms-btn sms-btn-primary" onClick={() => setExportVisible(true)}>
@@ -716,7 +1010,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                     type="button"
                                                     className="sms-action-link resend-terminate"
                                                     disabled={!canTerminate}
-                                                    onClick={() => setTerminateTarget(b)}
+                                                    onClick={() => openTerminate(b)}
                                                 >
                                                     <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
                                                     终止
@@ -950,6 +1244,19 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             <p className="resend-terminate-sub">
                                 终止后该批次将停止继续补发，已发送的部分不受影响。
                             </p>
+                            <div className="resend-terminate-reason">
+                                <label className="resend-terminate-reason-label" htmlFor="terminate-reason">
+                                    终止原因（选填）
+                                </label>
+                                <input
+                                    id="terminate-reason"
+                                    className="sms-input"
+                                    value={terminateReason}
+                                    maxLength={100}
+                                    placeholder="请输入终止原因"
+                                    onChange={(e) => setTerminateReason(e.target.value)}
+                                />
+                            </div>
                         </div>
                         <div className="sms-modal-actions">
                             <button type="button" className="sms-btn" onClick={() => setTerminateTarget(null)}>
@@ -973,7 +1280,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                 <BatchDetail
                     batch={detailBatch}
                     onClose={() => setDetailBatch(null)}
-                    onTerminate={(b) => setTerminateTarget(b)}
+                    onTerminate={openTerminate}
                     onViewRecords={(filter) => {
                         setDetailBatch(null);
                         onSwitchTab?.('record', filter);

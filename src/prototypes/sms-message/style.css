@@ -2919,6 +2919,114 @@ button {
     color: var(--text-secondary);
 }
 
+/* 批次动态 */
+.resend-log-count {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.resend-log-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.resend-log-item {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.resend-log-item:last-child {
+    border-bottom: none;
+}
+
+.resend-log-item.system {
+    background: #fafbfc;
+}
+
+.resend-log-time {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+}
+
+.resend-log-main {
+    min-width: 0;
+}
+
+.resend-log-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.resend-log-actor {
+    display: inline-flex;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #e6f4ff;
+    color: var(--primary);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.resend-log-item.system .resend-log-actor {
+    background: #f0f2f5;
+    color: var(--text-secondary);
+}
+
+.resend-log-action {
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.resend-log-status {
+    margin-top: 4px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.resend-log-remark {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.resend-log-empty {
+    padding: 16px;
+    border: 1px dashed var(--border-soft);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* 终止原因（选填） */
+.resend-terminate-reason {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.resend-terminate-reason-label {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.resend-terminate-reason .sms-input {
+    width: 100%;
+}
+
 .resend-stats-header {
     display: flex;
     align-items: center;

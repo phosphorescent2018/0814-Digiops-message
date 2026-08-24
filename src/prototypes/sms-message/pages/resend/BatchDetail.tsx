@@ -2,7 +2,7 @@
  * 批次详情抽屉：批次信息 / 数量概览 / 执行统计 / 明细表 / 操作
  */
 import React, { useMemo, useState } from 'react';
-import { X, RefreshCw, Ban, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
+import { X, RefreshCw, Ban, ChevronDown, ChevronRight, ExternalLink, History } from 'lucide-react';
 import { computeStatus, STATUS_CLASS, type BatchRow } from './ManualResend';
 
 interface BatchDetailProps {
@@ -127,6 +127,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
         status === '执行中' && batch.systemVerifiedCount !== null
             ? Math.min((batch.systemVerifiedCount / batch.userVerifiedCount) * 100, 100)
             : null;
+    const eventList = [...(batch.events ?? [])].sort((a, b) => b.happenTime.localeCompare(a.happenTime));
 
     const canTerminate = status === '待执行' || status === '执行中';
 
@@ -194,7 +195,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             </div>
                             <div className="resend-detail-item">
                                 <span className="resend-detail-label">提交时间</span>
-                                <span className="resend-detail-value">2026-08-12 15:02:00</span>
+                                <span className="resend-detail-value">{batch.submitTime}</span>
                             </div>
                         </div>
                         <button
@@ -334,6 +335,47 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             </div>
                         </div>
                     )}
+
+                    {/* 板块四：批次动态 */}
+                    <div className="resend-detail-section">
+                        <div className="resend-stats-header">
+                            <span className="resend-detail-section-title resend-stats-title">
+                                <History size={14} style={{ verticalAlign: '-2px', marginRight: 6 }} />
+                                批次动态
+                            </span>
+                            <span className="resend-log-count">{eventList.length} 条</span>
+                        </div>
+                        {eventList.length > 0 ? (
+                            <div className="resend-log-list">
+                                {eventList.map((event) => (
+                                    <div
+                                        className={`resend-log-item${event.actorType === 'SYSTEM' ? ' system' : ''}`}
+                                        key={event.id}
+                                    >
+                                        <div className="resend-log-time">{event.happenTime}</div>
+                                        <div className="resend-log-main">
+                                            <div className="resend-log-title">
+                                                <span className="resend-log-actor">
+                                                    {event.actorType === 'SYSTEM' ? '系统' : event.actorName}
+                                                </span>
+                                                <span className="resend-log-action">{event.eventType}</span>
+                                            </div>
+                                            <div className="resend-log-status">
+                                                {event.fromStatus
+                                                    ? `${event.fromStatus} → ${event.toStatus}`
+                                                    : `进入 ${event.toStatus}`}
+                                            </div>
+                                            {event.remark && (
+                                                <div className="resend-log-remark">{event.remark}</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="resend-log-empty">暂无批次动态</div>
+                        )}
+                    </div>
                 </div>
 
                 {/* 底部操作栏 */}
