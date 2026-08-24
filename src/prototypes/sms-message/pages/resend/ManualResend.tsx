@@ -581,7 +581,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             <div className="sms-form-control">
                                 <div className="resend-record-range">
                                     <input type="date" value={recordStart} onChange={(e) => setRecordStart(e.target.value)} />
-                                    <span>→</span>
+                                    <span className="arrow">→</span>
                                     <input type="date" value={recordEnd} onChange={(e) => setRecordEnd(e.target.value)} />
                                 </div>
                             </div>
