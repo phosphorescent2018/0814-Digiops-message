@@ -328,6 +328,12 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
             <div className="sms-card resend-section">
                 <div className="resend-section-title">
                     <span>条件筛选</span>
+                    <span className="resend-static-filter" title="人工补发范围固定为原始短信，补发短信不参与人工补发">
+                        <span className="resend-static-filter-label">补发类型</span>
+                        <select className="resend-static-filter-select" disabled value="原始短信">
+                            <option value="原始短信">原始短信</option>
+                        </select>
+                    </span>
                 </div>
                 <form ref={formRef} onChange={() => setHasFilter(checkHasFilter())}>
                     <div className="resend-filter-grid">
