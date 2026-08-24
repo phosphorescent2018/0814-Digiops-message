@@ -2934,71 +2934,59 @@ button {
 }
 
 .resend-log-item {
-    display: grid;
-    grid-template-columns: 132px minmax(0, 1fr);
-    gap: 10px;
-    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 32px;
+    padding: 6px 12px;
     border-bottom: 1px solid var(--border-soft);
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .resend-log-item:last-child {
     border-bottom: none;
 }
 
-.resend-log-item.system {
-    background: #fafbfc;
-}
-
 .resend-log-time {
+    flex: 0 0 142px;
     color: var(--text-muted);
     font-size: 12px;
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
 }
 
-.resend-log-main {
-    min-width: 0;
-}
-
-.resend-log-title {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
 .resend-log-actor {
-    display: inline-flex;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: #e6f4ff;
+    flex: 0 0 58px;
     color: var(--primary);
     font-size: 12px;
-    line-height: 1.6;
-}
-
-.resend-log-item.system .resend-log-actor {
-    background: #f0f2f5;
-    color: var(--text-secondary);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resend-log-action {
+    flex: 0 0 62px;
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .resend-log-status {
-    margin-top: 4px;
+    flex: 0 0 150px;
     color: var(--text-secondary);
     font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resend-log-remark {
-    margin-top: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
     color: var(--text-muted);
     font-size: 12px;
-    line-height: 1.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resend-log-empty {

@@ -527,7 +527,7 @@
             <li>定时/立即补发提交成功后：清空筛选条件、隐藏命中面板，回到初始状态，防止重复提交。</li>
             <li>批次列表置顶展示新批次；批次详情保存筛选条件快照供追溯。</li>
           </ul>
-          <h3>批次动态（2026-08-24 确认）</h3>
+          <h3>批次动态（2026-08-24 确认，仅记录人员操作）</h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -535,19 +535,15 @@
               </thead>
               <tbody>
                 <tr><td data-label="事件">创建批次</td><td data-label="触发方">用户</td><td data-label="状态变化">— → 待执行 / 执行中</td><td data-label="说明">定时补发或立即补发提交</td></tr>
-                <tr><td data-label="事件">开始执行</td><td data-label="触发方">系统</td><td data-label="状态变化">待执行 → 执行中</td><td data-label="说明">定时任务到点，或立即任务启动</td></tr>
-                <tr><td data-label="事件">分批校验</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 执行中</td><td data-label="说明">校验通过一批并发送，累计进度</td></tr>
-                <tr><td data-label="事件">执行完成</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 已完成</td><td data-label="说明">所有应发短信完成发送动作</td></tr>
-                <tr><td data-label="事件">执行异常</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 失败 / 部分失败</td><td data-label="说明">系统异常，记录异常原因</td></tr>
                 <tr><td data-label="事件">终止批次</td><td data-label="触发方">用户</td><td data-label="状态变化">待执行 / 执行中 → 已终止</td><td data-label="说明">用户手动终止，可选终止原因</td></tr>
               </tbody>
             </table>
           </div>
           <ul>
             <li>展示位置：补发记录「批次详情」抽屉新增「批次动态」板块，按事件时间倒序展示。</li>
-            <li>展示字段：操作时间、触发方（用户 / 系统）、事件类型、状态变化、说明。</li>
-            <li>用户事件操作人取当前登录用户；系统事件操作人统一显示为「系统」；终止原因选填，填写后写入事件说明。</li>
-            <li>创建、终止由原型交互实时写入；开始执行、分批校验、执行完成、执行异常使用 mock 事件模拟。</li>
+            <li>每条动态单行展示：操作时间、操作人、事件类型、状态变化、说明。</li>
+            <li>批次动态仅记录人员创建与终止操作；系统自动状态流转不展示在批次动态中。</li>
+            <li>创建、终止由原型交互实时写入；终止原因选填，填写后写入事件说明。</li>
           </ul>
         </section>
 
