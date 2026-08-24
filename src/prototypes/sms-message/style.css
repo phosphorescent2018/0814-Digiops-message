@@ -3038,16 +3038,11 @@ button {
 }
 
 .resend-record-filter {
-    display: flex;
-    align-items: flex-end;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 16px;
     max-width: 1020px;
-    margin: 0 auto 12px;
-}
-
-.resend-record-filter .sms-form-item {
-    flex: 1;
-    min-width: 0;
+    margin: 0 auto;
 }
 
 .resend-record-range {
@@ -3073,11 +3068,12 @@ button {
     flex-shrink: 0;
 }
 
-.resend-record-actions {
+.resend-record-actions-row {
     display: flex;
+    justify-content: flex-end;
     gap: 8px;
-    margin-left: auto;
-    flex-shrink: 0;
+    max-width: 1020px;
+    margin: 12px auto 0;
 }
 
 .resend-table-toolbar-actions {

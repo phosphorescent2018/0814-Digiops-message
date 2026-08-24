@@ -613,26 +613,26 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 />
                             </div>
                         </div>
-                        <div className="resend-record-actions">
-                            <button
-                                type="button"
-                                className="sms-btn"
-                                onClick={() => {
-                                    setRecordStart('');
-                                    setRecordEnd('');
-                                    setRecordStatus('');
-                                    setRecordBatchId('');
-                                    setBatchPage(1);
-                                }}
-                            >
-                                <RotateCcw size={14} />
-                                重置
-                            </button>
-                            <button type="button" className="sms-btn sms-btn-primary" onClick={() => setBatchPage(1)}>
-                                <Search size={14} />
-                                查询
-                            </button>
-                        </div>
+                    </div>
+                    <div className="resend-record-actions-row">
+                        <button
+                            type="button"
+                            className="sms-btn"
+                            onClick={() => {
+                                setRecordStart('');
+                                setRecordEnd('');
+                                setRecordStatus('');
+                                setRecordBatchId('');
+                                setBatchPage(1);
+                            }}
+                        >
+                            <RotateCcw size={14} />
+                            重置
+                        </button>
+                        <button type="button" className="sms-btn sms-btn-primary" onClick={() => setBatchPage(1)}>
+                            <Search size={14} />
+                            查询
+                        </button>
                     </div>
                 </div>
                 <div className="sms-card resend-section">
