@@ -566,27 +566,6 @@ button {
     overflow: hidden;
 }
 
-.record-applied-filter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    max-width: 1020px;
-    margin: 0 auto 12px;
-    font-size: 13px;
-}
-
-.record-applied-label {
-    color: var(--text-muted);
-}
-
-.record-applied-tag {
-    padding: 3px 10px;
-    border: 1px solid var(--border-soft);
-    border-radius: 4px;
-    background: #f2f7ff;
-    color: var(--primary);
-}
-
 .sms-toolbar {
     display: flex;
     align-items: center;
