@@ -22,10 +22,6 @@ const FIELD_LABELS = [
     '发送名称',
     '补发批次 ID',
     '路径标记',
-    '补发类型',
-    '发送状态',
-    '送达状态',
-    '补发状态',
 ];
 
 export interface BatchRow {
@@ -418,7 +414,60 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                                 </div>
                             </div>
                         ))}
-                        <div className="sms-filter-grid-actions">
+                    </div>
+                    <div className="resend-filter-last-row">
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发类型</label>
+                            <div className="sms-form-control">
+                                <select
+                                    className="resend-static-filter-select"
+                                    disabled
+                                    value="原始短信"
+                                    title="人工补发范围固定为原始短信，补发短信不参与人工补发"
+                                >
+                                    <option value="原始短信">原始短信</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">发送状态</label>
+                            <div className="sms-form-control">
+                                <select className="sms-select placeholder" name="发送状态">
+                                    <option value="">请选择</option>
+                                    <option value="2">成功</option>
+                                    <option value="1">失败</option>
+                                    <option value="0">暂无数据</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">送达状态</label>
+                            <div className="sms-form-control">
+                                <select className="sms-select sms-control-purple placeholder" name="送达状态">
+                                    <option value="">请选择</option>
+                                    <option value="回执中">回执中</option>
+                                    <option value="已送达">已送达</option>
+                                    <option value="回执超时">回执超时</option>
+                                    <option value="--">--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发状态</label>
+                            <div className="sms-form-control">
+                                <select
+                                    className={`sms-select${resendStatus ? '' : ' placeholder'}`}
+                                    name="补发状态"
+                                    value={resendStatus}
+                                    onChange={(e) => setResendStatus(e.target.value)}
+                                >
+                                    <option value="">请选择</option>
+                                    <option value="未补发过">未补发过</option>
+                                    <option value="已补发过">已补发过</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="resend-filter-actions">
                             <button type="button" className="sms-btn" onClick={reset}>
                                 <RotateCcw size={14} />
                                 重置
