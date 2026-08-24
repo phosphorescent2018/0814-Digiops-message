@@ -1873,6 +1873,11 @@ button {
     line-height: 1.4;
 }
 
+.plan-canvas-time-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
 
 .plan-canvas-inline-tip {
     font-size: 12px;
@@ -2949,7 +2954,7 @@ button {
 }
 
 .resend-log-time {
-    flex: 0 0 142px;
+    flex: 0 0 150px;
     color: var(--text-muted);
     font-size: 12px;
     line-height: 1.5;

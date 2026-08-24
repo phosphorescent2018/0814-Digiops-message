@@ -603,7 +603,7 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
     const windowMissing =
         timeWindowSelected && (!draft.window || !draft.window.start || !draft.window.end);
     const resendSaveDisabled =
-        triggersMissing || checksMissing || !draft.maxResend || !draft.interval || windowMissing;
+        triggersMissing || !draft.maxResend || !draft.interval || windowMissing;
 
     return (
         <div className="sms-mask" onClick={onClose}>
@@ -657,35 +657,6 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                                 </div>
                                 {triggersMissing && (
                                     <div className="plan-canvas-time-error">请至少选择一个触发条件</div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="sms-form-item plan-canvas-time-item">
-                            <label className="sms-form-label">
-                                <span className="resend-required">*</span>校验项
-                            </label>
-                            <div className="sms-form-control">
-                                <div className="resend-cond-options">
-                                    <label className="resend-cond-option">
-                                        <input
-                                            type="checkbox"
-                                            checked={draft.checks.includes('blacklist')}
-                                            onChange={() => toggleCheck('blacklist')}
-                                        />
-                                        <span className="resend-cond-option-text">黑名单校验</span>
-                                    </label>
-                                    <label className="resend-cond-option">
-                                        <input
-                                            type="checkbox"
-                                            checked={draft.checks.includes('timeWindow')}
-                                            onChange={() => toggleCheck('timeWindow')}
-                                        />
-                                        <span className="resend-cond-option-text">发送时段校验</span>
-                                    </label>
-                                </div>
-                                {checksMissing && (
-                                    <div className="plan-canvas-time-error">请至少选择一个校验项</div>
                                 )}
                             </div>
                         </div>
@@ -794,6 +765,35 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                                 </div>
                             </div>
                         )}
+
+                        <div className="sms-form-item plan-canvas-time-item">
+                            <label className="sms-form-label">校验项</label>
+                            <div className="sms-form-control">
+                                <div className="resend-cond-options">
+                                    <label className="resend-cond-option">
+                                        <input
+                                            type="checkbox"
+                                            checked={draft.checks.includes('blacklist')}
+                                            onChange={() => toggleCheck('blacklist')}
+                                        />
+                                        <span className="resend-cond-option-text">黑名单校验</span>
+                                    </label>
+                                    <label className="resend-cond-option">
+                                        <input
+                                            type="checkbox"
+                                            checked={draft.checks.includes('timeWindow')}
+                                            onChange={() => toggleCheck('timeWindow')}
+                                        />
+                                        <span className="resend-cond-option-text">发送时段校验</span>
+                                    </label>
+                                </div>
+                                {checksMissing && (
+                                    <div className="plan-canvas-time-hint">
+                                        未勾选校验项时，补发前不做黑名单 / 发送时段校验
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="sms-modal-actions">
