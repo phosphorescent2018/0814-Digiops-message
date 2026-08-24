@@ -246,6 +246,11 @@ const nowStr = () => {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
+const todayStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
 const CURRENT_OPERATOR = 'bohua';
 
 /** 按计划时间与当前时间动态计算批次状态 */
@@ -303,6 +308,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [recordEnd, setRecordEnd] = useState('');
     const [recordStatus, setRecordStatus] = useState('');
     const [recordBatchId, setRecordBatchId] = useState('');
+    const exportDefaultName = `${recordBatchId.trim() || '补发记录'}_${todayStr()}`;
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -1186,7 +1192,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
             {/* 导出补发记录 */}
             <ExportModal
                 visible={exportVisible}
-                defaultName="Transmission Log_20260813"
+                defaultName={exportDefaultName}
                 hideFormat
                 onClose={() => setExportVisible(false)}
             />
