@@ -1006,7 +1006,7 @@ export default function BlacklistPage() {
             <div className="blacklist-tip">
                 <Info size={14} />
                 <span>
-                    人工补发可选手动过滤，计划内自动补发默认强制校验，支持在运营计划画布中配置。
+                    人工补发可选手动过滤，亦支持在运营计划画布组件中配置。
                 </span>
             </div>
 
