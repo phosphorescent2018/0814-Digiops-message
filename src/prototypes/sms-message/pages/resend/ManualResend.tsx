@@ -1,7 +1,7 @@
 /**
  * 人工补发：条件筛选 → 命中汇总（导出/定时/立即补发）→ 批次补发记录
  */
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, RotateCcw, Download, Clock, Send, Eye, Ban, Check, Calendar, ChevronUp, ExternalLink } from 'lucide-react';
 import BatchDetail from './BatchDetail';
 import ColumnSettings, { type ColumnDef } from '../../components/ColumnSettings';
@@ -10,6 +10,8 @@ import type { RecordFilter } from './BatchDetail';
 
 interface ManualResendProps {
     onSwitchTab?: (tab: 'record', filter?: RecordFilter) => void;
+    /** 从发送记录点击补发批次 ID 跳转带入的批次筛选 */
+    incomingBatchId?: string;
 }
 
 const FIELD_LABELS = [
@@ -148,7 +150,7 @@ const MANUAL_COLUMNS: ColumnDef[] = [
     { key: 'action', label: '操作', fixed: true },
 ];
 
-export default function ManualResend({ onSwitchTab }: ManualResendProps) {
+export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualResendProps) {
     const formRef = React.useRef<HTMLFormElement>(null);
     const [filterCollapsed, setFilterCollapsed] = useState(false);
     const [querying, setQuerying] = useState(false);
@@ -174,6 +176,10 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
     const [batchPageSize, setBatchPageSize] = useState(10);
     const [resendStatus, setResendStatus] = useState('');
     const [activeView, setActiveView] = useState<'filter' | 'records'>('filter');
+    const [recordStart, setRecordStart] = useState('');
+    const [recordEnd, setRecordEnd] = useState('');
+    const [recordStatus, setRecordStatus] = useState('');
+    const [recordBatchId, setRecordBatchId] = useState('');
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -289,6 +295,29 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
         setHitVisible(false);
         showToast(`${isImmediate ? '立即补发' : '定时补发'}任务已创建（批次 ${newBatch.id}）`);
     };
+
+    /** 记录筛选结果（本地过滤） */
+    const filteredBatches = useMemo(
+        () =>
+            batches.filter((b) => {
+                const status = computeStatus(b);
+                if (recordBatchId.trim() && !b.id.includes(recordBatchId.trim().replace(/^B/, ''))) return false;
+                if (recordStatus && status !== recordStatus) return false;
+                const day = b.scheduledTime.slice(0, 10);
+                if (recordStart && day < recordStart) return false;
+                if (recordEnd && day > recordEnd) return false;
+                return true;
+            }),
+        [batches, recordBatchId, recordStatus, recordStart, recordEnd]
+    );
+
+    useEffect(() => {
+        if (incomingBatchId) {
+            setRecordBatchId(incomingBatchId);
+            setActiveView('records');
+            setBatchPage(1);
+        }
+    }, [incomingBatchId]);
 
     const confirmTerminate = () => {
         if (!terminateTarget || terminating) return;
@@ -546,10 +575,67 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
 
             {activeView === 'records' && (
             <div className="sms-card resend-section">
-                <div className="resend-table-toolbar">
+                    <div className="resend-record-filter">
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发时间</label>
+                            <div className="sms-form-control">
+                                <div className="resend-record-range">
+                                    <input type="date" value={recordStart} onChange={(e) => setRecordStart(e.target.value)} />
+                                    <span>→</span>
+                                    <input type="date" value={recordEnd} onChange={(e) => setRecordEnd(e.target.value)} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发状态</label>
+                            <div className="sms-form-control">
+                                <select className="sms-select" value={recordStatus} onChange={(e) => setRecordStatus(e.target.value)}>
+                                    <option value="">全部</option>
+                                    <option value="待执行">待执行</option>
+                                    <option value="执行中">执行中</option>
+                                    <option value="已完成">已完成</option>
+                                    <option value="已终止">已终止</option>
+                                    <option value="失败">失败</option>
+                                    <option value="部分失败">部分失败</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发批次 ID</label>
+                            <div className="sms-form-control">
+                                <input
+                                    className="sms-input"
+                                    placeholder="请输入"
+                                    value={recordBatchId}
+                                    onChange={(e) => setRecordBatchId(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="resend-record-actions">
+                            <button
+                                type="button"
+                                className="sms-btn"
+                                onClick={() => {
+                                    setRecordStart('');
+                                    setRecordEnd('');
+                                    setRecordStatus('');
+                                    setRecordBatchId('');
+                                    setBatchPage(1);
+                                }}
+                            >
+                                <RotateCcw size={14} />
+                                重置
+                            </button>
+                            <button type="button" className="sms-btn sms-btn-primary" onClick={() => setBatchPage(1)}>
+                                <Search size={14} />
+                                查询
+                            </button>
+                        </div>
+                    </div>
+                    <div className="resend-table-toolbar">
                     <div className="resend-section-title">
                         <span>补发记录</span>
-                        <span className="resend-section-sub">共 {batches.length} 个批次</span>
+                        <span className="resend-section-sub">共 {filteredBatches.length} 个批次</span>
                     </div>
                     <div className="resend-table-toolbar-actions">
                         <button type="button" className="sms-btn sms-btn-primary" onClick={() => setExportVisible(true)}>
@@ -588,7 +674,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {batches.slice((batchPage - 1) * batchPageSize, batchPage * batchPageSize).map((b) => {
+                            {filteredBatches.slice((batchPage - 1) * batchPageSize, batchPage * batchPageSize).map((b) => {
                                 const status = computeStatus(b);
                                 const canTerminate = status === '待执行' || status === '执行中';
                                 return (
@@ -638,7 +724,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     </table>
                 </div>
                 <div className="sms-pagination">
-                    <span className="sms-pagination-total">共 {batches.length} 个批次</span>
+                    <span className="sms-pagination-total">共 {filteredBatches.length} 个批次</span>
                     <button
                         type="button"
                         className="sms-page-btn"
@@ -647,7 +733,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     >
                         ‹
                     </button>
-                    {Array.from({ length: Math.max(1, Math.ceil(batches.length / batchPageSize)) }, (_, i) => (
+                    {Array.from({ length: Math.max(1, Math.ceil(filteredBatches.length / batchPageSize)) }, (_, i) => (
                         <button
                             key={i}
                             type="button"
@@ -660,7 +746,7 @@ export default function ManualResend({ onSwitchTab }: ManualResendProps) {
                     <button
                         type="button"
                         className="sms-page-btn"
-                        disabled={batchPage >= Math.max(1, Math.ceil(batches.length / batchPageSize))}
+                        disabled={batchPage >= Math.max(1, Math.ceil(filteredBatches.length / batchPageSize))}
                         onClick={() => setBatchPage((p) => p + 1)}
                     >
                         ›

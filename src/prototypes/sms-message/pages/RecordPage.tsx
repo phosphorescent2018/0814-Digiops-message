@@ -18,6 +18,8 @@ import type { RecordFilter } from './resend/BatchDetail';
 interface RecordPageProps {
     activeKey?: string;
     filter?: RecordFilter;
+    /** 跳转补发记录（从补发批次 ID 点击） */
+    onOpenResend?: (batchId: string) => void;
 }
 
 const PAGE_SIZE = 10;
@@ -215,10 +217,12 @@ function RecordTable({
     onExport,
     filter,
     resendType,
+    onOpenResend,
 }: {
     onExport: () => void;
     filter?: RecordFilter;
     resendType: string;
+    onOpenResend?: (batchId: string) => void;
 }) {
     const [page, setPage] = useState(1);
     const filteredRows = useMemo(
@@ -370,7 +374,13 @@ function RecordTable({
                                 <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
                                 <td>
                                     {row.batchId ? (
-                                        row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`
+                                        <button
+                                            type="button"
+                                            className="resend-link-btn"
+                                            onClick={() => onOpenResend?.(row.batchId as string)}
+                                        >
+                                            {row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`}
+                                        </button>
                                     ) : (
                                         <span className="sms-dash">—</span>
                                     )}
@@ -426,7 +436,7 @@ function RecordTable({
     );
 }
 
-export default function RecordPage({ activeKey, filter }: RecordPageProps) {
+export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
     const [resendType, setResendType] = useState('');
 
@@ -437,7 +447,12 @@ export default function RecordPage({ activeKey, filter }: RecordPageProps) {
                 resendType={resendType}
                 onResendTypeChange={setResendType}
             />
-            <RecordTable onExport={() => setExportVisible(true)} filter={filter} resendType={resendType} />
+            <RecordTable
+                onExport={() => setExportVisible(true)}
+                filter={filter}
+                resendType={resendType}
+                onOpenResend={onOpenResend}
+            />
 
             {exportVisible && (
                 <div className="sms-mask" onClick={() => setExportVisible(false)}>

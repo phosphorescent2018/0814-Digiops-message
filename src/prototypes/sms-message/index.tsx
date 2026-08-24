@@ -32,6 +32,7 @@ export default function SmsMessage() {
     const [activeTab, setActiveTab] = useState<TabKey>('record');
     const [page, setPage] = useState<AppPage>('sms');
     const [recordFilter, setRecordFilter] = useState<RecordFilter | null>(null);
+    const [resendBatchId, setResendBatchId] = useState('');
 
     return (
         <>
@@ -65,11 +66,21 @@ export default function SmsMessage() {
                               </div>
                           ))}
                       </div>
-                      {activeTab === 'record' && <RecordPage filter={recordFilter ?? undefined} />}
+                      {activeTab === 'record' && (
+                          <RecordPage
+                              filter={recordFilter ?? undefined}
+                              onOpenResend={(id) => {
+                                  setResendBatchId(id);
+                                  setRecordFilter(null);
+                                  setActiveTab('resend');
+                              }}
+                          />
+                      )}
                       {activeTab === 'template' && <TemplatePage />}
                       {activeTab === 'report' && <ReportPage />}
                       {activeTab === 'resend' && (
                           <ResendCenter
+                              incomingBatchId={resendBatchId}
                               onSwitchTab={(tab, filter) => {
                                   setRecordFilter(filter ?? null);
                                   setActiveTab(tab);

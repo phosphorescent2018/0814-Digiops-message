@@ -3037,6 +3037,43 @@ button {
     border-bottom: 1px solid var(--border-soft);
 }
 
+.resend-record-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    max-width: 1020px;
+    margin: 0 auto 12px;
+}
+
+.resend-record-filter .sms-form-item {
+    flex: 1;
+    min-width: 0;
+}
+
+.resend-record-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.resend-record-range input[type="date"] {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.resend-record-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .resend-table-toolbar-actions {
     display: flex;
     align-items: center;

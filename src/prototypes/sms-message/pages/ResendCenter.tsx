@@ -7,12 +7,13 @@ import type { RecordFilter } from './resend/BatchDetail';
 
 interface ResendCenterProps {
     onSwitchTab?: (tab: 'record', filter?: RecordFilter) => void;
+    incomingBatchId?: string;
 }
 
-export default function ResendCenter({ onSwitchTab }: ResendCenterProps) {
+export default function ResendCenter({ onSwitchTab, incomingBatchId }: ResendCenterProps) {
     return (
         <div className="sms-resend-center">
-            <ManualResend onSwitchTab={onSwitchTab} />
+            <ManualResend onSwitchTab={onSwitchTab} incomingBatchId={incomingBatchId} />
         </div>
     );
 }
