@@ -766,7 +766,7 @@ function ResendControlConfigModal({ initial, onClose, onSave }: ResendControlMod
                             </div>
                         )}
 
-                        <div className="sms-form-item plan-canvas-time-item">
+                        <div className="sms-form-item">
                             <label className="sms-form-label">校验项</label>
                             <div className="sms-form-control">
                                 <div className="resend-cond-options">
