@@ -897,9 +897,8 @@ function BatchModal({
 
 function DetailModal({ row, onClose }: { row: BlacklistRow; onClose: () => void }) {
     const hits = [
-        { time: '2026-08-13 09:32:18', source: '计划内自动补发校验', result: '已拦截' },
-        { time: '2026-08-13 08:15:47', source: '运营计划 · 运营计划名称', result: '已拦截' },
-        { time: '2026-08-12 19:04:22', source: '人工补发校验', result: '已拦截' },
+        { time: '2026-08-13 09:32:18', source: '人工补发校验', result: '已拦截' },
+        { time: '2026-08-13 08:15:47', source: '运营计划前置校验-运营计划名称', result: '已拦截' },
     ];
 
     return (
