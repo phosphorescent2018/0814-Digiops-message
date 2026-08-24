@@ -351,14 +351,14 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                 {eventList.map((event) => (
                                     <div className="resend-log-item" key={event.id}>
                                         <span className="resend-log-time">{event.happenTime}</span>
-                                        <span className="resend-log-actor">{event.actorName}</span>
-                                        <span className="resend-log-action">{event.eventType}</span>
+                                        <span className="resend-log-event">
+                                            <strong>{event.actorName} {event.eventType}</strong>
+                                        </span>
                                         <span className="resend-log-status">
                                             {event.fromStatus
                                                 ? `${event.fromStatus} → ${event.toStatus}`
-                                                : `进入 ${event.toStatus}`}
+                                                : `— → ${event.toStatus}`}
                                         </span>
-                                        <span className="resend-log-remark">{event.remark || '—'}</span>
                                     </div>
                                 ))}
                             </div>

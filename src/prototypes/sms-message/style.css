@@ -2956,34 +2956,19 @@ button {
     font-variant-numeric: tabular-nums;
 }
 
-.resend-log-actor {
-    flex: 0 0 58px;
-    color: var(--primary);
-    font-size: 12px;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.resend-log-action {
-    flex: 0 0 62px;
+.resend-log-event {
+    flex: 0 1 auto;
+    min-width: 0;
     color: var(--text-main);
     font-size: 12px;
-    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resend-log-status {
-    flex: 0 0 150px;
-    color: var(--text-secondary);
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.resend-log-remark {
     flex: 1 1 auto;
     min-width: 0;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
