@@ -119,7 +119,7 @@ interface SmsConfig {
 }
 
 const DEFAULT_SMS_CONFIG: SmsConfig = {
-    basic: { nodeName: '', sender: '', channel: 'SMPP', template: '' },
+    basic: { nodeName: '', sender: '', channel: '', template: '' },
     precheck: { checks: [], windows: [], strategy: 'wait' },
     resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
 };
@@ -188,13 +188,9 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         x: 200,
         y: 180,
         config: {
-            basic: { nodeName: '还款提醒', sender: 'MOMOADVANCE', channel: 'SMPP', template: '还款提醒-逾期' },
-            precheck: {
-                checks: ['blacklist', 'timeWindow'],
-                windows: [{ start: '09:00', end: '18:00' }],
-                strategy: 'wait' as const,
-            },
-            resend: { enabled: true, triggers: ['submitFail', 'receiptTimeout'], maxResend: '3', interval: '30' },
+            basic: { nodeName: '', sender: '', channel: '', template: '' },
+            precheck: { checks: [], windows: [], strategy: 'wait' as const },
+            resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
         },
     },
     { id: 'demo-end-main', def: findNodeDef('end'), x: 370, y: 180, config: null },
@@ -245,7 +241,7 @@ function loadPersistedCanvas(): PersistedCanvas | null {
                     basic: {
                         nodeName: sms.basic?.nodeName ?? '',
                         sender: sms.basic?.sender ?? '',
-                        channel: sms.basic?.channel ?? 'SMPP',
+                        channel: sms.basic?.channel ?? '',
                         template: sms.basic?.template ?? '',
                     },
                     precheck: {
@@ -551,6 +547,7 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                             value={draft.basic.channel}
                                             onChange={(e) => updateBasic('channel', e.target.value)}
                                         >
+                                            <option value="">请选择</option>
                                             <option value="SMPP">SMPP</option>
                                         </select>
                                     </div>
