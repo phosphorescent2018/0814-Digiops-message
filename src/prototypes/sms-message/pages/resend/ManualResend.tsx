@@ -712,10 +712,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                             </div>
                         </div>
                         <div className="resend-hit-actions">
-                            <button type="button" className="sms-btn" onClick={() => showToast('命中结果已导出（原型演示）')}>
-                                <Download size={14} />
-                                导出 Excel
-                            </button>
                             <button
                                 type="button"
                                 className="sms-btn"
