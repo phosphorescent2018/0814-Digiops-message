@@ -61,7 +61,7 @@ const NODE_GROUPS: NodeGroup[] = [
     {
         title: '动作',
         nodes: [
-            { id: 'judge', label: '判断', color: '#1890ff', shape: 'diamond', icon: Diamond },
+            { id: 'judge', label: '判断', color: '#98a1b8', shape: 'diamond', icon: Diamond },
             { id: 'end', label: '结束节点', color: '#98a1b8', shape: 'circle', text: 'END' },
             { id: 'delay', label: '延时器', color: '#98a1b8', shape: 'circle', icon: ClockIcon },
             { id: 'ab-test', label: 'A/B测试', color: '#98a1b8', icon: GitBranch },
@@ -72,7 +72,7 @@ const NODE_GROUPS: NodeGroup[] = [
     {
         title: '渠道',
         nodes: [
-            { id: 'sms', label: '短信', color: '#98a1b8', icon: MessageSquareText },
+            { id: 'sms', label: '短信', color: '#1890ff', icon: MessageSquareText },
             { id: 'whatsapp', label: 'WhatsApp', color: '#98a1b8', icon: MessageCircle },
             { id: 'voice', label: '智能语音', color: '#98a1b8', icon: AudioLines },
             { id: 'viber', label: 'Viber', color: '#98a1b8', icon: Phone },
