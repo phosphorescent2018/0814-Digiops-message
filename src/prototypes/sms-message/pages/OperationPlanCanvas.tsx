@@ -686,7 +686,9 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                         <div className="plan-canvas-non-slot-tip plan-canvas-non-slot-tip-gap">
                                             <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
                                             <span>
-                                                补发前校验：复用上方「校验设置」（黑名单 / 发送时段）；未启用校验项则补发前不做校验
+                                                补发前校验：复用上方「校验设置」（黑名单 / 发送时段）
+                                                <br />
+                                                未启用校验项则补发前不做校验
                                             </span>
                                         </div>
                                         <div className="sms-form-item plan-canvas-time-item">
