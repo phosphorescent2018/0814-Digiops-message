@@ -585,7 +585,9 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                         {openSections.precheck && (
                             <div className="sms-config-drawer-section-content">
                                 <div className="sms-config-drawer-hint">
-                                    黑名单与发送时段校验，发送前及补发前统一生效；勾选任意校验项即启用，不勾选则不做校验
+                                    黑名单与发送时段校验，发送前及补发前统一生效
+                                    <br />
+                                    勾选任意校验项即启用，不勾选则不做校验
                                 </div>
                                 <div className="sms-form-item">
                                     <label className="sms-form-label">校验项</label>
@@ -655,10 +657,12 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                         </div>
                                     </div>
                                 )}
-                                <div className="plan-canvas-non-slot-tip">
-                                    <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
-                                    <span>非允许时段内发送将自动挂起，等到下一允许时段再继续</span>
-                                </div>
+                                {precheckTimeSelected && (
+                                    <div className="plan-canvas-non-slot-tip">
+                                        <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
+                                        <span>非允许时段内发送将自动挂起，等到下一允许时段再继续</span>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
