@@ -30,7 +30,10 @@ const PURPLE_TABS: TabKey[] = ['record', 'resend'];
 export default function SmsMessage() {
     // 与 UAT 一致：默认激活「发送记录」
     const [activeTab, setActiveTab] = useState<TabKey>('record');
-    const [page, setPage] = useState<AppPage>('sms');
+    const [page, setPage] = useState<AppPage>(() => {
+        const p = new URLSearchParams(window.location.search).get('page');
+        return p === 'blacklist' ? 'blacklist' : 'sms';
+    });
     const [recordFilter, setRecordFilter] = useState<RecordFilter | null>(null);
     const [resendBatchId, setResendBatchId] = useState('');
 
@@ -39,7 +42,11 @@ export default function SmsMessage() {
           <Layout activePage={page} onNavigate={setPage}>
               {page === 'plan' ? (
                   <OperationPlanPage
-                      onOpenBlacklist={() => setPage('blacklist')}
+                      onOpenBlacklist={() => {
+                          const url = new URL(window.location.href);
+                          url.searchParams.set('page', 'blacklist');
+                          window.open(url.toString(), '_blank');
+                      }}
                   />
               ) : page === 'blacklist' ? (
                   <>

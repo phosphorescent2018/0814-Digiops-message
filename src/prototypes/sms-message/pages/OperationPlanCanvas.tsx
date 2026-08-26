@@ -367,9 +367,10 @@ interface SmsConfigModalProps {
     initial: SmsConfig;
     onClose: () => void;
     onSave: (config: SmsConfig) => void;
+    onOpenBlacklist?: () => void;
 }
 
-function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
+function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfigModalProps) {
     const [draft, setDraft] = useState<SmsConfig>(() => ({
         basic: { ...initial.basic },
         precheck: {
@@ -589,15 +590,28 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                 <div className="sms-form-item">
                                     <label className="sms-form-label">校验项</label>
                                     <div className="sms-form-control">
-                                        <div className="resend-cond-options">
-                                            <label className="resend-cond-option">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={draft.precheck.checks.includes('blacklist')}
-                                                    onChange={() => togglePrecheckCheck('blacklist')}
-                                                />
-                                                <span className="resend-cond-option-text">黑名单校验</span>
-                                            </label>
+                                        <div className="plan-canvas-checks">
+                                            <div className="plan-canvas-check-row">
+                                                <label className="resend-cond-option">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={draft.precheck.checks.includes('blacklist')}
+                                                        onChange={() => togglePrecheckCheck('blacklist')}
+                                                    />
+                                                    <span className="resend-cond-option-text">黑名单校验</span>
+                                                </label>
+                                                <a
+                                                    href="#"
+                                                    className="plan-canvas-link"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        onOpenBlacklist?.();
+                                                    }}
+                                                    title="前往短信黑名单页面"
+                                                >
+                                                    查看黑名单
+                                                </a>
+                                            </div>
                                             <label className="resend-cond-option">
                                                 <input
                                                     type="checkbox"
@@ -1320,6 +1334,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved, onOpenB
                     key={editingNode.id}
                     initial={editingNode.config as SmsConfig}
                     onClose={() => setEditingId(null)}
+                    onOpenBlacklist={onOpenBlacklist}
                     onSave={(config) => {
                         setNodes((prev) => prev.map((n) => (n.id === editingNode.id ? { ...n, config } : n)));
                         setEditingId(null);
