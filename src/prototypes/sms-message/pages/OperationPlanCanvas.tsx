@@ -138,17 +138,15 @@ interface SmsConfig {
     resend: {
         enabled: boolean;
         triggers: string[];
-        checks: string[];
         maxResend: string;
         interval: string;
-        window: { start: string; end: string } | null;
     };
 }
 
 const DEFAULT_SMS_CONFIG: SmsConfig = {
     basic: { nodeName: '', sender: '', channel: 'SMPP', template: '' },
     precheck: { checks: [], windows: [], strategy: 'wait' },
-    resend: { enabled: false, triggers: [], checks: [], maxResend: '', interval: '', window: null },
+    resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
 };
 
 /** 判断节点配置：事件类型下拉，支持复用为前置校验 */
@@ -236,7 +234,7 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         config: {
             basic: { nodeName: '', sender: '', channel: 'SMPP', template: '' },
             precheck: { checks: [], windows: [], strategy: 'wait' as const },
-            resend: { enabled: false, triggers: [], checks: [], maxResend: '', interval: '', window: null },
+            resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
         },
     },
     {
@@ -325,10 +323,8 @@ function loadPersistedCanvas(): PersistedCanvas | null {
                     resend: {
                         enabled: sms.resend?.enabled ?? false,
                         triggers: Array.isArray(sms.resend?.triggers) ? sms.resend.triggers : [],
-                        checks: Array.isArray(sms.resend?.checks) ? sms.resend.checks : [],
                         maxResend: sms.resend?.maxResend ?? '',
                         interval: sms.resend?.interval ?? '',
-                        window: sms.resend?.window ?? null,
                     },
                 };
             }
@@ -894,10 +890,8 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
         resend: {
             enabled: initial.resend.enabled ?? false,
             triggers: [...initial.resend.triggers],
-            checks: [...(initial.resend.checks ?? [])],
             maxResend: initial.resend.maxResend,
             interval: initial.resend.interval,
-            window: initial.resend.window ? { ...initial.resend.window } : null,
         },
     }));
     const [timeError, setTimeError] = useState<string | null>(null);
@@ -968,35 +962,21 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
         });
     };
 
-    const toggleResendCheck = (key: string) => {
-        setDraft((prev) => {
-            const r = prev.resend;
-            const has = r.checks.includes(key);
-            const checks = has ? r.checks.filter((c) => c !== key) : [...r.checks, key];
-            return { ...prev, resend: { ...r, checks, window: checks.includes('timeWindow') ? r.window : null } };
-        });
-    };
-
     const precheckTimeSelected = draft.precheck.checks.includes('timeWindow');
-    // 勾选任意校验项即视为「启用发送前校验」；不勾选 = 发送前不做校验
+    // 勾选任意校验项即视为「启用校验」；不勾选 = 发送前/补发前均不做校验
     const precheckEnabled = draft.precheck.checks.length > 0;
     const precheckTimeMissing =
         precheckTimeSelected &&
         (draft.precheck.windows.length === 0 || draft.precheck.windows.some((w) => !w.start || !w.end));
-    // 启用后若勾了时段校验则必须配全时段，否则拦截保存
+    // 启用校验后若勾了时段校验则必须配全时段，否则拦截保存
     const precheckIncomplete =
         precheckEnabled && (precheckTimeMissing || (precheckTimeSelected && timeError !== null));
 
-    const resendTimeSelected = draft.resend.enabled && draft.resend.checks.includes('timeWindow');
     const resendTriggersMissing = draft.resend.enabled && draft.resend.triggers.length === 0;
     const resendCountMissing = draft.resend.enabled && !draft.resend.maxResend;
     const resendIntervalMissing = draft.resend.enabled && !draft.resend.interval;
-    const resendWindowMissing =
-        draft.resend.enabled &&
-        resendTimeSelected &&
-        (!draft.resend.window || !draft.resend.window.start || !draft.resend.window.end);
-    // 补发控制为可选项：未启用不校验；启用后须配全
-    const resendIncomplete = resendTriggersMissing || resendCountMissing || resendIntervalMissing || resendWindowMissing;
+    // 补发控制为可选项：未启用不校验；启用后须配全（校验项统一复用上方「校验设置」）
+    const resendIncomplete = resendTriggersMissing || resendCountMissing || resendIntervalMissing;
 
     const basicMissing =
         !draft.basic.nodeName.trim() ||
@@ -1004,7 +984,7 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
         !draft.basic.channel.trim() ||
         !draft.basic.template.trim();
 
-    // 保存可用性只由基础信息必填 + 「启用后未配全」决定；发送前校验/补发控制不作为必选项
+    // 保存可用性由基础信息必填 + 「启用后未配全」决定；校验与补发控制本身不作为必选项
     const saveDisabled = basicMissing || precheckIncomplete || resendIncomplete;
 
     const sectionToggle = (title: string, key: 'basic' | 'precheck' | 'resend') => (
@@ -1105,13 +1085,13 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                         )}
                     </div>
 
-                    {/* 发送前校验 */}
+                    {/* 校验设置：黑名单 / 发送时段，发送前与补发前统一生效 */}
                     <div className="sms-config-drawer-section">
-                        {sectionToggle('发送前校验', 'precheck')}
+                        {sectionToggle('校验设置', 'precheck')}
                         {openSections.precheck && (
                             <div className="sms-config-drawer-section-content">
                                 <div className="sms-config-drawer-hint">
-                                    勾选任意校验项即启用发送前校验；不勾选则发送前不做校验
+                                    黑名单与发送时段校验，发送前及补发前统一生效；勾选任意校验项即启用，不勾选则不做校验
                                 </div>
                                 <div className="sms-form-item">
                                     <label className="sms-form-label">校验项</label>
@@ -1189,7 +1169,7 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                         )}
                     </div>
 
-                    {/* 补发控制 */}
+                    {/* 补发控制：仅策略字段，校验项统一复用上方「校验设置」 */}
                     <div className="sms-config-drawer-section">
                         {sectionToggle('补发控制', 'resend')}
                         {openSections.resend && (
@@ -1210,7 +1190,9 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                     <>
                                         <div className="plan-canvas-non-slot-tip plan-canvas-non-slot-tip-gap">
                                             <ClockIcon size={14} className="plan-canvas-non-slot-icon" />
-                                            <span>流程将在此停留，直到补发完成（补发成功或达到上限）后继续</span>
+                                            <span>
+                                                补发前校验：复用上方「校验设置」（黑名单 / 发送时段）；未启用校验项则补发前不做校验
+                                            </span>
                                         </div>
                                         <div className="sms-form-item plan-canvas-time-item">
                                             <label className="sms-form-label">
@@ -1297,89 +1279,6 @@ function SmsConfigModal({ initial, onClose, onSave }: SmsConfigModalProps) {
                                                 </select>
                                                 {resendIntervalMissing && (
                                                     <div className="plan-canvas-time-error">请选择补发间隔</div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {resendTimeSelected && (
-                                            <div className="sms-form-item plan-canvas-time-item">
-                                                <label className="sms-form-label">允许发送时段</label>
-                                                <div className="sms-form-control">
-                                                    {draft.resend.window ? (
-                                                        <div className="plan-canvas-time-row">
-                                                            <input
-                                                                type="time"
-                                                                className="plan-canvas-time-input"
-                                                                value={draft.resend.window.start}
-                                                                onChange={(e) =>
-                                                                    setDraft((prev) => ({
-                                                                        ...prev,
-                                                                        resend: { ...prev.resend, window: { start: e.target.value, end: prev.resend.window!.end } },
-                                                                    }))
-                                                                }
-                                                            />
-                                                            <span className="plan-canvas-time-sep">-</span>
-                                                            <input
-                                                                type="time"
-                                                                className="plan-canvas-time-input"
-                                                                value={draft.resend.window.end}
-                                                                onChange={(e) =>
-                                                                    setDraft((prev) => ({
-                                                                        ...prev,
-                                                                        resend: { ...prev.resend, window: { start: prev.resend.window!.start, end: e.target.value } },
-                                                                    }))
-                                                                }
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                className="plan-canvas-time-del"
-                                                                title="删除该时段"
-                                                                onClick={() => setDraft((prev) => ({ ...prev, resend: { ...prev.resend, window: null } }))}
-                                                            >
-                                                                ×
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <button
-                                                            type="button"
-                                                            className="plan-canvas-time-add"
-                                                            onClick={() =>
-                                                                setDraft((prev) => ({ ...prev, resend: { ...prev.resend, window: { start: '', end: '' } } }))
-                                                            }
-                                                        >
-                                                            + 添加时段
-                                                        </button>
-                                                    )}
-                                                    {resendWindowMissing && (
-                                                        <div className="plan-canvas-time-error">请完整填写允许发送时段</div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
-                                        <div className="sms-form-item">
-                                            <label className="sms-form-label">校验项</label>
-                                            <div className="sms-form-control">
-                                                <div className="resend-cond-options">
-                                                    <label className="resend-cond-option">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={draft.resend.checks.includes('blacklist')}
-                                                            onChange={() => toggleResendCheck('blacklist')}
-                                                        />
-                                                        <span className="resend-cond-option-text">黑名单校验</span>
-                                                    </label>
-                                                    <label className="resend-cond-option">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={draft.resend.checks.includes('timeWindow')}
-                                                            onChange={() => toggleResendCheck('timeWindow')}
-                                                        />
-                                                        <span className="resend-cond-option-text">发送时段校验</span>
-                                                    </label>
-                                                </div>
-                                                {draft.resend.checks.length === 0 && (
-                                                    <div className="plan-canvas-time-hint">
-                                                        未勾选校验项时，补发前不做黑名单 / 发送时段校验
-                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -1492,7 +1391,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved, onOpenB
                         ? { ...DEFAULT_SMS_CONFIG,
                             basic: { ...DEFAULT_SMS_CONFIG.basic },
                             precheck: { checks: [], windows: [], strategy: 'wait' as const },
-                            resend: { enabled: false, triggers: [], checks: [], maxResend: '', interval: '', window: null },
+                            resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
                           }
                         : null,
         };
