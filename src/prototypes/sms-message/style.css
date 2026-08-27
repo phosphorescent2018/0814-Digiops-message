@@ -1879,6 +1879,40 @@ button {
     line-height: 1.4;
 }
 
+.plan-canvas-time-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.plan-canvas-time-day-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.plan-canvas-time-day {
+    width: 36px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.plan-canvas-time-day-error {
+    font-size: 12px;
+    color: #cf1322;
+    margin-left: 4px;
+    white-space: nowrap;
+}
+
+.plan-canvas-time-hint-gap {
+    margin-top: 6px;
+}
+
+.plan-canvas-time-error-gap {
+    margin-top: 6px;
+}
+
 .plan-canvas-inline-tip {
     font-size: 12px;
     color: var(--text-muted);

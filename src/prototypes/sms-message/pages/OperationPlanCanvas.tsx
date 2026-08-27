@@ -92,10 +92,35 @@ const CANVAS_TOOLS = [LayoutGrid, SquarePlus, Copy, Trash2, Undo2, Redo2, Locate
 const NODE_W = 128;
 const NODE_H = 92;
 
+/** 周一到周日的每天允许发送时段：索引 0=周一 … 6=周日，每天仅 1 段，留空 = 该天不发送 */
+interface DailyTimeWindow {
+    start: string;
+    end: string;
+}
+
+const DAILY_LABELS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] as const;
+
+const emptyDailyWindows = (): DailyTimeWindow[] => Array.from({ length: 7 }, () => ({ start: '', end: '' }));
+
+/** 归一化按天时段：优先新结构 dailyWindows（逐索引取），否则兼容旧 windows（取第一段复制到每天） */
+const normalizeDailyWindows = (daily: unknown, legacy: unknown): DailyTimeWindow[] => {
+    if (Array.isArray(daily) && daily.length) {
+        return Array.from({ length: 7 }, (_, i) => {
+            const d = daily[i] as DailyTimeWindow | undefined;
+            return { start: d?.start ?? '', end: d?.end ?? '' };
+        });
+    }
+    const first = (Array.isArray(legacy) ? legacy : []).find((w) => w && (w.start || w.end)) as
+        | DailyTimeWindow
+        | undefined;
+    const base = first ?? { start: '', end: '' };
+    return Array.from({ length: 7 }, () => ({ start: base.start ?? '', end: base.end ?? '' }));
+};
+
 /** 前置校验配置 */
 interface PrecheckConfig {
     checks: string[];
-    windows: { start: string; end: string }[];
+    dailyWindows: DailyTimeWindow[];
     strategy: 'wait';
 }
 
@@ -120,7 +145,7 @@ interface SmsConfig {
 
 const DEFAULT_SMS_CONFIG: SmsConfig = {
     basic: { nodeName: '', sender: '', channel: '', template: '' },
-    precheck: { checks: [], windows: [], strategy: 'wait' },
+    precheck: { checks: [], dailyWindows: emptyDailyWindows(), strategy: 'wait' },
     resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
 };
 
@@ -189,7 +214,7 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         y: 180,
         config: {
             basic: { nodeName: '', sender: '', channel: '', template: '' },
-            precheck: { checks: [], windows: [], strategy: 'wait' as const },
+            precheck: { checks: [], dailyWindows: emptyDailyWindows(), strategy: 'wait' as const },
             resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
         },
     },
@@ -244,11 +269,14 @@ function loadPersistedCanvas(): PersistedCanvas | null {
                         channel: sms.basic?.channel ?? '',
                         template: sms.basic?.template ?? '',
                     },
-                    precheck: {
-                        checks: Array.isArray(sms.precheck?.checks) ? sms.precheck.checks : [],
-                        windows: Array.isArray(sms.precheck?.windows) ? sms.precheck.windows : [],
-                        strategy: 'wait' as const,
-                    },
+                   precheck: {
+                       checks: Array.isArray(sms.precheck?.checks) ? sms.precheck.checks : [],
+                        dailyWindows: normalizeDailyWindows(
+                            sms.precheck?.dailyWindows,
+                            (sms.precheck as { windows?: unknown } | undefined)?.windows,
+                        ),
+                       strategy: 'wait' as const,
+                   },
                     resend: {
                         enabled: sms.resend?.enabled ?? false,
                         triggers: Array.isArray(sms.resend?.triggers) ? sms.resend.triggers : [],
@@ -376,7 +404,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         precheck: {
             ...initial.precheck,
             checks: [...initial.precheck.checks],
-            windows: initial.precheck.windows.map((w) => ({ ...w })),
+            dailyWindows: normalizeDailyWindows(initial.precheck.dailyWindows, []),
         },
         resend: {
             enabled: initial.resend.enabled ?? false,
@@ -403,21 +431,25 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
             const p = prev.precheck;
             const has = p.checks.includes(key);
             const checks = has ? p.checks.filter((c) => c !== key) : [...p.checks, key];
-            // 勾选「发送时段校验」时保证有一个可编辑时段；取消勾选则清空
-            let windows = p.windows;
+            // 勾选「发送时段校验」时保证 7 天时段齐备；取消勾选则清空
+            let dailyWindows = p.dailyWindows;
             if (key === 'timeWindow') {
-                windows = has ? [] : windows.length ? windows : [{ start: '', end: '' }];
+                dailyWindows = has
+                    ? emptyDailyWindows()
+                    : p.dailyWindows.length === 7
+                        ? p.dailyWindows
+                        : normalizeDailyWindows(p.dailyWindows, []);
             }
-            return { ...prev, precheck: { ...p, checks, windows } };
+            return { ...prev, precheck: { ...p, checks, dailyWindows } };
         });
     };
 
-    const updatePrecheckWindow = (index: number, key: 'start' | 'end', value: string) => {
+    const updatePrecheckWindow = (day: number, key: 'start' | 'end', value: string) => {
         setDraft((prev) => ({
             ...prev,
             precheck: {
                 ...prev.precheck,
-                windows: prev.precheck.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w)),
+                dailyWindows: prev.precheck.dailyWindows.map((w, i) => (i === day ? { ...w, [key]: value } : w)),
             },
         }));
     };
@@ -433,9 +465,9 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     const precheckTimeSelected = draft.precheck.checks.includes('timeWindow');
     // 勾选任意校验项即视为「启用校验」；不勾选 = 发送前/补发前均不做校验
     const precheckEnabled = draft.precheck.checks.length > 0;
-    const precheckTimeMissing =
-        precheckTimeSelected &&
-        (!draft.precheck.windows[0] || !draft.precheck.windows[0].start || !draft.precheck.windows[0].end);
+    const dayWindowValid = (w: { start: string; end: string }) => !!w.start && !!w.end;
+    // 至少完整配置 1 天的时段，否则时段校验视为未完成；留空的天 = 该天不发送
+    const precheckTimeMissing = precheckTimeSelected && !draft.precheck.dailyWindows.some(dayWindowValid);
     // 启用校验后若勾了时段校验则必须配全时段，否则拦截保存
     const precheckIncomplete = precheckEnabled && precheckTimeMissing;
 
@@ -601,29 +633,41 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                 </div>
                                 {precheckTimeSelected && (
                                     <div className="sms-form-item plan-canvas-time-item">
-                                        <label className="sms-form-label">允许发送时段（仅 1 段）</label>
-                                        <div className="sms-form-control">
-                                            {draft.precheck.windows.slice(0, 1).map((w, index) => (
-                                                <div className="plan-canvas-time-row" key={index}>
-                                                    <input
-                                                        type="time"
-                                                        className="plan-canvas-time-input"
-                                                        value={w.start}
-                                                        onChange={(e) => updatePrecheckWindow(0, 'start', e.target.value)}
-                                                    />
-                                                    <span className="plan-canvas-time-sep">-</span>
-                                                    <input
-                                                        type="time"
-                                                        className="plan-canvas-time-input"
-                                                        value={w.end}
-                                                        onChange={(e) => updatePrecheckWindow(0, 'end', e.target.value)}
-                                                    />
-                                                </div>
-                                            ))}
-                                            {precheckTimeMissing && (
-                                                <div className="plan-canvas-time-error">请完整填写允许发送时段</div>
-                                            )}
+                                        <label className="sms-form-label">允许发送时段（按天，每天仅 1 段）</label>
+                                        <div className="sms-form-control plan-canvas-time-grid">
+                                            {draft.precheck.dailyWindows.map((w, day) => {
+                                                const partial = (!!w.start || !!w.end) && !dayWindowValid(w);
+                                                return (
+                                                    <div className="plan-canvas-time-day-row" key={day}>
+                                                        <span className="plan-canvas-time-day">{DAILY_LABELS[day]}</span>
+                                                        <input
+                                                            type="time"
+                                                            className="plan-canvas-time-input"
+                                                            value={w.start}
+                                                            onChange={(e) => updatePrecheckWindow(day, 'start', e.target.value)}
+                                                        />
+                                                        <span className="plan-canvas-time-sep">-</span>
+                                                        <input
+                                                            type="time"
+                                                            className="plan-canvas-time-input"
+                                                            value={w.end}
+                                                            onChange={(e) => updatePrecheckWindow(day, 'end', e.target.value)}
+                                                        />
+                                                        {partial && (
+                                                            <span className="plan-canvas-time-day-error">未填写完整</span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
+                                        <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
+                                            留空的天表示该天不发送
+                                        </div>
+                                        {precheckTimeMissing && (
+                                            <div className="plan-canvas-time-error plan-canvas-time-error-gap">
+                                                请至少配置一天的允许发送时段
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 {precheckTimeSelected && (
@@ -768,7 +812,10 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                         onClick={() =>
                             onSave({
                                 ...draft,
-                                precheck: { ...draft.precheck, windows: draft.precheck.windows.slice(0, 1) },
+                                precheck: {
+                                    ...draft.precheck,
+                                    dailyWindows: normalizeDailyWindows(draft.precheck.dailyWindows, []),
+                                },
                             })
                         }
                     >
@@ -862,7 +909,7 @@ export default function OperationPlanCanvas({ planName, onBack, onSaved, onOpenB
                     : def.id === 'sms'
                         ? { ...DEFAULT_SMS_CONFIG,
                             basic: { ...DEFAULT_SMS_CONFIG.basic },
-                            precheck: { checks: [], windows: [], strategy: 'wait' as const },
+                            precheck: { checks: [], dailyWindows: emptyDailyWindows(), strategy: 'wait' as const },
                             resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
                           }
                         : null,
