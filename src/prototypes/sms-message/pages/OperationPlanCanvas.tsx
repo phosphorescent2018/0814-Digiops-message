@@ -633,7 +633,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                 </div>
                                 {precheckTimeSelected && (
                                     <div className="sms-form-item plan-canvas-time-item">
-                                        <label className="sms-form-label">允许发送时段（按天，每天仅 1 段）</label>
+                                        <label className="sms-form-label">允许发送时段（按天）</label>
                                         <div className="sms-form-control">
                                             <div className="plan-canvas-time-grid">
                                                 {draft.precheck.dailyWindows.map((w, day) => {
@@ -662,7 +662,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 })}
                                             </div>
                                             <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
-                                                留空的天表示该天不发送
+                                                每天仅 1 段；留空的天表示该天不发送
                                             </div>
                                             {precheckTimeMissing && (
                                                 <div className="plan-canvas-time-error plan-canvas-time-error-gap">

@@ -1785,7 +1785,8 @@ button {
 }
 
 .plan-canvas-time-item .sms-form-label {
-    line-height: 30px;
+    line-height: 22px;
+    white-space: normal;
 }
 
 .plan-canvas-time-row {
