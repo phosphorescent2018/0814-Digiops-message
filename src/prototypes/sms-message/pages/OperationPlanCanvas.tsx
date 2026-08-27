@@ -385,7 +385,6 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
             interval: initial.resend.interval,
         },
     }));
-    const [timeError, setTimeError] = useState<string | null>(null);
     const [openSections, setOpenSections] = useState<{ basic: boolean; precheck: boolean; resend: boolean }>({
         basic: true,
         precheck: false,
@@ -395,16 +394,6 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     const toggleSection = (key: 'basic' | 'precheck' | 'resend') =>
         setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
-    /** 两个时段是否重合（端点相接不算重合，如 09:00-12:00 与 12:00-14:00 允许） */
-    const timeOverlap = (a: { start: string; end: string }, b: { start: string; end: string }) =>
-        a.start < b.end && b.start < a.end;
-
-    const hasWindowConflict = (windows: { start: string; end: string }[], target: { start: string; end: string }, index: number) =>
-        windows.some((w, i) => i !== index && timeOverlap(w, target));
-
-    /** 新增时段不预填，由用户自行录入 */
-    const nextWindowCandidate = () => ({ start: '', end: '' });
-
     const updateBasic = (key: keyof SmsBasicConfig, value: string) => {
         setDraft((prev) => ({ ...prev, basic: { ...prev.basic, [key]: value } }));
     };
@@ -413,35 +402,23 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         setDraft((prev) => {
             const p = prev.precheck;
             const has = p.checks.includes(key);
-            return { ...prev, precheck: { ...p, checks: has ? p.checks.filter((c) => c !== key) : [...p.checks, key] } };
+            const checks = has ? p.checks.filter((c) => c !== key) : [...p.checks, key];
+            // 勾选「发送时段校验」时保证有一个可编辑时段；取消勾选则清空
+            let windows = p.windows;
+            if (key === 'timeWindow') {
+                windows = has ? [] : windows.length ? windows : [{ start: '', end: '' }];
+            }
+            return { ...prev, precheck: { ...p, checks, windows } };
         });
     };
 
     const updatePrecheckWindow = (index: number, key: 'start' | 'end', value: string) => {
-        const nextWindows = draft.precheck.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w));
-        if (hasWindowConflict(nextWindows, nextWindows[index], index)) {
-            setTimeError('时段存在重合，请调整后再保存');
-            return;
-        }
-        setTimeError(null);
         setDraft((prev) => ({
             ...prev,
-            precheck: { ...prev.precheck, windows: nextWindows },
-        }));
-    };
-
-    const addPrecheckWindow = () => {
-        setTimeError(null);
-        setDraft((prev) => ({
-            ...prev,
-            precheck: { ...prev.precheck, windows: [...prev.precheck.windows, nextWindowCandidate()] },
-        }));
-    };
-
-    const removePrecheckWindow = (index: number) => {
-        setDraft((prev) => ({
-            ...prev,
-            precheck: { ...prev.precheck, windows: prev.precheck.windows.filter((_, i) => i !== index) },
+            precheck: {
+                ...prev.precheck,
+                windows: prev.precheck.windows.map((w, i) => (i === index ? { ...w, [key]: value } : w)),
+            },
         }));
     };
 
@@ -458,10 +435,9 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     const precheckEnabled = draft.precheck.checks.length > 0;
     const precheckTimeMissing =
         precheckTimeSelected &&
-        (draft.precheck.windows.length === 0 || draft.precheck.windows.some((w) => !w.start || !w.end));
+        (!draft.precheck.windows[0] || !draft.precheck.windows[0].start || !draft.precheck.windows[0].end);
     // 启用校验后若勾了时段校验则必须配全时段，否则拦截保存
-    const precheckIncomplete =
-        precheckEnabled && (precheckTimeMissing || (precheckTimeSelected && timeError !== null));
+    const precheckIncomplete = precheckEnabled && precheckTimeMissing;
 
     const resendTriggersMissing = draft.resend.enabled && draft.resend.triggers.length === 0;
     const resendCountMissing = draft.resend.enabled && !draft.resend.maxResend;
@@ -625,45 +601,27 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                 </div>
                                 {precheckTimeSelected && (
                                     <div className="sms-form-item plan-canvas-time-item">
-                                        <label className="sms-form-label">允许发送时段</label>
+                                        <label className="sms-form-label">允许发送时段（仅 1 段）</label>
                                         <div className="sms-form-control">
-                                            {draft.precheck.windows.map((w, index) => (
+                                            {draft.precheck.windows.slice(0, 1).map((w, index) => (
                                                 <div className="plan-canvas-time-row" key={index}>
                                                     <input
                                                         type="time"
                                                         className="plan-canvas-time-input"
                                                         value={w.start}
-                                                        onChange={(e) => updatePrecheckWindow(index, 'start', e.target.value)}
+                                                        onChange={(e) => updatePrecheckWindow(0, 'start', e.target.value)}
                                                     />
                                                     <span className="plan-canvas-time-sep">-</span>
                                                     <input
                                                         type="time"
                                                         className="plan-canvas-time-input"
                                                         value={w.end}
-                                                        onChange={(e) => updatePrecheckWindow(index, 'end', e.target.value)}
+                                                        onChange={(e) => updatePrecheckWindow(0, 'end', e.target.value)}
                                                     />
-                                                    {draft.precheck.windows.length > 0 && (
-                                                        <button
-                                                            type="button"
-                                                            className="plan-canvas-time-del"
-                                                            title="删除该时段"
-                                                            onClick={() => removePrecheckWindow(index)}
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    )}
                                                 </div>
                                             ))}
-                                            {draft.precheck.windows.length < 3 && (
-                                                <button type="button" className="plan-canvas-time-add" onClick={addPrecheckWindow}>
-                                                    + 新增时段（最多 3 段）
-                                                </button>
-                                            )}
                                             {precheckTimeMissing && (
                                                 <div className="plan-canvas-time-error">请完整填写允许发送时段</div>
-                                            )}
-                                            {timeError && (
-                                                <div className="plan-canvas-time-error">{timeError}</div>
                                             )}
                                         </div>
                                     </div>
@@ -807,7 +765,12 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                         type="button"
                         className="sms-btn sms-btn-primary"
                         disabled={saveDisabled}
-                        onClick={() => onSave(draft)}
+                        onClick={() =>
+                            onSave({
+                                ...draft,
+                                precheck: { ...draft.precheck, windows: draft.precheck.windows.slice(0, 1) },
+                            })
+                        }
                     >
                         保 存
                     </button>
