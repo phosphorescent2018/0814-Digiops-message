@@ -454,14 +454,14 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         }));
     };
 
-    const copyPrecheckWindowToNext = (day: number) => {
+    const copyPrecheckWindowFromPrev = (day: number) => {
         setDraft((prev) => ({
             ...prev,
             precheck: {
                 ...prev.precheck,
                 dailyWindows: prev.precheck.dailyWindows.map((w, i) =>
-                    i === day + 1
-                        ? { start: prev.precheck.dailyWindows[day].start, end: prev.precheck.dailyWindows[day].end }
+                    i === day
+                        ? { start: prev.precheck.dailyWindows[day - 1].start, end: prev.precheck.dailyWindows[day - 1].end }
                         : w,
                 ),
             },
@@ -480,10 +480,12 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     // 勾选任意校验项即视为「启用校验」；不勾选 = 发送前/补发前均不做校验
     const precheckEnabled = draft.precheck.checks.length > 0;
     const dayWindowValid = (w: { start: string; end: string }) => !!w.start && !!w.end;
+    const dayWindowEndBeforeStart = (w: { start: string; end: string }) => !!w.start && !!w.end && w.end < w.start;
+    const hasTimeOrderError = draft.precheck.dailyWindows.some(dayWindowEndBeforeStart);
     // 至少完整配置 1 天的时段，否则时段校验视为未完成；留空的天 = 该天不发送
     const precheckTimeMissing = precheckTimeSelected && !draft.precheck.dailyWindows.some(dayWindowValid);
     // 启用校验后若勾了时段校验则必须配全时段，否则拦截保存
-    const precheckIncomplete = precheckEnabled && precheckTimeMissing;
+    const precheckIncomplete = precheckEnabled && (precheckTimeMissing || hasTimeOrderError);
 
     const resendTriggersMissing = draft.resend.enabled && draft.resend.triggers.length === 0;
     const resendCountMissing = draft.resend.enabled && !draft.resend.maxResend;
@@ -652,6 +654,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                             <div className="plan-canvas-time-grid">
                                                 {draft.precheck.dailyWindows.map((w, day) => {
                                                     const partial = (!!w.start || !!w.end) && !dayWindowValid(w);
+                                                    const endBeforeStart = dayWindowEndBeforeStart(w);
                                                     return (
                                                         <div className="plan-canvas-time-day-row" key={day}>
                                                             <span className="plan-canvas-time-day">{DAILY_LABELS[day]}</span>
@@ -668,17 +671,20 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                                 value={w.end}
                                                                 onChange={(e) => updatePrecheckWindow(day, 'end', e.target.value)}
                                                             />
-                                                            {partial && (
+                                                            {partial && !endBeforeStart && (
                                                                 <span className="plan-canvas-time-day-error">未填写完整</span>
                                                             )}
-                                                            {day < DAILY_LABELS.length - 1 && (
+                                                            {endBeforeStart && (
+                                                                <span className="plan-canvas-time-day-error">结束不能早于开始</span>
+                                                            )}
+                                                            {day > 0 && (
                                                                 <button
                                                                     type="button"
                                                                     className="plan-canvas-time-copy"
-                                                                    onClick={() => copyPrecheckWindowToNext(day)}
-                                                                    title={`复制${DAILY_LABELS[day]}的时段到${DAILY_LABELS[day + 1]}`}
+                                                                    onClick={() => copyPrecheckWindowFromPrev(day)}
+                                                                    title={`复制${DAILY_LABELS[day - 1]}的时段到${DAILY_LABELS[day]}`}
                                                                 >
-                                                                    复制到下一行
+                                                                    复制上一行
                                                                 </button>
                                                             )}
                                                         </div>
@@ -686,7 +692,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 })}
                                             </div>
                                             <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
-                                                每天仅 1 段；留空的天表示该天不发送
+                                                每天仅 1 段；留空的天表示该天不发送；结束时间不能早于开始
                                             </div>
                                             {precheckTimeMissing && (
                                                 <div className="plan-canvas-time-error plan-canvas-time-error-gap">
