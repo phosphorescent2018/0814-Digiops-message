@@ -762,7 +762,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                     <div className="resend-cond-group">
                                                         <div className="resend-cond-group-head">
                                                             <span className="resend-cond-group-title">回执判定后</span>
-                                                            <span className="resend-cond-group-desc">24 小时内无明确回执</span>
+                                                            <span className="resend-cond-group-desc">1 小时内无明确回执</span>
                                                         </div>
                                                         <div className="resend-cond-options">
                                                             <label className="resend-cond-option">

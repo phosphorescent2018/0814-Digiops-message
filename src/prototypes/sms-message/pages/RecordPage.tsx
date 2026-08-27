@@ -301,7 +301,7 @@ function RecordTable({
         const tipMap: Record<string, string> = {
             回执中: '正在等待运营商回执',
             已送达: '短信投递成功',
-            回执超时: '24 小时内无明确回执',
+            回执超时: '1 小时内无明确回执',
         };
         const className = classMap[row.deliveryStatus] ?? 'sms-status-unknown';
         return (
