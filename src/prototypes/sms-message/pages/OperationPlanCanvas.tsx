@@ -454,6 +454,20 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         }));
     };
 
+    const copyPrecheckWindowToNext = (day: number) => {
+        setDraft((prev) => ({
+            ...prev,
+            precheck: {
+                ...prev.precheck,
+                dailyWindows: prev.precheck.dailyWindows.map((w, i) =>
+                    i === day + 1
+                        ? { start: prev.precheck.dailyWindows[day].start, end: prev.precheck.dailyWindows[day].end }
+                        : w,
+                ),
+            },
+        }));
+    };
+
     const toggleResendTrigger = (key: string) => {
         setDraft((prev) => {
             const r = prev.resend;
@@ -656,6 +670,16 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                             />
                                                             {partial && (
                                                                 <span className="plan-canvas-time-day-error">未填写完整</span>
+                                                            )}
+                                                            {day < DAILY_LABELS.length - 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="plan-canvas-time-copy"
+                                                                    onClick={() => copyPrecheckWindowToNext(day)}
+                                                                    title={`复制${DAILY_LABELS[day]}的时段到${DAILY_LABELS[day + 1]}`}
+                                                                >
+                                                                    复制到下一行
+                                                                </button>
                                                             )}
                                                         </div>
                                                     );
