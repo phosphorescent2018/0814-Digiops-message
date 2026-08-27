@@ -634,40 +634,42 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                 {precheckTimeSelected && (
                                     <div className="sms-form-item plan-canvas-time-item">
                                         <label className="sms-form-label">允许发送时段（按天，每天仅 1 段）</label>
-                                        <div className="sms-form-control plan-canvas-time-grid">
-                                            {draft.precheck.dailyWindows.map((w, day) => {
-                                                const partial = (!!w.start || !!w.end) && !dayWindowValid(w);
-                                                return (
-                                                    <div className="plan-canvas-time-day-row" key={day}>
-                                                        <span className="plan-canvas-time-day">{DAILY_LABELS[day]}</span>
-                                                        <input
-                                                            type="time"
-                                                            className="plan-canvas-time-input"
-                                                            value={w.start}
-                                                            onChange={(e) => updatePrecheckWindow(day, 'start', e.target.value)}
-                                                        />
-                                                        <span className="plan-canvas-time-sep">-</span>
-                                                        <input
-                                                            type="time"
-                                                            className="plan-canvas-time-input"
-                                                            value={w.end}
-                                                            onChange={(e) => updatePrecheckWindow(day, 'end', e.target.value)}
-                                                        />
-                                                        {partial && (
-                                                            <span className="plan-canvas-time-day-error">未填写完整</span>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
-                                            留空的天表示该天不发送
-                                        </div>
-                                        {precheckTimeMissing && (
-                                            <div className="plan-canvas-time-error plan-canvas-time-error-gap">
-                                                请至少配置一天的允许发送时段
+                                        <div className="sms-form-control">
+                                            <div className="plan-canvas-time-grid">
+                                                {draft.precheck.dailyWindows.map((w, day) => {
+                                                    const partial = (!!w.start || !!w.end) && !dayWindowValid(w);
+                                                    return (
+                                                        <div className="plan-canvas-time-day-row" key={day}>
+                                                            <span className="plan-canvas-time-day">{DAILY_LABELS[day]}</span>
+                                                            <input
+                                                                type="time"
+                                                                className="plan-canvas-time-input"
+                                                                value={w.start}
+                                                                onChange={(e) => updatePrecheckWindow(day, 'start', e.target.value)}
+                                                            />
+                                                            <span className="plan-canvas-time-sep">-</span>
+                                                            <input
+                                                                type="time"
+                                                                className="plan-canvas-time-input"
+                                                                value={w.end}
+                                                                onChange={(e) => updatePrecheckWindow(day, 'end', e.target.value)}
+                                                            />
+                                                            {partial && (
+                                                                <span className="plan-canvas-time-day-error">未填写完整</span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
-                                        )}
+                                            <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
+                                                留空的天表示该天不发送
+                                            </div>
+                                            {precheckTimeMissing && (
+                                                <div className="plan-canvas-time-error plan-canvas-time-error-gap">
+                                                    请至少配置一天的允许发送时段
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                                 {precheckTimeSelected && (
