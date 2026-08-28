@@ -10,11 +10,6 @@ import {
     MoreVertical,
     ChevronDown,
     LayoutGrid,
-    PlayCircle,
-    Timer,
-    Users,
-    Mail,
-    CircleDot,
 } from 'lucide-react';
 
 interface HomeTab {
@@ -30,16 +25,6 @@ const PURPLE_HOME_TABS = ['home'];
 const STATS_SMS = {
     base: { total: 12847, success: 11203, percent: 87, count: 0 },
     withResend: { total: 14362, success: 12580, percent: 88, count: 1515 },
-};
-
-const STATS_COST = {
-    base: { total: 8420.5, resend: 0 },
-    withResend: { total: 9315.75, resend: 895.25 },
-};
-
-const STATS_PLAN = {
-    base: { count: 12, running: 3, done: 9 },
-    withResend: { count: 15, running: 4, done: 11 },
 };
 
 function IncludeResendSwitch({
@@ -96,8 +81,6 @@ export default function HomePage() {
     const [includeResend, setIncludeResend] = useState(false);
 
     const sms = includeResend ? STATS_SMS.withResend : STATS_SMS.base;
-    const cost = includeResend ? STATS_COST.withResend : STATS_COST.base;
-    const plan = includeResend ? STATS_PLAN.withResend : STATS_PLAN.base;
 
     return (
         <div className="home-page">
@@ -175,80 +158,15 @@ export default function HomePage() {
                         checked={includeResend}
                         onToggle={setIncludeResend}
                     />
-                    <div className="home-card-body">
-                        <div className="home-ring">
-                            <div className="home-ring-circle home-ring-circle-cost">
-                                <div className="home-ring-center">
-                                    <div className="home-ring-percent home-ring-percent-cost">
-                                        {((cost.resend / cost.total) * 100).toFixed(1)}%
-                                    </div>
-                                    <div className="home-ring-count">补发占比</div>
-                                </div>
-                            </div>
+                    <div className="home-cost-chart">
+                        <div className="home-cost-line">
+                            <span className="home-cost-num">0</span>
+                            <svg className="home-cost-svg" viewBox="0 0 600 80" preserveAspectRatio="none">
+                                <line x1="0" y1="40" x2="600" y2="40" className="home-cost-dash" />
+                                <circle cx="56" cy="40" r="4" className="home-cost-dot" />
+                            </svg>
                         </div>
-                        <div className="home-card-stats">
-                            <div className="home-card-stat">
-                                <span className="home-card-dot home-card-dot-gray" />
-                                总费用：
-                                <span className="home-card-num">UGX {cost.total.toLocaleString()}</span>
-                            </div>
-                            <div className="home-card-stat">
-                                <span className="home-card-dot home-card-dot-blue" />
-                                补发费用：
-                                <span className="home-card-num home-card-num-blue">UGX {cost.resend.toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 运营计划 */}
-                <div className="home-card home-card-gap">
-                    <CardHead
-                        title="运营计划"
-                        date="2026-08-27 至 2026-08-27"
-                        checked={includeResend}
-                        onToggle={setIncludeResend}
-                    />
-                    <div className="home-plan-body">
-                        <div className="home-plan-stats">
-                            <div className="home-plan-stat">
-                                <span className="home-card-dot home-card-dot-gray" />
-                                计划数：
-                                <span className="home-card-num">{plan.count}</span>
-                            </div>
-                            <div className="home-plan-stat">
-                                <span className="home-card-dot home-card-dot-blue" />
-                                执行中：
-                                <span className="home-card-num">{plan.running}</span>
-                            </div>
-                            <div className="home-plan-stat">
-                                <span className="home-card-dot home-card-dot-success" />
-                                已完成：
-                                <span className="home-card-num">{plan.done}</span>
-                            </div>
-                        </div>
-                        <div className="home-plan-flow">
-                            <div className="home-plan-node home-plan-node-start">
-                                <PlayCircle size={30} />
-                            </div>
-                            <div className="home-plan-link" />
-                            <div className="home-plan-node home-plan-node-wait">
-                                <Timer size={30} />
-                            </div>
-                            <div className="home-plan-link" />
-                            <div className="home-plan-node home-plan-node-group">
-                                <Users size={30} />
-                            </div>
-                            <div className="home-plan-link" />
-                            <div className="home-plan-node home-plan-node-sms">
-                                <Mail size={30} />
-                            </div>
-                            <div className="home-plan-link" />
-                            <div className="home-plan-node home-plan-node-end">
-                                <CircleDot size={24} />
-                                <span className="home-plan-node-end-text">END</span>
-                            </div>
-                        </div>
+                        <div className="home-cost-date">2026-08-27</div>
                     </div>
                 </div>
             </div>
