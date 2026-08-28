@@ -60,7 +60,7 @@ function ResendToggle({
         <div className="home-card-toggle">
             <span className="home-card-toggle-label">补发短信</span>
             <div className="home-card-toggle-options">
-                {[false, true].map((value) => (
+                {[true, false].map((value) => (
                     <label
                         key={String(value)}
                         className={`home-card-toggle-option${checked === value ? ' active' : ''}`}
@@ -110,7 +110,7 @@ function CardHead({
 
 export default function HomePage() {
     const [activeTab, setActiveTab] = useState<string>('home');
-    const [includeResend, setIncludeResend] = useState(false);
+    const [includeResend, setIncludeResend] = useState(true);
 
     const sms = includeResend ? STATS_SMS.withResend : STATS_SMS.base;
     const plan = includeResend ? STATS_PLAN.withResend : STATS_PLAN.base;
