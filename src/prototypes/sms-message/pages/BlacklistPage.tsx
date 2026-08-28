@@ -316,7 +316,7 @@ function ExpireDatePicker({
 }
 
 function BlacklistTable({
-    filters,
+    filters, searchForm,
     onAdd,
     onImport,
     onDetail,
@@ -325,6 +325,7 @@ function BlacklistTable({
     onExportSelected,
 }: {
     filters: BlacklistFilter | null;
+    searchForm: React.ReactNode;
     onAdd: () => void;
     onImport: () => void;
     onDetail: (row: BlacklistRow) => void;
@@ -353,7 +354,7 @@ function BlacklistTable({
             if (endDate && date > endDate) return false;
             return true;
         });
-    }, [filters, rows]);
+    }, [filters, searchForm, rows]);
 
     useEffect(() => {
         setPage(1);
@@ -432,6 +433,7 @@ function BlacklistTable({
 
     return (
         <div className="sms-card sms-table-card blacklist-card">
+            {searchForm}
             <div className="sms-toolbar">
                 <span className="blacklist-table-title">黑名单列表</span>
                 <div className="sms-toolbar-right">
@@ -1244,25 +1246,25 @@ export default function BlacklistPage() {
                     </div>
                 </div>
                 {activeTab === 'list' ? (
-                    <>
-                        <SearchForm
-                            draft={draft}
-                            onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
-                            onQuery={handleQuery}
-                            onReset={handleReset}
-                        />
-                        <BlacklistTable
-                            filters={applied}
+                    <BlacklistTable
+                        filters={applied}
+                        searchForm={
+                            <SearchForm
+                                draft={draft}
+                                onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+                                onQuery={handleQuery}
+                                onReset={handleReset}
+                            />
+                        }
                         onAdd={() => setAddVisible(true)}
                         onImport={() => setImportVisible(true)}
                         onDetail={(row) => setDetailTarget(row)}
                         onExport={() => setExportVisible(true)}
                         onToast={showToast}
-                            onExportSelected={() => {
-                                setExportVisible(true);
-                            }}
-                        />
-                    </>
+                        onExportSelected={() => {
+                            setExportVisible(true);
+                        }}
+                    />
                 ) : (
                     <ImportBatchPanel />
                 )}
