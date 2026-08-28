@@ -183,10 +183,6 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
                                         <div className="sms-form-control">{renderSelect(undefined, ['是', '否'])}</div>
                                     </div>
                                     <div className="sms-form-item">
-                                        <label className="sms-form-label">存在补发控制</label>
-                                        <div className="sms-form-control">{renderSelect(undefined, ['是', '否'], 'sms-control-purple')}</div>
-                                    </div>
-                                    <div className="sms-form-item">
                                         <label className="sms-form-label">操作人</label>
                                         <div className="sms-form-control">
                                             <input className="sms-input" placeholder="请输入" />
