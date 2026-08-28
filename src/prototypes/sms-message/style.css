@@ -4996,20 +4996,33 @@ button {
     padding-left: 12px;
 }
 
+.home-card-toggle-options {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border: 1px solid #d0d6e0;
+    border-radius: 6px;
+    background: #f7f8fa;
+}
+
 .home-card-toggle-option {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 24px;
-    padding: 0 10px;
-    border: 1px solid #d0d6e0;
-    border-radius: 12px;
-    background: #ffffff;
+    padding: 0 12px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
     color: var(--text-secondary);
     font-size: 12px;
     cursor: pointer;
     user-select: none;
-    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-card-toggle-option:hover {
+    background: #eceff3;
 }
 
 .home-card-toggle-option input {
@@ -5017,9 +5030,10 @@ button {
 }
 
 .home-card-toggle-option.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: #ffffff;
+    background: #ffffff;
+    color: var(--primary);
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(30, 45, 75, 0.1);
 }
 
 .home-cost-chart {

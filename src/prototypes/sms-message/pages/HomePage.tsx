@@ -59,20 +59,22 @@ function ResendToggle({
     return (
         <div className="home-card-toggle">
             <span className="home-card-toggle-label">补发短信</span>
-            {[false, true].map((value) => (
-                <label
-                    key={String(value)}
-                    className={`home-card-toggle-option${checked === value ? ' active' : ''}`}
-                >
-                    <input
-                        type="radio"
-                        name="includeResend"
-                        checked={checked === value}
-                        onChange={() => onChange(value)}
-                    />
-                    {value ? '包含' : '不包含'}
-                </label>
-            ))}
+            <div className="home-card-toggle-options">
+                {[false, true].map((value) => (
+                    <label
+                        key={String(value)}
+                        className={`home-card-toggle-option${checked === value ? ' active' : ''}`}
+                    >
+                        <input
+                            type="radio"
+                            name="includeResend"
+                            checked={checked === value}
+                            onChange={() => onChange(value)}
+                        />
+                        {value ? '包含' : '不包含'}
+                    </label>
+                ))}
+            </div>
         </div>
     );
 }
