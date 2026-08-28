@@ -581,6 +581,7 @@ button {
     align-items: center;
     justify-content: space-between;
     padding: 0 16px 16px;
+    margin-bottom: 24px;
 }
 
 .sms-toolbar-right {
@@ -3324,6 +3325,7 @@ button {
 .resend-section > .sms-toolbar {
     padding: 0 0 14px;
     border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 24px;
 }
 
 .resend-rule-title-wrap {
@@ -3942,6 +3944,9 @@ button {
 }
 
 .blacklist-table th {
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 600;
     background: #fafafa;
     color: var(--text-secondary);
     font-weight: 500;
@@ -5430,4 +5435,12 @@ button {
     gap: 10px;
     padding: 12px 20px;
     border-top: 1px solid var(--border-soft);
+}
+
+.blacklist-status-tag {
+    background-color: #ecfdf5;
+    color: #065f46;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
 }

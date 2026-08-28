@@ -544,11 +544,11 @@ function BlacklistTable({
                                 <td className="blacklist-col-status">
                                     {row.status === 'active' ? (
                                         <BlacklistTooltip text="参与补发 / 发送拦截">
-                                            <span className="sms-status sms-status-success">生效中</span>
+                                            <span className="blacklist-status-tag">生效中</span>
                                         </BlacklistTooltip>
                                     ) : (
                                         <BlacklistTooltip text="不再参与拦截">
-                                            <span className="sms-status sms-status-unknown">已失效</span>
+                                            <span className="blacklist-status-tag">已失效</span>
                                         </BlacklistTooltip>
                                     )}
                                 </td>
@@ -832,7 +832,7 @@ const IMPORT_STATUS_LABEL: Record<ImportBatchStatus, string> = {
 const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
     pending: 'blacklist-import-status-pending',
     processing: 'blacklist-import-status-processing',
-    completed: 'blacklist-import-status-completed',
+    completed: 'blacklist-status-tag',
     failed: 'blacklist-import-status-failed',
 };
 
@@ -907,7 +907,7 @@ function ImportBatchPanel() {
                                         <td>{b.total.toLocaleString()}</td>
                                         <td>{b.submittedAt}</td>
                                         <td>
-                                            <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[b.status]}`}>
+                                            <span className="blacklist-status-tag">
                                                 {IMPORT_STATUS_LABEL[b.status]}
                                             </span>
                                         </td>
@@ -1249,7 +1249,7 @@ export default function BlacklistPage() {
                     <BlacklistTable
                         filters={applied}
                         searchForm={
-                            <SearchForm
+                            <div className="search-form"><SearchForm
                                 draft={draft}
                                 onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
                                 onQuery={handleQuery}
