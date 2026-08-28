@@ -4438,7 +4438,7 @@ button {
 }
 
 .blacklist-import-drawer {
-    width: min(900px, calc(100vw - 96px));
+    width: min(760px, calc(100vw - 96px));
     height: calc(100vh - 64px);
     margin: 32px 0;
     border-radius: 8px;
@@ -4506,7 +4506,7 @@ button {
 
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table {
     width: 100%;
-    min-width: 780px;
+    min-width: 680px;
     table-layout: auto;
 }
 
@@ -4579,17 +4579,6 @@ button {
 
 .blacklist-import-batch-simulate {
     margin-top: 12px;
-}
-
-.blacklist-import-batch-detail {
-    width: 560px;
-    max-width: 92vw;
-}
-
-.blacklist-import-batch-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 16px;
 }
 
 .export-format-tip {

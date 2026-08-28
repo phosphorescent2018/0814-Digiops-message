@@ -846,7 +846,6 @@ const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
 
 function ImportBatchPanel() {
     const [batches, setBatches] = useState<ImportBatch[]>(initialImportBatches);
-    const [detail, setDetail] = useState<ImportBatch | null>(null);
     const [simulating, setSimulating] = useState(false);
 
     useEffect(() => {
@@ -881,31 +880,29 @@ function ImportBatchPanel() {
         setSimulating(true);
     };
 
-    const openDetail = (batch: ImportBatch) => setDetail({ ...batch });
-
     return (
-        <>
-            <div className="blacklist-import-batch-body">
-                <div className="blacklist-import-batch-tip">
-                    <Info size={14} />
-                    <span>按时间查看批量导入任务的处理进度与结果。</span>
-                </div>
-                <div className="blacklist-import-batch-table">
-                    <table className="sms-table">
-                        <thead>
-                            <tr>
-                                <th>批次 ID</th>
-                                <th>文件名</th>
-                                <th>提交时间</th>
-                                <th>状态</th>
-                                <th>成功 / 跳过 / 覆盖</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {batches.map((b) => (
+        <div className="blacklist-import-batch-body">
+            <div className="blacklist-import-batch-tip">
+                <Info size={14} />
+                <span>按时间查看批量导入任务的处理进度与结果。</span>
+            </div>
+            <div className="blacklist-import-batch-table">
+                <table className="sms-table">
+                    <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>提交时间</th>
+                            <th>状态</th>
+                            <th>成功</th>
+                            <th>跳过</th>
+                            <th>覆盖</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {batches.map((b) => {
+                            const hasResult = b.status === 'completed' || b.status === 'failed';
+                            return (
                                 <tr key={b.id}>
-                                    <td>{b.id}</td>
                                     <td className="blacklist-import-batch-file">{b.fileName}</td>
                                     <td>{b.submittedAt}</td>
                                     <td>
@@ -913,90 +910,21 @@ function ImportBatchPanel() {
                                             {IMPORT_STATUS_LABEL[b.status]}
                                         </span>
                                     </td>
-                                    <td>
-                                        {b.status === 'completed' || b.status === 'failed'
-                                            ? `${b.successCount.toLocaleString()} / ${b.skipCount.toLocaleString()} / ${b.overwriteCount.toLocaleString()}`
-                                            : '—'}
-                                    </td>
-                                    <td>
-                                        <button type="button" className="sms-action-link" onClick={() => openDetail(b)}>
-                                            详情
-                                        </button>
-                                    </td>
+                                    <td>{hasResult ? b.successCount.toLocaleString() : '-'}</td>
+                                    <td>{hasResult ? b.skipCount.toLocaleString() : '-'}</td>
+                                    <td>{hasResult ? b.overwriteCount.toLocaleString() : '-'}</td>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                {!simulating && (
-                    <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
-                        模拟新建批次
-                    </button>
-                )}
+                            );
+                        })}
+                    </tbody>
+                </table>
             </div>
-            {detail &&
-                createPortal(
-                    <div className="sms-mask" onClick={() => setDetail(null)}>
-                        <div className="sms-modal blacklist-modal blacklist-import-batch-detail" onClick={(e) => e.stopPropagation()}>
-                            <div className="sms-modal-header">批次详情</div>
-                            <div className="sms-modal-body">
-                                <div className="blacklist-import-batch-detail-grid">
-                                    <div>
-                                        <span className="blacklist-detail-label">批次 ID</span>
-                                        <span className="blacklist-detail-value">{detail.id}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">文件名</span>
-                                        <span className="blacklist-detail-value">{detail.fileName}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">总条数</span>
-                                        <span className="blacklist-detail-value">{detail.total.toLocaleString()}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">提交时间</span>
-                                        <span className="blacklist-detail-value">{detail.submittedAt}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">状态</span>
-                                        <span className="blacklist-detail-value">
-                                            <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[detail.status]}`}>
-                                                {IMPORT_STATUS_LABEL[detail.status]}
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">完成时间</span>
-                                        <span className="blacklist-detail-value">{detail.completedAt || '—'}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">成功条数</span>
-                                        <span className="blacklist-detail-value">{detail.successCount.toLocaleString()}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">跳过条数</span>
-                                        <span className="blacklist-detail-value">{detail.skipCount.toLocaleString()}</span>
-                                    </div>
-                                    <div>
-                                        <span className="blacklist-detail-label">覆盖条数</span>
-                                        <span className="blacklist-detail-value">{detail.overwriteCount.toLocaleString()}</span>
-                                    </div>
-                                    <div className="blacklist-detail-full">
-                                        <span className="blacklist-detail-label">失败原因</span>
-                                        <span className="blacklist-detail-value">{detail.failReason || '—'}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="sms-modal-actions">
-                                <button type="button" className="sms-btn sms-btn-primary" onClick={() => setDetail(null)}>
-                                    关闭
-                                </button>
-                            </div>
-                        </div>
-                    </div>,
-                    document.body
-                )}
-        </>
+            {!simulating && (
+                <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
+                    模拟新建批次
+                </button>
+            )}
+        </div>
     );
 }
 

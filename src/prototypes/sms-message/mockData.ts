@@ -375,7 +375,7 @@ export interface ImportBatch {
 export const initialImportBatches: ImportBatch[] = [
     {
         id: 'B20260828001',
-        fileName: '黑名单全量导出_20260827.xlsx',
+        fileName: '全量名单.xlsx',
         total: 1284700,
         submittedAt: '2026-08-28 10:02:18',
         status: 'completed',
@@ -387,7 +387,7 @@ export const initialImportBatches: ImportBatch[] = [
     },
     {
         id: 'B20260828002',
-        fileName: 'UG_新增拉黑_20260828.csv',
+        fileName: '新增名单.csv',
         total: 860000,
         submittedAt: '2026-08-28 11:20:03',
         status: 'processing',
@@ -399,7 +399,7 @@ export const initialImportBatches: ImportBatch[] = [
     },
     {
         id: 'B20260827001',
-        fileName: '历史黑名单修复_20260827.xlsx',
+        fileName: '历史名单.xlsx',
         total: 1000000,
         submittedAt: '2026-08-27 15:40:26',
         status: 'failed',
@@ -412,7 +412,7 @@ export const initialImportBatches: ImportBatch[] = [
     },
     {
         id: 'B20260826001',
-        fileName: '临时拉黑活动_20260826.xlsx',
+        fileName: '临时拉黑.xlsx',
         total: 320000,
         submittedAt: '2026-08-26 09:15:47',
         status: 'pending',
