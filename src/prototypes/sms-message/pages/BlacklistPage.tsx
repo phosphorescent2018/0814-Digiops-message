@@ -19,7 +19,13 @@ import {
     CheckCircle2,
     FileSpreadsheet,
 } from 'lucide-react';
-import { blacklistRows, type BlacklistRow } from '../mockData';
+import {
+    blacklistRows,
+    initialImportBatches,
+    type BlacklistRow,
+    type ImportBatch,
+    type ImportBatchStatus,
+} from '../mockData';
 import ExportModal from '../components/ExportModal';
 
 const PAGE_SIZE = 10;
@@ -313,6 +319,7 @@ function BlacklistTable({
     filters,
     onAdd,
     onImport,
+    onImportBatch,
     onDetail,
     onExport,
     onToast,
@@ -321,6 +328,7 @@ function BlacklistTable({
     filters: BlacklistFilter | null;
     onAdd: () => void;
     onImport: () => void;
+    onImportBatch: () => void;
     onDetail: (row: BlacklistRow) => void;
     onExport: () => void;
     onToast: (text: string, warn?: boolean) => void;
@@ -429,6 +437,10 @@ function BlacklistTable({
             <div className="sms-toolbar">
                 <span className="blacklist-table-title">黑名单列表</span>
                 <div className="sms-toolbar-right">
+                    <button type="button" className="sms-btn" onClick={onImportBatch}>
+                        <FileSpreadsheet size={14} />
+                        导入批次
+                    </button>
                     <button type="button" className="sms-btn" onClick={onImport}>
                         <Upload size={14} />
                         批量导入
@@ -755,7 +767,7 @@ function ImportModal({ onClose }: { onClose: () => void }) {
                     <div className="blacklist-file-drop">
                         <FileSpreadsheet size={28} />
                         <span>点击选择或拖拽文件到此处</span>
-                            <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；每次仅允许上传 1 万条</span>
+                            <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；单次最多 100 万条，100 万条约需 30 分钟</span>
                             <button type="button" className="sms-btn">
                                 选择文件
                             </button>
@@ -808,6 +820,186 @@ function ImportModal({ onClose }: { onClose: () => void }) {
                 <div className="resend-toast">
                     <CheckCircle2 size={15} />
                     {templateTip}
+                </div>
+            )}
+        </div>
+    );
+}
+
+const IMPORT_STATUS_LABEL: Record<ImportBatchStatus, string> = {
+    pending: '待处理',
+    processing: '处理中',
+    completed: '已完成',
+    failed: '失败',
+};
+
+const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
+    pending: 'blacklist-import-status-pending',
+    processing: 'blacklist-import-status-processing',
+    completed: 'blacklist-import-status-completed',
+    failed: 'blacklist-import-status-failed',
+};
+
+function ImportBatchModal({ onClose }: { onClose: () => void }) {
+    const [batches, setBatches] = useState<ImportBatch[]>(initialImportBatches);
+    const [detail, setDetail] = useState<ImportBatch | null>(null);
+    const [simulating, setSimulating] = useState(false);
+
+    useEffect(() => {
+        if (!simulating) return;
+        const timer = window.setTimeout(() => {
+            setBatches((prev) =>
+                prev.map((b) => {
+                    if (b.id !== 'B20260826001') return b;
+                    if (b.status === 'pending') {
+                        return { ...b, status: 'processing' as const, submittedAt: '2026-08-26 09:15:47' };
+                    }
+                    if (b.status === 'processing') {
+                        return {
+                            ...b,
+                            status: 'completed' as const,
+                            completedAt: '2026-08-26 09:45:32',
+                            successCount: 318500,
+                            skipCount: 1100,
+                            overwriteCount: 400,
+                            failCount: 0,
+                        };
+                    }
+                    return b;
+                })
+            );
+        }, 4000);
+        return () => window.clearTimeout(timer);
+    }, [simulating]);
+
+    const startSimulate = () => {
+        if (simulating) return;
+        setSimulating(true);
+    };
+
+    const openDetail = (batch: ImportBatch) => setDetail({ ...batch });
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div className="sms-modal blacklist-modal blacklist-import-batch-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header">导入批次</div>
+                <div className="sms-modal-body">
+                    <div className="blacklist-import-batch-tip">
+                        <Info size={14} />
+                        <span>100 万条约需 30 分钟，可在本页查看导入进度。</span>
+                    </div>
+                    <div className="blacklist-import-batch-table">
+                        <table className="sms-table">
+                            <thead>
+                                <tr>
+                                    <th>批次 ID</th>
+                                    <th>文件名</th>
+                                    <th>总条数</th>
+                                    <th>提交时间</th>
+                                    <th>状态</th>
+                                    <th>成功 / 跳过 / 覆盖</th>
+                                    <th>完成时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {batches.map((b) => (
+                                    <tr key={b.id}>
+                                        <td>{b.id}</td>
+                                        <td className="blacklist-import-batch-file">{b.fileName}</td>
+                                        <td>{b.total.toLocaleString()}</td>
+                                        <td>{b.submittedAt}</td>
+                                        <td>
+                                            <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[b.status]}`}>
+                                                {IMPORT_STATUS_LABEL[b.status]}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {b.status === 'completed' || b.status === 'failed'
+                                                ? `${b.successCount.toLocaleString()} / ${b.skipCount.toLocaleString()} / ${b.overwriteCount.toLocaleString()}`
+                                                : '—'}
+                                        </td>
+                                        <td>{b.completedAt || '—'}</td>
+                                        <td>
+                                            <button type="button" className="sms-action-link" onClick={() => openDetail(b)}>
+                                                详情
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {!simulating && (
+                        <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
+                            模拟新建批次
+                        </button>
+                    )}
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onClose}>
+                        关闭
+                    </button>
+                </div>
+            </div>
+            {detail && (
+                <div className="sms-mask" onClick={() => setDetail(null)}>
+                    <div className="sms-modal blacklist-modal blacklist-import-batch-detail" onClick={(e) => e.stopPropagation()}>
+                        <div className="sms-modal-header">批次详情</div>
+                        <div className="sms-modal-body">
+                            <div className="blacklist-import-batch-detail-grid">
+                                <div>
+                                    <span className="blacklist-detail-label">批次 ID</span>
+                                    <span className="blacklist-detail-value">{detail.id}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">文件名</span>
+                                    <span className="blacklist-detail-value">{detail.fileName}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">总条数</span>
+                                    <span className="blacklist-detail-value">{detail.total.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">提交时间</span>
+                                    <span className="blacklist-detail-value">{detail.submittedAt}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">状态</span>
+                                    <span className="blacklist-detail-value">
+                                        <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[detail.status]}`}>
+                                            {IMPORT_STATUS_LABEL[detail.status]}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">完成时间</span>
+                                    <span className="blacklist-detail-value">{detail.completedAt || '—'}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">成功条数</span>
+                                    <span className="blacklist-detail-value">{detail.successCount.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">跳过条数</span>
+                                    <span className="blacklist-detail-value">{detail.skipCount.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                    <span className="blacklist-detail-label">覆盖条数</span>
+                                    <span className="blacklist-detail-value">{detail.overwriteCount.toLocaleString()}</span>
+                                </div>
+                                <div className="blacklist-detail-full">
+                                    <span className="blacklist-detail-label">失败原因</span>
+                                    <span className="blacklist-detail-value">{detail.failReason || '—'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sms-modal-actions">
+                            <button type="button" className="sms-btn sms-btn-primary" onClick={() => setDetail(null)}>
+                                关闭
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
@@ -988,6 +1180,7 @@ export default function BlacklistPage() {
     const [exportVisible, setExportVisible] = useState(false);
     const [addVisible, setAddVisible] = useState(false);
     const [importVisible, setImportVisible] = useState(false);
+    const [importBatchVisible, setImportBatchVisible] = useState(false);
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
     const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
     const [applied, setApplied] = useState<BlacklistFilter | null>(null);
@@ -1057,6 +1250,7 @@ export default function BlacklistPage() {
                     filters={applied}
                     onAdd={() => setAddVisible(true)}
                     onImport={() => setImportVisible(true)}
+                    onImportBatch={() => setImportBatchVisible(true)}
                     onDetail={(row) => setDetailTarget(row)}
                     onExport={() => setExportVisible(true)}
                     onToast={showToast}
@@ -1079,6 +1273,7 @@ export default function BlacklistPage() {
             )}
             {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
+            {importBatchVisible && <ImportBatchModal onClose={() => setImportBatchVisible(false)} />}
             {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
             {toast && (
                 <div className={`resend-toast${toast.warn ? ' warn' : ''}`}>

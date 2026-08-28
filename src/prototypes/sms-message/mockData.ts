@@ -354,3 +354,72 @@ export const blacklistRows: BlacklistRow[] = [
     { index: 11, phone: '2567****6789', businessId: 'MTN_UG_Account_id', addTime: '2026-08-05 12:08:31', effectiveTime: '2026-08-05 12:08:31', expireTime: '2026-08-12 23:59:59', status: 'expired', remark: 'xxxxx' },
     { index: 12, phone: '2567****0123', businessId: 'MTN_UG_Product_id', addTime: '2026-08-04 09:14:57', effectiveTime: '2026-08-04 09:14:57', expireTime: '永久', status: 'active', remark: 'xxxxx' },
 ];
+
+/** 黑名单导入批次：状态机 待处理 → 处理中 → 已完成 / 失败 */
+export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface ImportBatch {
+    id: string;
+    fileName: string;
+    total: number;
+    submittedAt: string;
+    status: ImportBatchStatus;
+    completedAt: string;
+    successCount: number;
+    skipCount: number;
+    overwriteCount: number;
+    failCount: number;
+    failReason?: string;
+}
+
+export const initialImportBatches: ImportBatch[] = [
+    {
+        id: 'B20260828001',
+        fileName: '黑名单全量导出_20260827.xlsx',
+        total: 1284700,
+        submittedAt: '2026-08-28 10:02:18',
+        status: 'completed',
+        completedAt: '2026-08-28 10:31:45',
+        successCount: 1268300,
+        skipCount: 8900,
+        overwriteCount: 6800,
+        failCount: 700,
+    },
+    {
+        id: 'B20260828002',
+        fileName: 'UG_新增拉黑_20260828.csv',
+        total: 860000,
+        submittedAt: '2026-08-28 11:20:03',
+        status: 'processing',
+        completedAt: '',
+        successCount: 0,
+        skipCount: 0,
+        overwriteCount: 0,
+        failCount: 0,
+    },
+    {
+        id: 'B20260827001',
+        fileName: '历史黑名单修复_20260827.xlsx',
+        total: 1000000,
+        submittedAt: '2026-08-27 15:40:26',
+        status: 'failed',
+        completedAt: '2026-08-27 15:42:11',
+        successCount: 214300,
+        skipCount: 1200,
+        overwriteCount: 0,
+        failCount: 784500,
+        failReason: '文件第 214301 行手机号码格式异常，任务中断',
+    },
+    {
+        id: 'B20260826001',
+        fileName: '临时拉黑活动_20260826.xlsx',
+        total: 320000,
+        submittedAt: '2026-08-26 09:15:47',
+        status: 'pending',
+        completedAt: '',
+        successCount: 0,
+        skipCount: 0,
+        overwriteCount: 0,
+        failCount: 0,
+    },
+];

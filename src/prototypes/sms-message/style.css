@@ -4401,6 +4401,84 @@ button {
     margin-right: 0;
 }
 
+.blacklist-import-batch-modal {
+    width: 840px;
+    max-width: 94vw;
+}
+
+.blacklist-import-batch-tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: #e8f4ff;
+    border: 1px solid #b7e3ff;
+    color: #0050b3;
+    font-size: 13px;
+}
+
+.blacklist-import-batch-table {
+    overflow-x: auto;
+}
+
+.blacklist-import-batch-table .sms-table th,
+.blacklist-import-batch-table .sms-table td {
+    white-space: nowrap;
+}
+
+.blacklist-import-batch-file {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.blacklist-import-status {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.blacklist-import-status-pending {
+    background: #f0f2f5;
+    color: #6b7280;
+}
+
+.blacklist-import-status-processing {
+    background: #e6f4ff;
+    color: #1677ff;
+}
+
+.blacklist-import-status-completed {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.blacklist-import-status-failed {
+    background: #fff1f0;
+    color: #cf1322;
+}
+
+.blacklist-import-batch-simulate {
+    margin-top: 12px;
+}
+
+.blacklist-import-batch-detail {
+    width: 560px;
+    max-width: 92vw;
+}
+
+.blacklist-import-batch-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+}
+
 .export-format-tip {
     margin: -8px 0 16px 120px;
     font-size: 12px;
