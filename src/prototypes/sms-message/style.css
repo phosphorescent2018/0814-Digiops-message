@@ -4971,3 +4971,159 @@ button {
 .home-card-num-blue {
     color: var(--primary);
 }
+
+/* 首页卡片：开关 / 间距 / 费用 / 运营计划流程 */
+.home-card-gap {
+    margin-top: 16px;
+}
+
+.home-card-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-card-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.home-card-toggle input {
+    display: none;
+}
+
+.home-card-toggle-track {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: #d9d9d9;
+    transition: background 0.2s ease;
+}
+
+.home-card-toggle input:checked + .home-card-toggle-track {
+    background: var(--primary);
+}
+
+.home-card-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.home-card-toggle input:checked + .home-card-toggle-track .home-card-toggle-thumb {
+    transform: translateX(16px);
+}
+
+.home-ring-circle-cost {
+    background: conic-gradient(#52c41a 0% 40%, #f0f2f5 40% 100%);
+}
+
+.home-ring-percent-cost {
+    color: #52c41a;
+}
+
+.home-plan-body {
+    padding: 24px 0 8px;
+}
+
+.home-plan-stats {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 24px;
+}
+
+.home-plan-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.home-card-dot-success {
+    background: #52c41a;
+}
+
+.home-plan-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 32px 24px;
+    justify-content: center;
+}
+
+.home-plan-node {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.home-plan-node-start {
+    background: #8c9bb5;
+}
+
+.home-plan-node-wait {
+    background: #f5a623;
+}
+
+.home-plan-node-group {
+    background: #52c41a;
+    border-radius: 10px;
+}
+
+.home-plan-node-sms {
+    background: #4a90e2;
+    border-radius: 10px;
+}
+
+.home-plan-node-end {
+    background: #8c9bb5;
+    width: 56px;
+    height: 56px;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.home-plan-node-end-text {
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.home-plan-link {
+    width: 72px;
+    height: 2px;
+    background: #c9ced8;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.home-plan-link::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid #c9ced8;
+}
