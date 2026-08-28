@@ -68,8 +68,8 @@ const MENU: MenuItem[] = [
             { label: '应用推送' },
         ],
     },
-    { icon: Gift, label: '活动' },
-    { icon: Settings, label: '系统管理' },
+    { icon: Gift, label: '活动', children: ['优惠券'] },
+    { icon: Settings, label: '系统管理', children: ['权限管理'] },
 ];
 
 function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?: (page: AppPage) => void }) {

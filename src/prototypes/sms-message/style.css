@@ -4735,3 +4735,239 @@ button {
     border-top: 1px solid var(--border-soft);
     flex-shrink: 0;
 }
+
+/* ================================================================
+   首页（Digiops UAT /home）
+   ================================================================ */
+
+.home-page {
+    padding: 16px 24px 24px;
+    min-height: calc(100vh - var(--header-height) - 32px);
+}
+
+.home-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 12px 0 0;
+    border-bottom: 1px solid #eef0f5;
+    overflow-x: auto;
+}
+
+.home-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid #eef0f5;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #ffffff;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.home-tab:hover {
+    background: #f7f9fc;
+    color: var(--text-main);
+}
+
+.home-tab.active {
+    color: var(--primary-active);
+    font-weight: 500;
+}
+
+.home-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: var(--primary-active);
+    border-radius: 3px 3px 0 0;
+}
+
+.home-tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    color: #98a1b8;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.home-tab-close:hover {
+    background: #e8eaf0;
+    color: var(--text-main);
+}
+
+.home-tab.home-tab-purple {
+    background: #ede7f6;
+    animation: sms-tab-breathe 3s ease-in-out infinite;
+}
+
+.home-tab.home-tab-purple:hover {
+    animation: none;
+    background: #e3ddf2;
+}
+
+.home-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 14px 0 10px;
+}
+
+.home-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.home-content {
+    margin-top: 4px;
+}
+
+.home-card {
+    background: #ffffff;
+    border: 1px solid #eef0f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(30, 45, 75, 0.06);
+    padding: 20px 24px;
+}
+
+.home-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.home-card-title {
+    position: relative;
+    padding-left: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 24px;
+}
+
+.home-card-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 2px;
+    width: 4px;
+    border-radius: 2px;
+    background: var(--primary);
+}
+
+.home-card-date {
+    margin-top: 4px;
+    padding-left: 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.home-card-more {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.home-card-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 40px 0 24px;
+}
+
+.home-ring {
+    width: 148px;
+    height: 148px;
+    flex-shrink: 0;
+}
+
+.home-ring-circle {
+    width: 148px;
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: conic-gradient(#d6e6f7 0% 100%, #ffffff 0);
+    box-shadow: inset 0 0 0 14px #ffffff;
+}
+
+.home-ring-center {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.home-ring-percent {
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.home-ring-count {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.home-card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 160px;
+}
+
+.home-card-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.home-card-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.home-card-dot-gray {
+    background: #8c8c8c;
+}
+
+.home-card-dot-blue {
+    background: var(--primary);
+}
+
+.home-card-num {
+    color: var(--text-main);
+}
+
+.home-card-num-blue {
+    color: var(--primary);
+}

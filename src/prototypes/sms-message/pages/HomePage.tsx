@@ -9,24 +9,26 @@ import {
     Maximize2,
     MoreVertical,
     ChevronDown,
-    Monitor,
+    LayoutGrid,
 } from 'lucide-react';
 
 interface HomeTab {
     key: string;
     label: string;
-    purple?: boolean;
 }
 
 const HOME_TABS: HomeTab[] = [
-    { key: 'home', label: '首页', purple: true },
+    { key: 'home', label: '首页' },
     { key: 'sms', label: '短信' },
     { key: 'plan', label: '运营计划管理' },
     { key: 'call', label: '电销' },
     { key: 'voice', label: '智能语音' },
     { key: 'whatsapp', label: 'WhatsApp' },
-    { key: 'userTag', label: '用户标签', purple: true },
+    { key: 'userTag', label: '用户标签' },
 ];
+
+/** 本次增强的首页页签：淡紫色呼吸 */
+const PURPLE_HOME_TABS = ['home', 'blacklist'];
 
 export default function HomePage() {
     const [activeTab, setActiveTab] = useState<string>('home');
@@ -38,18 +40,21 @@ export default function HomePage() {
                     <div
                         key={tab.key}
                         className={`home-tab${activeTab === tab.key ? ' active' : ''}${
-                            tab.purple ? ' home-tab-purple' : ''
+                            PURPLE_HOME_TABS.includes(tab.key) ? ' home-tab-purple' : ''
                         }`}
                         onClick={() => setActiveTab(tab.key)}
                     >
                         {tab.label}
-                        {activeTab === tab.key && <span className="home-tab-close">×</span>}
+                        {activeTab !== tab.key && <span className="home-tab-close">×</span>}
                     </div>
                 ))}
             </div>
 
             <div className="home-toolbar">
                 <div className="home-toolbar-right">
+                    <button type="button" className="sms-btn sms-btn-icon" title="视图">
+                        <LayoutGrid size={15} />
+                    </button>
                     <button type="button" className="sms-btn sms-btn-primary">
                         <Plus size={14} />
                         新建
@@ -61,9 +66,6 @@ export default function HomePage() {
                     <button type="button" className="sms-btn sms-btn-icon" title="全屏">
                         <Maximize2 size={15} />
                     </button>
-                    <span className="home-toolbar-screen">
-                        <Monitor size={15} />
-                    </span>
                 </div>
             </div>
 
