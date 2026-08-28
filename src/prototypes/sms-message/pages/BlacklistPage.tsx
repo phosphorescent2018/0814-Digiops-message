@@ -205,7 +205,6 @@ function SearchForm({
                     </button>
                 </div>
             </div>
-            <div className="blacklist-search-divider" />
         </div>
     );
 }
