@@ -28,8 +28,8 @@ const HOME_TABS: HomeTab[] = [{ key: 'home', label: '首页' }];
 const PURPLE_HOME_TABS = ['home'];
 
 const STATS_SMS = {
-    base: { total: 12847, success: 11203, percent: 87, count: 0 },
-    withResend: { total: 14362, success: 12580, percent: 88, count: 1515 },
+    base: { total: 12847, success: 11203, percent: 87 },
+    withResend: { total: 14362, success: 12580, percent: 88 },
 };
 
 const STATS_PLAN = {
@@ -49,7 +49,7 @@ const STATS_PLAN = {
     },
 };
 
-function IncludeResendSwitch({
+function ResendToggle({
     checked,
     onChange,
 }: {
@@ -57,17 +57,23 @@ function IncludeResendSwitch({
     onChange: (v: boolean) => void;
 }) {
     return (
-        <label className="home-card-toggle">
-            <input
-                type="checkbox"
-                checked={checked}
-                onChange={(e) => onChange(e.target.checked)}
-            />
-            <span className="home-card-toggle-track">
-                <span className="home-card-toggle-thumb" />
-            </span>
-            <span className="home-card-toggle-label">是否包含补发短信</span>
-        </label>
+        <div className="home-card-toggle">
+            <span className="home-card-toggle-label">补发短信</span>
+            {[false, true].map((value) => (
+                <label
+                    key={String(value)}
+                    className={`home-card-toggle-option${checked === value ? ' active' : ''}`}
+                >
+                    <input
+                        type="radio"
+                        name="includeResend"
+                        checked={checked === value}
+                        onChange={() => onChange(value)}
+                    />
+                    {value ? '包含' : '不包含'}
+                </label>
+            ))}
+        </div>
     );
 }
 
@@ -89,7 +95,7 @@ function CardHead({
                 <div className="home-card-date">{date}</div>
             </div>
             <div className="home-card-head-actions">
-                <IncludeResendSwitch checked={checked} onChange={onToggle} />
+                <ResendToggle checked={checked} onChange={onToggle} />
                 <button type="button" className="home-card-more" title="更多">
                     <MoreVertical size={14} />
                 </button>
@@ -154,7 +160,7 @@ export default function HomePage() {
                             <div className="home-ring-circle">
                                 <div className="home-ring-center">
                                     <div className="home-ring-percent">{sms.percent}%</div>
-                                    <div className="home-ring-count">（{sms.count.toLocaleString()}）</div>
+                                    <div className="home-ring-count">（{sms.total.toLocaleString()}）</div>
                                 </div>
                             </div>
                         </div>
