@@ -18,6 +18,8 @@ import {
     Info,
     CheckCircle2,
     FileSpreadsheet,
+    History,
+    X,
 } from 'lucide-react';
 import {
     blacklistRows,
@@ -319,6 +321,7 @@ function BlacklistTable({
     filters, searchForm,
     onAdd,
     onImport,
+    onImportHistory,
     onDetail,
     onExport,
     onToast,
@@ -328,6 +331,7 @@ function BlacklistTable({
     searchForm: React.ReactNode;
     onAdd: () => void;
     onImport: () => void;
+    onImportHistory: () => void;
     onDetail: (row: BlacklistRow) => void;
     onExport: () => void;
     onToast: (text: string, warn?: boolean) => void;
@@ -440,6 +444,10 @@ function BlacklistTable({
                     <button type="button" className="sms-btn" onClick={onImport}>
                         <Upload size={14} />
                         批量导入
+                    </button>
+                    <button type="button" className="sms-btn" onClick={onImportHistory}>
+                        <History size={14} />
+                        导入记录
                     </button>
                     <button type="button" className="sms-btn sms-btn-primary" onClick={onAdd}>
                         <Plus size={14} />
@@ -832,7 +840,7 @@ const IMPORT_STATUS_LABEL: Record<ImportBatchStatus, string> = {
 const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
     pending: 'blacklist-import-status-pending',
     processing: 'blacklist-import-status-processing',
-    completed: 'blacklist-status-tag',
+    completed: 'blacklist-import-status-completed',
     failed: 'blacklist-import-status-failed',
 };
 
@@ -876,124 +884,119 @@ function ImportBatchPanel() {
     const openDetail = (batch: ImportBatch) => setDetail({ ...batch });
 
     return (
-        <div className="sms-card sms-table-card blacklist-card blacklist-import-batch-panel">
-            <div className="sms-toolbar">
-                <span className="blacklist-table-title">导入批次</span>
-            </div>
+        <>
             <div className="blacklist-import-batch-body">
                 <div className="blacklist-import-batch-tip">
                     <Info size={14} />
-                    <span>可在本页查看导入进度。</span>
+                    <span>按时间查看批量导入任务的处理进度与结果。</span>
                 </div>
                 <div className="blacklist-import-batch-table">
-                        <table className="sms-table">
-                            <thead>
-                                <tr>
-                                    <th>批次 ID</th>
-                                    <th>文件名</th>
-                                    <th>总条数</th>
-                                    <th>提交时间</th>
-                                    <th>状态</th>
-                                    <th>成功 / 跳过 / 覆盖</th>
-                                    <th>完成时间</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {batches.map((b) => (
-                                    <tr key={b.id}>
-                                        <td>{b.id}</td>
-                                        <td className="blacklist-import-batch-file">{b.fileName}</td>
-                                        <td>{b.total.toLocaleString()}</td>
-                                        <td>{b.submittedAt}</td>
-                                        <td>
-                                            <span className="blacklist-status-tag">
-                                                {IMPORT_STATUS_LABEL[b.status]}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {b.status === 'completed' || b.status === 'failed'
-                                                ? `${b.successCount.toLocaleString()} / ${b.skipCount.toLocaleString()} / ${b.overwriteCount.toLocaleString()}`
-                                                : '—'}
-                                        </td>
-                                        <td>{b.completedAt || '—'}</td>
-                                        <td>
-                                            <button type="button" className="sms-action-link" onClick={() => openDetail(b)}>
-                                                详情
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {!simulating && (
-                        <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
-                            模拟新建批次
-                        </button>
-                    )}
-                </div>
-            {detail && (
-                <div className="sms-mask" onClick={() => setDetail(null)}>
-                    <div className="sms-modal blacklist-modal blacklist-import-batch-detail" onClick={(e) => e.stopPropagation()}>
-                        <div className="sms-modal-header">批次详情</div>
-                        <div className="sms-modal-body">
-                            <div className="blacklist-import-batch-detail-grid">
-                                <div>
-                                    <span className="blacklist-detail-label">批次 ID</span>
-                                    <span className="blacklist-detail-value">{detail.id}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">文件名</span>
-                                    <span className="blacklist-detail-value">{detail.fileName}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">总条数</span>
-                                    <span className="blacklist-detail-value">{detail.total.toLocaleString()}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">提交时间</span>
-                                    <span className="blacklist-detail-value">{detail.submittedAt}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">状态</span>
-                                    <span className="blacklist-detail-value">
-                                        <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[detail.status]}`}>
-                                            {IMPORT_STATUS_LABEL[detail.status]}
+                    <table className="sms-table">
+                        <thead>
+                            <tr>
+                                <th>批次 ID</th>
+                                <th>文件名</th>
+                                <th>提交时间</th>
+                                <th>状态</th>
+                                <th>成功 / 跳过 / 覆盖</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {batches.map((b) => (
+                                <tr key={b.id}>
+                                    <td>{b.id}</td>
+                                    <td className="blacklist-import-batch-file">{b.fileName}</td>
+                                    <td>{b.submittedAt}</td>
+                                    <td>
+                                        <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[b.status]}`}>
+                                            {IMPORT_STATUS_LABEL[b.status]}
                                         </span>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">完成时间</span>
-                                    <span className="blacklist-detail-value">{detail.completedAt || '—'}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">成功条数</span>
-                                    <span className="blacklist-detail-value">{detail.successCount.toLocaleString()}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">跳过条数</span>
-                                    <span className="blacklist-detail-value">{detail.skipCount.toLocaleString()}</span>
-                                </div>
-                                <div>
-                                    <span className="blacklist-detail-label">覆盖条数</span>
-                                    <span className="blacklist-detail-value">{detail.overwriteCount.toLocaleString()}</span>
-                                </div>
-                                <div className="blacklist-detail-full">
-                                    <span className="blacklist-detail-label">失败原因</span>
-                                    <span className="blacklist-detail-value">{detail.failReason || '—'}</span>
+                                    </td>
+                                    <td>
+                                        {b.status === 'completed' || b.status === 'failed'
+                                            ? `${b.successCount.toLocaleString()} / ${b.skipCount.toLocaleString()} / ${b.overwriteCount.toLocaleString()}`
+                                            : '—'}
+                                    </td>
+                                    <td>
+                                        <button type="button" className="sms-action-link" onClick={() => openDetail(b)}>
+                                            详情
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {!simulating && (
+                    <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
+                        模拟新建批次
+                    </button>
+                )}
+            </div>
+            {detail &&
+                createPortal(
+                    <div className="sms-mask" onClick={() => setDetail(null)}>
+                        <div className="sms-modal blacklist-modal blacklist-import-batch-detail" onClick={(e) => e.stopPropagation()}>
+                            <div className="sms-modal-header">批次详情</div>
+                            <div className="sms-modal-body">
+                                <div className="blacklist-import-batch-detail-grid">
+                                    <div>
+                                        <span className="blacklist-detail-label">批次 ID</span>
+                                        <span className="blacklist-detail-value">{detail.id}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">文件名</span>
+                                        <span className="blacklist-detail-value">{detail.fileName}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">总条数</span>
+                                        <span className="blacklist-detail-value">{detail.total.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">提交时间</span>
+                                        <span className="blacklist-detail-value">{detail.submittedAt}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">状态</span>
+                                        <span className="blacklist-detail-value">
+                                            <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[detail.status]}`}>
+                                                {IMPORT_STATUS_LABEL[detail.status]}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">完成时间</span>
+                                        <span className="blacklist-detail-value">{detail.completedAt || '—'}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">成功条数</span>
+                                        <span className="blacklist-detail-value">{detail.successCount.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">跳过条数</span>
+                                        <span className="blacklist-detail-value">{detail.skipCount.toLocaleString()}</span>
+                                    </div>
+                                    <div>
+                                        <span className="blacklist-detail-label">覆盖条数</span>
+                                        <span className="blacklist-detail-value">{detail.overwriteCount.toLocaleString()}</span>
+                                    </div>
+                                    <div className="blacklist-detail-full">
+                                        <span className="blacklist-detail-label">失败原因</span>
+                                        <span className="blacklist-detail-value">{detail.failReason || '—'}</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div className="sms-modal-actions">
+                                <button type="button" className="sms-btn sms-btn-primary" onClick={() => setDetail(null)}>
+                                    关闭
+                                </button>
+                            </div>
                         </div>
-                        <div className="sms-modal-actions">
-                            <button type="button" className="sms-btn sms-btn-primary" onClick={() => setDetail(null)}>
-                                关闭
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+                    </div>,
+                    document.body
+                )}
+        </>
     );
 }
 
@@ -1171,11 +1174,20 @@ export default function BlacklistPage() {
     const [exportVisible, setExportVisible] = useState(false);
     const [addVisible, setAddVisible] = useState(false);
     const [importVisible, setImportVisible] = useState(false);
-    const [activeTab, setActiveTab] = useState<'list' | 'batch'>('list');
+    const [importHistoryVisible, setImportHistoryVisible] = useState(false);
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
     const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
     const [applied, setApplied] = useState<BlacklistFilter | null>(null);
     const [toast, setToast] = useState<{ text: string; warn?: boolean } | null>(null);
+
+    useEffect(() => {
+        if (!importHistoryVisible) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setImportHistoryVisible(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [importHistoryVisible]);
 
     const showToast = (text: string, warn = false) => {
         setToast({ text, warn });
@@ -1231,46 +1243,62 @@ export default function BlacklistPage() {
             </div>
 
             <div className="blacklist-section">
-                <div className="blacklist-tabs sms-tabs">
-                    <div
-                        className={`sms-tab${activeTab === 'list' ? ' active' : ''}`}
-                        onClick={() => setActiveTab('list')}
-                    >
-                        黑名单列表
-                    </div>
-                    <div
-                        className={`sms-tab${activeTab === 'batch' ? ' active' : ''}`}
-                        onClick={() => setActiveTab('batch')}
-                    >
-                        导入批次
-                    </div>
-                </div>
-                {activeTab === 'list' ? (
-                    <BlacklistTable
-                        filters={applied}
-                        searchForm={
-                            <div className="search-form">
-                                <SearchForm
-                                    draft={draft}
-                                    onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
-                                    onQuery={handleQuery}
-                                    onReset={handleReset}
-                                />
-                            </div>
-                        }
-                        onAdd={() => setAddVisible(true)}
-                        onImport={() => setImportVisible(true)}
-                        onDetail={(row) => setDetailTarget(row)}
-                        onExport={() => setExportVisible(true)}
-                        onToast={showToast}
-                        onExportSelected={() => {
-                            setExportVisible(true);
-                        }}
-                    />
-                ) : (
-                    <ImportBatchPanel />
-                )}
+                <BlacklistTable
+                    filters={applied}
+                    searchForm={
+                        <div className="search-form">
+                            <SearchForm
+                                draft={draft}
+                                onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+                                onQuery={handleQuery}
+                                onReset={handleReset}
+                            />
+                        </div>
+                    }
+                    onAdd={() => setAddVisible(true)}
+                    onImport={() => setImportVisible(true)}
+                    onImportHistory={() => setImportHistoryVisible(true)}
+                    onDetail={(row) => setDetailTarget(row)}
+                    onExport={() => setExportVisible(true)}
+                    onToast={showToast}
+                    onExportSelected={() => {
+                        setExportVisible(true);
+                    }}
+                />
             </div>
+
+            {importHistoryVisible && (
+                <div className="sms-mask blacklist-import-drawer-mask" onClick={() => setImportHistoryVisible(false)}>
+                    <aside
+                        className="blacklist-import-drawer"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="导入记录"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="blacklist-import-drawer-header">
+                            <div className="blacklist-import-drawer-heading">
+                                <History size={17} />
+                                <div>
+                                    <div className="blacklist-import-drawer-title">导入记录</div>
+                                    <div className="blacklist-import-drawer-subtitle">查看批量导入任务的处理进度与结果</div>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="blacklist-import-drawer-close"
+                                onClick={() => setImportHistoryVisible(false)}
+                                title="关闭"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="blacklist-import-drawer-body">
+                            <ImportBatchPanel />
+                        </div>
+                    </aside>
+                </div>
+            )}
 
             {exportVisible && (
                 <ExportModal
