@@ -3860,7 +3860,8 @@ button {
 }
 
 .blacklist-search {
-    padding: 12px 24px 0;
+    padding: 16px 24px 0;
+    border-bottom: 1px solid var(--border-soft);
 }
 
 .blacklist-search .sms-form-item {
@@ -3879,6 +3880,12 @@ button {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.blacklist-search-divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 0 0 16px;
 }
 
 .blacklist-search .sms-date-range {

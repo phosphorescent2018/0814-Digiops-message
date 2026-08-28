@@ -137,7 +137,7 @@ function SearchForm({
     onReset: () => void;
 }) {
     return (
-        <div className="sms-card sms-search blacklist-search">
+        <div className="blacklist-search">
             <div className="sms-search-grid">
                 <div className="sms-form-item">
                     <label className="sms-form-label">手机号码</label>
@@ -205,6 +205,7 @@ function SearchForm({
                     </button>
                 </div>
             </div>
+            <div className="blacklist-search-divider" />
         </div>
     );
 }
