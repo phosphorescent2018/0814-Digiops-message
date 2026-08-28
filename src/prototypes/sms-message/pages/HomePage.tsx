@@ -10,6 +10,11 @@ import {
     MoreVertical,
     ChevronDown,
     LayoutGrid,
+    PlayCircle,
+    Timer,
+    Users,
+    Mail,
+    CircleDot,
 } from 'lucide-react';
 
 interface HomeTab {
@@ -25,6 +30,23 @@ const PURPLE_HOME_TABS = ['home'];
 const STATS_SMS = {
     base: { total: 12847, success: 11203, percent: 87, count: 0 },
     withResend: { total: 14362, success: 12580, percent: 88, count: 1515 },
+};
+
+const STATS_PLAN = {
+    base: {
+        start: 12847,
+        wait: 12847,
+        group: 12580,
+        sms: 11203,
+        end: 11203,
+    },
+    withResend: {
+        start: 14362,
+        wait: 14362,
+        group: 13950,
+        sms: 12580,
+        end: 12580,
+    },
 };
 
 function IncludeResendSwitch({
@@ -81,6 +103,7 @@ export default function HomePage() {
     const [includeResend, setIncludeResend] = useState(false);
 
     const sms = includeResend ? STATS_SMS.withResend : STATS_SMS.base;
+    const plan = includeResend ? STATS_PLAN.withResend : STATS_PLAN.base;
 
     return (
         <div className="home-page">
@@ -167,6 +190,43 @@ export default function HomePage() {
                             </svg>
                         </div>
                         <div className="home-cost-date">2026-08-27</div>
+                    </div>
+                </div>
+
+                {/* 运营计划 */}
+                <div className="home-card home-card-gap">
+                    <CardHead
+                        title="运营计划"
+                        date="2026-08-27 至 2026-08-27"
+                        checked={includeResend}
+                        onToggle={setIncludeResend}
+                    />
+                    <div className="home-plan-flow">
+                        <div className="home-plan-node home-plan-node-start">
+                            <PlayCircle size={30} />
+                            <span className="home-plan-count">{plan.start.toLocaleString()}</span>
+                        </div>
+                        <div className="home-plan-link" />
+                        <div className="home-plan-node home-plan-node-wait">
+                            <Timer size={30} />
+                            <span className="home-plan-count">{plan.wait.toLocaleString()}</span>
+                        </div>
+                        <div className="home-plan-link" />
+                        <div className="home-plan-node home-plan-node-group">
+                            <Users size={30} />
+                            <span className="home-plan-count">{plan.group.toLocaleString()}</span>
+                        </div>
+                        <div className="home-plan-link" />
+                        <div className="home-plan-node home-plan-node-sms">
+                            <Mail size={30} />
+                            <span className="home-plan-count">{plan.sms.toLocaleString()}</span>
+                        </div>
+                        <div className="home-plan-link" />
+                        <div className="home-plan-node home-plan-node-end">
+                            <CircleDot size={22} />
+                            <span className="home-plan-node-end-text">END</span>
+                            <span className="home-plan-count">{plan.end.toLocaleString()}</span>
+                        </div>
                     </div>
                 </div>
             </div>

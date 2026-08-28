@@ -5066,3 +5066,79 @@ button {
     color: var(--text-muted);
     font-size: 13px;
 }
+
+.home-plan-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 24px 16px;
+}
+
+.home-plan-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.home-plan-node-start {
+    background: #8c9bb5;
+}
+
+.home-plan-node-wait {
+    background: #f5a623;
+}
+
+.home-plan-node-group {
+    background: #52c41a;
+    border-radius: 12px;
+}
+
+.home-plan-node-sms {
+    background: #4a90e2;
+    border-radius: 12px;
+}
+
+.home-plan-node-end {
+    background: #8c9bb5;
+    width: 72px;
+    height: 72px;
+}
+
+.home-plan-node-end-text {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.home-plan-count {
+    font-size: 12px;
+    line-height: 1;
+}
+
+.home-plan-link {
+    width: 64px;
+    height: 2px;
+    background: #c9ced8;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 35px;
+}
+
+.home-plan-link::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -4px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid #c9ced8;
+}
