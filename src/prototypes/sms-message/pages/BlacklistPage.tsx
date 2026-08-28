@@ -319,7 +319,6 @@ function BlacklistTable({
     filters,
     onAdd,
     onImport,
-    onImportBatch,
     onDetail,
     onExport,
     onToast,
@@ -328,7 +327,6 @@ function BlacklistTable({
     filters: BlacklistFilter | null;
     onAdd: () => void;
     onImport: () => void;
-    onImportBatch: () => void;
     onDetail: (row: BlacklistRow) => void;
     onExport: () => void;
     onToast: (text: string, warn?: boolean) => void;
@@ -437,10 +435,6 @@ function BlacklistTable({
             <div className="sms-toolbar">
                 <span className="blacklist-table-title">黑名单列表</span>
                 <div className="sms-toolbar-right">
-                    <button type="button" className="sms-btn" onClick={onImportBatch}>
-                        <FileSpreadsheet size={14} />
-                        导入批次
-                    </button>
                     <button type="button" className="sms-btn" onClick={onImport}>
                         <Upload size={14} />
                         批量导入
@@ -841,6 +835,7 @@ const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
 };
 
 function ImportBatchModal({ onClose }: { onClose: () => void }) {
+function ImportBatchPanel() {
     const [batches, setBatches] = useState<ImportBatch[]>(initialImportBatches);
     const [detail, setDetail] = useState<ImportBatch | null>(null);
     const [simulating, setSimulating] = useState(false);
@@ -880,15 +875,16 @@ function ImportBatchModal({ onClose }: { onClose: () => void }) {
     const openDetail = (batch: ImportBatch) => setDetail({ ...batch });
 
     return (
-        <div className="sms-mask" onClick={onClose}>
-            <div className="sms-modal blacklist-modal blacklist-import-batch-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="sms-modal-header">导入批次</div>
-                <div className="sms-modal-body">
-                    <div className="blacklist-import-batch-tip">
-                        <Info size={14} />
-                        <span>100 万条约需 30 分钟，可在本页查看导入进度。</span>
-                    </div>
-                    <div className="blacklist-import-batch-table">
+        <div className="sms-card sms-table-card blacklist-card blacklist-import-batch-panel">
+            <div className="sms-toolbar">
+                <span className="blacklist-table-title">导入批次</span>
+            </div>
+            <div className="blacklist-import-batch-body">
+                <div className="blacklist-import-batch-tip">
+                    <Info size={14} />
+                    <span>100 万条约需 30 分钟，可在本页查看导入进度。</span>
+                </div>
+                <div className="blacklist-import-batch-table">
                         <table className="sms-table">
                             <thead>
                                 <tr>
@@ -935,11 +931,6 @@ function ImportBatchModal({ onClose }: { onClose: () => void }) {
                             模拟新建批次
                         </button>
                     )}
-                </div>
-                <div className="sms-modal-actions">
-                    <button type="button" className="sms-btn sms-btn-primary" onClick={onClose}>
-                        关闭
-                    </button>
                 </div>
             </div>
             {detail && (
@@ -1180,7 +1171,7 @@ export default function BlacklistPage() {
     const [exportVisible, setExportVisible] = useState(false);
     const [addVisible, setAddVisible] = useState(false);
     const [importVisible, setImportVisible] = useState(false);
-    const [importBatchVisible, setImportBatchVisible] = useState(false);
+    const [activeTab, setActiveTab] = useState<'list' | 'batch'>('list');
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
     const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
     const [applied, setApplied] = useState<BlacklistFilter | null>(null);
@@ -1246,18 +1237,35 @@ export default function BlacklistPage() {
                     onQuery={handleQuery}
                     onReset={handleReset}
                 />
-                <BlacklistTable
-                    filters={applied}
-                    onAdd={() => setAddVisible(true)}
-                    onImport={() => setImportVisible(true)}
-                    onImportBatch={() => setImportBatchVisible(true)}
-                    onDetail={(row) => setDetailTarget(row)}
-                    onExport={() => setExportVisible(true)}
-                    onToast={showToast}
-                    onExportSelected={(count) => {
-                        setExportVisible(true);
-                    }}
-                />
+                <div className="blacklist-tabs sms-tabs">
+                    <div
+                        className={`sms-tab${activeTab === 'list' ? ' active' : ''}`}
+                        onClick={() => setActiveTab('list')}
+                    >
+                        黑名单列表
+                    </div>
+                    <div
+                        className={`sms-tab${activeTab === 'batch' ? ' active' : ''}`}
+                        onClick={() => setActiveTab('batch')}
+                    >
+                        导入批次
+                    </div>
+                </div>
+                {activeTab === 'list' ? (
+                    <BlacklistTable
+                        filters={applied}
+                        onAdd={() => setAddVisible(true)}
+                        onImport={() => setImportVisible(true)}
+                        onDetail={(row) => setDetailTarget(row)}
+                        onExport={() => setExportVisible(true)}
+                        onToast={showToast}
+                        onExportSelected={() => {
+                            setExportVisible(true);
+                        }}
+                    />
+                ) : (
+                    <ImportBatchPanel />
+                )}
             </div>
 
             {exportVisible && (
@@ -1273,7 +1281,6 @@ export default function BlacklistPage() {
             )}
             {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
-            {importBatchVisible && <ImportBatchModal onClose={() => setImportBatchVisible(false)} />}
             {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
             {toast && (
                 <div className={`resend-toast${toast.warn ? ' warn' : ''}`}>
