@@ -28,7 +28,7 @@ interface LayoutProps {
     onNavigate?: (page: AppPage) => void;
 }
 
-export type AppPage = 'sms' | 'plan' | 'blacklist';
+export type AppPage = 'sms' | 'plan' | 'blacklist' | 'home';
 
 interface MenuChild {
     label: string;
@@ -43,7 +43,7 @@ interface MenuItem {
 }
 
 const MENU: MenuItem[] = [
-    { icon: Home, label: '首页' },
+    { icon: Home, label: '首页', page: 'home' },
     {
         icon: Users,
         label: '用户管理',
@@ -98,8 +98,14 @@ function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?:
                             <div
                                 className={`sms-menu-item${itemActive ? ' active' : ''}${
                                     item.children ? ` open${expanded[item.label] ? ' expanded' : ''}` : ''
-                                }`}
-                                onClick={item.children ? () => toggleMenu(item.label) : undefined}
+                                }${item.page === 'home' ? ' sms-menu-item-purple' : ''}`}
+                                onClick={
+                                    item.children
+                                        ? () => toggleMenu(item.label)
+                                        : item.page
+                                            ? () => onNavigate?.(item.page!)
+                                            : undefined
+                                }
                             >
                                 <item.icon className="sms-menu-icon" size={18} strokeWidth={1.8} />
                                 <span>{item.label}</span>
@@ -113,7 +119,7 @@ function Sidebar({ activePage, onNavigate }: { activePage: AppPage; onNavigate?:
                                         const childLabel = typeof child === 'string' ? child : child.label;
                                         const childPage = typeof child === 'object' ? child.page : undefined;
                                         const childActive = childPage ? activePage === childPage : false;
-                                        const purple = childPage === 'sms' || childPage === 'plan';
+                                        const purple = childPage === 'sms' || childPage === 'plan' || childPage === 'blacklist';
                                         return (
                                             <div
                                                 key={childLabel}

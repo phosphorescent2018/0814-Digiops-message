@@ -147,6 +147,16 @@ button {
     color: var(--primary);
 }
 
+.sms-menu-item.sms-menu-item-purple {
+    background: #ede7f6;
+    animation: sms-tab-breathe 3s ease-in-out infinite;
+}
+
+.sms-menu-item.sms-menu-item-purple:hover {
+    animation: none;
+    background: #e3ddf2;
+}
+
 .sms-menu-sub {
     background: #fafbfd;
     border-left: 2px solid transparent;
