@@ -49,6 +49,25 @@ const STATS_PLAN = {
     },
 };
 
+const STATS_COST_DAILY = {
+    base: [
+        { day: '08-22', value: 890.5 },
+        { day: '08-23', value: 1020.25 },
+        { day: '08-24', value: 960.75 },
+        { day: '08-25', value: 1180.4 },
+        { day: '08-26', value: 1350.2 },
+        { day: '08-27', value: 1280.6 },
+    ],
+    withResend: [
+        { day: '08-22', value: 990.5 },
+        { day: '08-23', value: 1140.25 },
+        { day: '08-24', value: 1080.75 },
+        { day: '08-25', value: 1310.4 },
+        { day: '08-26', value: 1490.2 },
+        { day: '08-27', value: 1420.6 },
+    ],
+};
+
 function PlanCountBubble({ value }: { value: number }) {
     const [expanded, setExpanded] = useState(false);
     const short = value >= 1000 ? `${Math.round(value / 100) / 10}K` : String(value);
@@ -128,6 +147,16 @@ export default function HomePage() {
 
     const sms = includeResend ? STATS_SMS.withResend : STATS_SMS.base;
     const plan = includeResend ? STATS_PLAN.withResend : STATS_PLAN.base;
+    const costDaily = includeResend ? STATS_COST_DAILY.withResend : STATS_COST_DAILY.base;
+    const costMax = Math.max(...costDaily.map((d) => d.value)) * 1.15;
+    const costPoints = costDaily
+        .map((d, i) => {
+            const x = (i / (costDaily.length - 1)) * 100;
+            const y = 100 - (d.value / costMax) * 88;
+            return `${x},${y}`;
+        })
+        .join(' ');
+    const costArea = `0,100 ${costPoints} 100,100`;
 
     return (
         <div className="home-page">
@@ -207,13 +236,34 @@ export default function HomePage() {
                     />
                     <div className="home-cost-chart">
                         <div className="home-cost-line">
-                            <span className="home-cost-num">0</span>
-                            <svg className="home-cost-svg" viewBox="0 0 600 80" preserveAspectRatio="none">
-                                <line x1="0" y1="40" x2="600" y2="40" className="home-cost-dash" />
-                                <circle cx="56" cy="40" r="4" className="home-cost-dot" />
+                            <div className="home-cost-y">
+                                <span>UGX</span>
+                                <span>{Math.round(costMax).toLocaleString()}</span>
+                                <span>0</span>
+                            </div>
+                            <svg className="home-cost-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="costAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#1890ff" stopOpacity="0.22" />
+                                        <stop offset="100%" stopColor="#1890ff" stopOpacity="0.02" />
+                                    </linearGradient>
+                                </defs>
+                                <line x1="0" y1="12" x2="100" y2="12" className="home-cost-grid" />
+                                <line x1="0" y1="56" x2="100" y2="56" className="home-cost-grid" />
+                                <polygon points={costArea} fill="url(#costAreaGrad)" />
+                                <polyline points={costPoints} className="home-cost-line-path" />
+                                {costDaily.map((d, i) => {
+                                    const x = (i / (costDaily.length - 1)) * 100;
+                                    const y = 100 - (d.value / costMax) * 88;
+                                    return <circle key={d.day} cx={x} cy={y} r="1.6" className="home-cost-point" />;
+                                })}
                             </svg>
                         </div>
-                        <div className="home-cost-date">2026-08-27</div>
+                        <div className="home-cost-x">
+                            {costDaily.map((d) => (
+                                <span key={d.day}>{d.day}</span>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
