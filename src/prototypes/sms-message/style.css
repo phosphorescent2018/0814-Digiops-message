@@ -4577,10 +4577,6 @@ button {
     color: #cf1322;
 }
 
-.blacklist-import-batch-simulate {
-    margin-top: 12px;
-}
-
 .export-format-tip {
     margin: -8px 0 16px 120px;
     font-size: 12px;

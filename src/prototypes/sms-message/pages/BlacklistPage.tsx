@@ -845,40 +845,7 @@ const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
 };
 
 function ImportBatchPanel() {
-    const [batches, setBatches] = useState<ImportBatch[]>(initialImportBatches);
-    const [simulating, setSimulating] = useState(false);
-
-    useEffect(() => {
-        if (!simulating) return;
-        const timer = window.setTimeout(() => {
-            setBatches((prev) =>
-                prev.map((b) => {
-                    if (b.id !== 'B20260826001') return b;
-                    if (b.status === 'pending') {
-                        return { ...b, status: 'processing' as const, submittedAt: '2026-08-26 09:15:47' };
-                    }
-                    if (b.status === 'processing') {
-                        return {
-                            ...b,
-                            status: 'completed' as const,
-                            completedAt: '2026-08-26 09:45:32',
-                            successCount: 318500,
-                            skipCount: 1100,
-                            overwriteCount: 400,
-                            failCount: 0,
-                        };
-                    }
-                    return b;
-                })
-            );
-        }, 4000);
-        return () => window.clearTimeout(timer);
-    }, [simulating]);
-
-    const startSimulate = () => {
-        if (simulating) return;
-        setSimulating(true);
-    };
+    const batches = initialImportBatches;
 
     return (
         <div className="blacklist-import-batch-body">
@@ -919,11 +886,6 @@ function ImportBatchPanel() {
                     </tbody>
                 </table>
             </div>
-            {!simulating && (
-                <button type="button" className="sms-btn sms-btn-primary blacklist-import-batch-simulate" onClick={startSimulate}>
-                    模拟新建批次
-                </button>
-            )}
         </div>
     );
 }
