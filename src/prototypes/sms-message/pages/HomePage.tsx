@@ -49,6 +49,20 @@ const STATS_PLAN = {
     },
 };
 
+function PlanCountBubble({ value }: { value: number }) {
+    const [expanded, setExpanded] = useState(false);
+    const short = value >= 1000 ? `${Math.round(value / 100) / 10}K` : String(value);
+    return (
+        <span
+            className="home-plan-bubble"
+            title={expanded ? short : value.toLocaleString()}
+            onClick={() => setExpanded((v) => !v)}
+        >
+            {expanded ? value.toLocaleString() : short}
+        </span>
+    );
+}
+
 function ResendToggle({
     checked,
     onChange,
@@ -214,28 +228,28 @@ export default function HomePage() {
                     <div className="home-plan-flow">
                         <div className="home-plan-node home-plan-node-start">
                             <PlayCircle size={30} />
-                            <span className="home-plan-count">{plan.start.toLocaleString()}</span>
+                            <PlanCountBubble value={plan.start} />
                         </div>
                         <div className="home-plan-link" />
                         <div className="home-plan-node home-plan-node-wait">
                             <Timer size={30} />
-                            <span className="home-plan-count">{plan.wait.toLocaleString()}</span>
+                            <PlanCountBubble value={plan.wait} />
                         </div>
                         <div className="home-plan-link" />
                         <div className="home-plan-node home-plan-node-group">
                             <Users size={30} />
-                            <span className="home-plan-count">{plan.group.toLocaleString()}</span>
+                            <PlanCountBubble value={plan.group} />
                         </div>
                         <div className="home-plan-link" />
                         <div className="home-plan-node home-plan-node-sms">
                             <Mail size={30} />
-                            <span className="home-plan-count">{plan.sms.toLocaleString()}</span>
+                            <PlanCountBubble value={plan.sms} />
                         </div>
                         <div className="home-plan-link" />
                         <div className="home-plan-node home-plan-node-end">
                             <CircleDot size={22} />
                             <span className="home-plan-node-end-text">END</span>
-                            <span className="home-plan-count">{plan.end.toLocaleString()}</span>
+                            <PlanCountBubble value={plan.end} />
                         </div>
                     </div>
                 </div>
