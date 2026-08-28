@@ -761,7 +761,7 @@ function ImportModal({ onClose }: { onClose: () => void }) {
                     <div className="blacklist-file-drop">
                         <FileSpreadsheet size={28} />
                         <span>点击选择或拖拽文件到此处</span>
-                            <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；单次最多 100 万条，100 万条约需 30 分钟</span>
+                    <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；单次最多 100 万条</span>
                             <button type="button" className="sms-btn">
                                 选择文件
                             </button>
@@ -834,7 +834,6 @@ const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
     failed: 'blacklist-import-status-failed',
 };
 
-function ImportBatchModal({ onClose }: { onClose: () => void }) {
 function ImportBatchPanel() {
     const [batches, setBatches] = useState<ImportBatch[]>(initialImportBatches);
     const [detail, setDetail] = useState<ImportBatch | null>(null);
@@ -882,7 +881,7 @@ function ImportBatchPanel() {
             <div className="blacklist-import-batch-body">
                 <div className="blacklist-import-batch-tip">
                     <Info size={14} />
-                    <span>100 万条约需 30 分钟，可在本页查看导入进度。</span>
+                    <span>可在本页查看导入进度。</span>
                 </div>
                 <div className="blacklist-import-batch-table">
                         <table className="sms-table">
@@ -932,7 +931,6 @@ function ImportBatchPanel() {
                         </button>
                     )}
                 </div>
-            </div>
             {detail && (
                 <div className="sms-mask" onClick={() => setDetail(null)}>
                     <div className="sms-modal blacklist-modal blacklist-import-batch-detail" onClick={(e) => e.stopPropagation()}>
