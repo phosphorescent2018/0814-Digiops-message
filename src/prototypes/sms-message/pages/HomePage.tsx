@@ -19,12 +19,6 @@ interface HomeTab {
 
 const HOME_TABS: HomeTab[] = [
     { key: 'home', label: '首页' },
-    { key: 'sms', label: '短信' },
-    { key: 'plan', label: '运营计划管理' },
-    { key: 'call', label: '电销' },
-    { key: 'voice', label: '智能语音' },
-    { key: 'whatsapp', label: 'WhatsApp' },
-    { key: 'userTag', label: '用户标签' },
 ];
 
 /** 本次增强的首页页签：淡紫色呼吸 */
