@@ -149,14 +149,6 @@ export default function HomePage() {
     const plan = includeResend ? STATS_PLAN.withResend : STATS_PLAN.base;
     const costDaily = includeResend ? STATS_COST_DAILY.withResend : STATS_COST_DAILY.base;
     const costMax = Math.max(...costDaily.map((d) => d.value)) * 1.15;
-    const costPoints = costDaily
-        .map((d, i) => {
-            const x = (i / (costDaily.length - 1)) * 100;
-            const y = 100 - (d.value / costMax) * 88;
-            return `${x},${y}`;
-        })
-        .join(' ');
-    const costArea = `0,100 ${costPoints} 100,100`;
 
     return (
         <div className="home-page">
@@ -235,33 +227,26 @@ export default function HomePage() {
                         onToggle={setIncludeResend}
                     />
                     <div className="home-cost-chart">
-                        <div className="home-cost-line">
-                            <div className="home-cost-y">
-                                <span>UGX</span>
-                                <span>{Math.round(costMax).toLocaleString()}</span>
-                                <span>0</span>
-                            </div>
-                            <svg className="home-cost-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <defs>
-                                    <linearGradient id="costAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#1890ff" stopOpacity="0.22" />
-                                        <stop offset="100%" stopColor="#1890ff" stopOpacity="0.02" />
-                                    </linearGradient>
-                                </defs>
-                                <line x1="0" y1="12" x2="100" y2="12" className="home-cost-grid" />
-                                <line x1="0" y1="56" x2="100" y2="56" className="home-cost-grid" />
-                                <polygon points={costArea} fill="url(#costAreaGrad)" />
-                                <polyline points={costPoints} className="home-cost-line-path" />
-                                {costDaily.map((d, i) => {
-                                    const x = (i / (costDaily.length - 1)) * 100;
-                                    const y = 100 - (d.value / costMax) * 88;
-                                    return <circle key={d.day} cx={x} cy={y} r="1.6" className="home-cost-point" />;
-                                })}
-                            </svg>
+                        <div className="home-cost-y">
+                            <span>UGX</span>
+                            <span>{Math.round(costMax).toLocaleString()}</span>
+                            <span>{Math.round(costMax / 2).toLocaleString()}</span>
+                            <span>0</span>
                         </div>
-                        <div className="home-cost-x">
+                        <div className="home-cost-bars">
                             {costDaily.map((d) => (
-                                <span key={d.day}>{d.day}</span>
+                                <div className="home-cost-bar-item" key={d.day}>
+                                    <span className="home-cost-bar-value">
+                                        {d.value >= 1000 ? `${Math.round(d.value / 100) / 10}K` : Math.round(d.value)}
+                                    </span>
+                                    <div className="home-cost-bar-track">
+                                        <div
+                                            className="home-cost-bar"
+                                            style={{ height: `${Math.max((d.value / costMax) * 100, 3)}%` }}
+                                        />
+                                    </div>
+                                    <span className="home-cost-bar-label">{d.day}</span>
+                                </div>
                             ))}
                         </div>
                     </div>
