@@ -93,9 +93,11 @@ function CardHead({
             <div>
                 <div className="home-card-title">{title}</div>
                 <div className="home-card-date">{date}</div>
+                <div className="home-card-toggle-wrap">
+                    <ResendToggle checked={checked} onChange={onToggle} />
+                </div>
             </div>
             <div className="home-card-head-actions">
-                <ResendToggle checked={checked} onChange={onToggle} />
                 <button type="button" className="home-card-more" title="更多">
                     <MoreVertical size={14} />
                 </button>

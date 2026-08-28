@@ -4991,6 +4991,11 @@ button {
     color: var(--text-secondary);
 }
 
+.home-card-toggle-wrap {
+    margin-top: 12px;
+    padding-left: 12px;
+}
+
 .home-card-toggle-option {
     display: inline-flex;
     align-items: center;
