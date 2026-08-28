@@ -740,6 +740,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
 
 function ImportModal({ onClose }: { onClose: () => void }) {
     const [templateTip, setTemplateTip] = useState('');
+    const [duplicateMode, setDuplicateMode] = useState<'skip' | 'overwrite'>('skip');
 
     const downloadTemplate = () => {
         setTemplateTip('黑名单导入模板下载成功');
@@ -754,14 +755,38 @@ function ImportModal({ onClose }: { onClose: () => void }) {
                     <div className="blacklist-file-drop">
                         <FileSpreadsheet size={28} />
                         <span>点击选择或拖拽文件到此处</span>
-                        <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；每次仅允许上传 1 万条</span>
-                        <button type="button" className="sms-btn">
-                            选择文件
-                        </button>
-                    </div>
-                    <div className="blacklist-import-tip">
-                        导入前请确认号码格式正确，导入后立即生效；已有号码将自动跳过。
-                    </div>
+                            <span className="blacklist-file-hint">支持 .xlsx / .csv，首列为手机号码；每次仅允许上传 1 万条</span>
+                            <button type="button" className="sms-btn">
+                                选择文件
+                            </button>
+                        </div>
+                        <div className="blacklist-import-duplicate">
+                            <span className="blacklist-import-duplicate-label">已存在号码</span>
+                            <label className="blacklist-radio">
+                                <input
+                                    type="radio"
+                                    name="duplicateMode"
+                                    checked={duplicateMode === 'skip'}
+                                    onChange={() => setDuplicateMode('skip')}
+                                />
+                                跳过
+                            </label>
+                            <label className="blacklist-radio">
+                                <input
+                                    type="radio"
+                                    name="duplicateMode"
+                                    checked={duplicateMode === 'overwrite'}
+                                    onChange={() => setDuplicateMode('overwrite')}
+                                />
+                                覆盖
+                            </label>
+                        </div>
+                        <div className="blacklist-import-tip">
+                            导入前请确认号码格式正确，导入后立即生效；
+                            {duplicateMode === 'skip'
+                                ? '已有号码将自动跳过。'
+                                : '已有号码将覆盖更新有效期、备注，生效/失效时间以本次导入为准。'}
+                        </div>
                     <button
                         type="button"
                         className="sms-action-link blacklist-import-template"

@@ -4382,6 +4382,19 @@ button {
     line-height: 1.5;
 }
 
+.blacklist-import-duplicate {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.blacklist-import-duplicate-label {
+    flex-shrink: 0;
+}
+
 .blacklist-import-template {
     display: inline-block;
     margin-top: 12px;
