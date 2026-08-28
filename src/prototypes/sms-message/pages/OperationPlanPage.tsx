@@ -375,7 +375,7 @@ function OperationPlanReportModal({ plan, onClose }: { plan: PlanRow; onClose: (
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="plan-report-header">
-                    <span className="plan-report-title">{plan.id}</span>
+                    <span className="plan-report-title">{plan.name}</span>
                     <button type="button" className="sms-btn sms-btn-icon" onClick={onClose} title="关闭">
                         <X size={16} />
                     </button>
