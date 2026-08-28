@@ -1249,12 +1249,14 @@ export default function BlacklistPage() {
                     <BlacklistTable
                         filters={applied}
                         searchForm={
-                            <div className="search-form"><SearchForm
-                                draft={draft}
-                                onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
-                                onQuery={handleQuery}
-                                onReset={handleReset}
-                            />
+                            <div className="search-form">
+                                <SearchForm
+                                    draft={draft}
+                                    onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+                                    onQuery={handleQuery}
+                                    onReset={handleReset}
+                                />
+                            </div>
                         }
                         onAdd={() => setAddVisible(true)}
                         onImport={() => setImportVisible(true)}
