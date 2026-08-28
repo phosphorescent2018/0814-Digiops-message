@@ -1229,12 +1229,6 @@ export default function BlacklistPage() {
             </div>
 
             <div className="blacklist-section">
-                <SearchForm
-                    draft={draft}
-                    onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
-                    onQuery={handleQuery}
-                    onReset={handleReset}
-                />
                 <div className="blacklist-tabs sms-tabs">
                     <div
                         className={`sms-tab${activeTab === 'list' ? ' active' : ''}`}
@@ -1250,17 +1244,25 @@ export default function BlacklistPage() {
                     </div>
                 </div>
                 {activeTab === 'list' ? (
-                    <BlacklistTable
-                        filters={applied}
+                    <>
+                        <SearchForm
+                            draft={draft}
+                            onDraftChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
+                            onQuery={handleQuery}
+                            onReset={handleReset}
+                        />
+                        <BlacklistTable
+                            filters={applied}
                         onAdd={() => setAddVisible(true)}
                         onImport={() => setImportVisible(true)}
                         onDetail={(row) => setDetailTarget(row)}
                         onExport={() => setExportVisible(true)}
                         onToast={showToast}
-                        onExportSelected={() => {
-                            setExportVisible(true);
-                        }}
-                    />
+                            onExportSelected={() => {
+                                setExportVisible(true);
+                            }}
+                        />
+                    </>
                 ) : (
                     <ImportBatchPanel />
                 )}
