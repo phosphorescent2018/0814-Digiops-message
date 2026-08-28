@@ -16,6 +16,16 @@ import {
     Eye,
     Copy,
     MoreHorizontal,
+    BarChart3,
+    X,
+    Calendar as CalendarIcon,
+    RefreshCw as RefreshIcon,
+    PlayCircle,
+    Timer,
+    Users,
+    Mail,
+    CircleDot,
+    ChevronDown,
 } from 'lucide-react';
 import OperationPlanCanvas from './OperationPlanCanvas';
 
@@ -66,6 +76,7 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
     const [canvasCtx, setCanvasCtx] = useState<{ mode: 'new' | 'edit'; planId: string | null; name: string } | null>(
         null,
     );
+    const [reportTarget, setReportTarget] = useState<PlanRow | null>(null);
 
     const renderSelect = (placeholder = '请选择', options?: string[], className = '') => (
         <select className={`sms-select placeholder${className ? ` ${className}` : ''}`} defaultValue="">
@@ -268,8 +279,8 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
                                                     <button type="button" className="sms-btn sms-btn-icon" title="删除">
                                                         <Trash2 size={15} />
                                                     </button>
-                                                    <button type="button" className="sms-btn sms-btn-icon" title="更多">
-                                                        <MoreHorizontal size={15} />
+                                                    <button type="button" className="sms-btn sms-btn-icon" title="报表" onClick={() => setReportTarget(r)}>
+                                                        <BarChart3 size={15} />
                                                     </button>
                                                 </span>
                                             </td>
@@ -333,6 +344,193 @@ export default function OperationPlanPage({ onOpenBlacklist }: { onOpenBlacklist
                     <span>计划总结</span>
                 </div>
             )}
+
+            {reportTarget && (
+                <OperationPlanReportModal
+                    plan={reportTarget}
+                    onClose={() => setReportTarget(null)}
+                />
+            )}
+        </div>
+    );
+}
+
+function OperationPlanReportModal({ plan, onClose }: { plan: PlanRow; onClose: () => void }) {
+    const [includeResend, setIncludeResend] = useState(true);
+
+    const sms = includeResend
+        ? { total: 14362, success: 12580, percent: 88 }
+        : { total: 12847, success: 11203, percent: 87 };
+    const push = includeResend
+        ? { total: 860, success: 790, percent: 92 }
+        : { total: 720, success: 660, percent: 92 };
+    const flow = includeResend
+        ? { start: 14362, wait: 14362, group: 13950, sms: 12580, end: 12580 }
+        : { start: 12847, wait: 12847, group: 12580, sms: 11203, end: 11203 };
+
+    return (
+        <div className="sms-mask" onClick={onClose}>
+            <div
+                className="sms-modal plan-report-modal"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="plan-report-header">
+                    <span className="plan-report-title">{plan.id}</span>
+                    <button type="button" className="sms-btn sms-btn-icon" onClick={onClose} title="关闭">
+                        <X size={16} />
+                    </button>
+                </div>
+
+                <div className="plan-report-toolbar">
+                    <div className="plan-report-date">
+                        <span className="plan-report-date-label">统计日期：</span>
+                        <span className="plan-report-date-value">2026-08-28</span>
+                        <span className="plan-report-date-sep">—</span>
+                        <span className="plan-report-date-value">2026-08-28</span>
+                        <button type="button" className="sms-btn sms-btn-icon">
+                            <CalendarIcon size={14} />
+                        </button>
+                        <button type="button" className="sms-btn sms-btn-icon">
+                            <RefreshIcon size={14} />
+                        </button>
+                    </div>
+                    <div className="plan-report-total">
+                        延时器中延时总人数：
+                        <span className="plan-report-total-num">
+                            {includeResend ? '12,850' : '12,030'}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="plan-report-toggle">
+                    <span className="plan-report-toggle-label">补发短信</span>
+                    <div className="home-card-toggle-options">
+                        {[true, false].map((value) => (
+                            <label
+                                key={String(value)}
+                                className={`home-card-toggle-option${
+                                    includeResend === value ? ' active' : ''
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="planReportResend"
+                                    checked={includeResend === value}
+                                    onChange={() => setIncludeResend(value)}
+                                />
+                                {value ? '包含' : '不包含'}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="plan-report-body">
+                    <div className="plan-report-chart-row">
+                        <div className="plan-report-chart-card">
+                            <div className="plan-report-chart-title">短信发送数量</div>
+                            <div className="plan-report-chart-content">
+                                <div className="plan-report-legend">
+                                    <div className="plan-report-legend-item">
+                                        <span className="home-card-dot home-card-dot-gray" />
+                                        发送总数：
+                                        <span className="plan-report-num">{sms.total.toLocaleString()}</span>
+                                    </div>
+                                    <div className="plan-report-legend-item">
+                                        <span className="home-card-dot home-card-dot-blue" />
+                                        成功数：
+                                        <span className="plan-report-num">{sms.success.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                <div className="home-ring">
+                                    <div className="home-ring-circle">
+                                        <div className="home-ring-center">
+                                            <div className="home-ring-percent">{sms.percent}%</div>
+                                            <div className="home-ring-count">（0）</div>
+                                            <div className="plan-report-rate">到达率</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="plan-report-chart-card">
+                            <div className="plan-report-chart-title">电销推送数量</div>
+                            <div className="plan-report-chart-content">
+                                <div className="plan-report-legend">
+                                    <div className="plan-report-legend-item">
+                                        <span className="home-card-dot home-card-dot-gray" />
+                                        发送总数：
+                                        <span className="plan-report-num">{push.total.toLocaleString()}</span>
+                                    </div>
+                                    <div className="plan-report-legend-item">
+                                        <span className="home-card-dot home-card-dot-blue" />
+                                        成功数：
+                                        <span className="plan-report-num">{push.success.toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                <div className="home-ring">
+                                    <div className="home-ring-circle">
+                                        <div className="home-ring-center">
+                                            <div className="home-ring-percent">{push.percent}%</div>
+                                            <div className="home-ring-count">（0）</div>
+                                            <div className="plan-report-rate">到达率</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="plan-report-flow-card">
+                        <div className="plan-report-chart-title">运营计划</div>
+                        <div className="plan-report-flow-date">2026.08.28 - 2026.08.28</div>
+                        <div className="plan-report-flow-trigger">
+                            <span>触发时间</span>
+                            <ChevronDown size={13} />
+                        </div>
+                        <div className="home-plan-flow">
+                            <div className="home-plan-node home-plan-node-start">
+                                <PlayCircle size={30} />
+                            </div>
+                            <div className="home-plan-link" />
+                            <div className="home-plan-node home-plan-node-wait">
+                                <Timer size={30} />
+                                <span className="home-plan-node-label">定时触发</span>
+                            </div>
+                            <div className="home-plan-link" />
+                            <div className="home-plan-node home-plan-node-group">
+                                <Users size={30} />
+                                <span className="home-plan-node-label">客户群组</span>
+                                <span className="plan-report-bubble plan-report-bubble-group">
+                                    {flow.group.toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="home-plan-link" />
+                            <div className="home-plan-node home-plan-node-sms">
+                                <Mail size={30} />
+                                <span className="home-plan-node-label">短信</span>
+                                <span className="plan-report-bubble plan-report-bubble-sms">
+                                    {flow.sms.toLocaleString()}
+                                </span>
+                            </div>
+                            <div className="home-plan-link" />
+                            <div className="home-plan-node home-plan-node-end">
+                                <CircleDot size={22} />
+                                <span className="home-plan-node-end-text">END</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="plan-report-footer">
+                    <button type="button" className="sms-btn" onClick={onClose}>
+                        取消
+                    </button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={onClose}>
+                        确定
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

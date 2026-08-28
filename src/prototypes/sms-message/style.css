@@ -5152,3 +5152,229 @@ button {
     border-bottom: 5px solid transparent;
     border-left: 7px solid #c9ced8;
 }
+
+/* 运营计划报表弹窗 */
+.plan-report-modal {
+    width: 920px;
+    max-width: 94vw;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.plan-report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.plan-report-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.plan-report-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 0;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.plan-report-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.plan-report-date-label {
+    color: var(--text-main);
+}
+
+.plan-report-date-value {
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.plan-report-date-sep::after {
+    content: '—';
+    color: var(--text-muted);
+}
+
+.plan-report-total {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.plan-report-total-num {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.plan-report-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px 0;
+}
+
+.plan-report-toggle-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.plan-report-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 20px;
+}
+
+.plan-report-chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.plan-report-chart-card,
+.plan-report-flow-card {
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 16px;
+}
+
+.plan-report-chart-title {
+    position: relative;
+    padding-left: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.plan-report-chart-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 2px;
+    width: 4px;
+    border-radius: 2px;
+    background: var(--primary);
+}
+
+.plan-report-chart-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.plan-report-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.plan-report-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.plan-report-num {
+    margin-left: auto;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.plan-report-rate {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.plan-report-flow-card {
+    position: relative;
+    margin-top: 16px;
+    padding-bottom: 8px;
+}
+
+.plan-report-flow-date {
+    margin-top: 6px;
+    padding-left: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.plan-report-flow-trigger {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #ffffff;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.home-plan-node-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.plan-report-bubble {
+    position: absolute;
+    top: -34px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0063cc;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 99, 204, 0.3);
+}
+
+.plan-report-bubble-group,
+.plan-report-bubble-sms {
+    z-index: 2;
+}
+
+.plan-report-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-soft);
+}
