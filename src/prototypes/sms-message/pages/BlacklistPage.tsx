@@ -870,7 +870,11 @@ function ImportBatchPanel() {
                             const hasResult = b.status === 'completed' || b.status === 'failed';
                             return (
                                 <tr key={b.id}>
-                                    <td className="blacklist-import-batch-file">{b.fileName}</td>
+                                    <td>
+                                        <span className="blacklist-import-batch-file" title={b.fileName}>
+                                            {b.fileName}
+                                        </span>
+                                    </td>
                                     <td>{b.submittedAt}</td>
                                     <td>
                                         <span className={`blacklist-import-status ${IMPORT_STATUS_CLASS[b.status]}`}>

@@ -4542,9 +4542,11 @@ button {
 }
 
 .blacklist-import-batch-file {
-    max-width: 220px;
+    display: block;
+    max-width: 240px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .blacklist-import-status {
