@@ -13,6 +13,7 @@ import {
     ArrowRight,
 } from 'lucide-react';
 import { recordRows, contentTypeOptions, statusOptions } from '../mockData';
+import ExportModal from '../components/ExportModal';
 import type { RecordFilter } from './resend/BatchDetail';
 
 interface RecordPageProps {
@@ -463,6 +464,13 @@ function RecordTable({
     );
 }
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const exportTimeStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+};
+
 export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
     const [view, setView] = useState<RecordView>('original');
@@ -504,39 +512,12 @@ export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPa
             />
 
             {exportVisible && (
-                <div className="sms-mask" onClick={() => setExportVisible(false)}>
-                    <div className="sms-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="sms-modal-header">导出</div>
-                        <div className="sms-modal-body">
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">导出名称</label>
-                                <div className="sms-form-control">
-                                    <input className="sms-input" defaultValue="短信发送记录_20260811_1327" />
-                                </div>
-                            </div>
-                            <div className="sms-form-item">
-                                <label className="sms-form-label">文件格式</label>
-                                <div className="sms-form-control">
-                                    <select className="sms-select" defaultValue="EXECL">
-                                        <option value="EXECL">EXECL</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sms-modal-actions">
-                            <button type="button" className="sms-btn" onClick={() => setExportVisible(false)}>
-                                取消
-                            </button>
-                            <button
-                                type="button"
-                                className="sms-btn sms-btn-primary"
-                                onClick={() => setExportVisible(false)}
-                            >
-                                确定
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ExportModal
+                    visible
+                    requireName
+                    defaultName={`短信发送记录_${exportTimeStr()}`}
+                    onClose={() => setExportVisible(false)}
+                />
             )}
         </div>
     );

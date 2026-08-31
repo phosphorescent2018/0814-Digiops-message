@@ -246,9 +246,9 @@ const nowStr = () => {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
-const todayStr = () => {
+const exportTimeStr = () => {
     const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
 };
 
 const CURRENT_OPERATOR = 'bohua';
@@ -307,8 +307,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [recordEnd, setRecordEnd] = useState('');
     const [recordStatus, setRecordStatus] = useState('');
     const [recordBatchId, setRecordBatchId] = useState('');
-    const exportBatchId = recordBatchId.trim().replace(/^B/i, '') || BATCHES[0]?.id || '补发记录';
-    const exportDefaultName = `${exportBatchId}_${todayStr()}`;
+    const exportDefaultName = `补发记录_${exportTimeStr()}`;
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
@@ -1184,7 +1183,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
             <ExportModal
                 visible={exportVisible}
                 defaultName={exportDefaultName}
-                hideFormat
+                requireName
                 onClose={() => setExportVisible(false)}
             />
         </div>

@@ -3786,6 +3786,93 @@ button {
     padding: 0 24px 24px;
 }
 
+.export-modal {
+    width: 560px;
+    max-width: 92vw;
+}
+
+.export-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.export-modal-close {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.export-modal-close:hover {
+    background: #f0f2f5;
+    color: var(--text-main);
+}
+
+.export-form-item {
+    margin-bottom: 24px;
+}
+
+.export-label {
+    color: var(--text-main);
+}
+
+.export-required {
+    color: #f5222d;
+    margin-right: 3px;
+}
+
+.export-name-wrap {
+    position: relative;
+}
+
+.export-name-input {
+    padding-right: 34px;
+}
+
+.export-name-clear {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: #f0f2f5;
+    color: #98a1b8;
+    cursor: pointer;
+}
+
+.export-name-clear:hover {
+    background: #e5e7eb;
+    color: var(--text-main);
+}
+
+.export-format-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.export-format-radio input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
 .sms-modal .sms-form-item {
     margin-bottom: 20px;
 }

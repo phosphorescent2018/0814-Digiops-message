@@ -1200,7 +1200,7 @@ export default function BlacklistPage() {
                     hideFormat
                     requireName
                     simulateFailure
-                    defaultName="黑名单_20260813"
+                    defaultName=""
                     onClose={() => setExportVisible(false)}
                     onConfirm={() => showToast('导出成功')}
                 />
