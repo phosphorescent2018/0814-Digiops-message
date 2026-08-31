@@ -4504,6 +4504,17 @@ button {
     padding: 16px 24px 24px;
 }
 
+.blacklist-import-drawer-body,
+.blacklist-import-batch-table {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.blacklist-import-drawer-body::-webkit-scrollbar,
+.blacklist-import-batch-table::-webkit-scrollbar {
+    display: none;
+}
+
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table {
     width: 100%;
     min-width: 680px;
