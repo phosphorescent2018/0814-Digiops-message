@@ -515,7 +515,7 @@ export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPa
                 <ExportModal
                     visible
                     requireName
-                    defaultName={`短信发送记录_${exportTimeStr()}`}
+                    defaultName={`${view === 'original' ? '原始短信发送记录' : '补发发送记录'}_${exportTimeStr()}`}
                     onClose={() => setExportVisible(false)}
                 />
             )}

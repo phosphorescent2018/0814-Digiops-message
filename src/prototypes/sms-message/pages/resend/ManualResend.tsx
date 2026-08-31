@@ -307,7 +307,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [recordEnd, setRecordEnd] = useState('');
     const [recordStatus, setRecordStatus] = useState('');
     const [recordBatchId, setRecordBatchId] = useState('');
-    const exportDefaultName = `补发记录_${exportTimeStr()}`;
+    const exportDefaultName = `补发发送记录_${exportTimeStr()}`;
 
     const toggleCol = (key: string, checked: boolean) => {
         setVisibleCols((prev) => (checked ? [...prev, key] : prev.filter((k) => k !== key)));
