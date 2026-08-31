@@ -42,6 +42,13 @@ interface BlacklistFilter {
 
 const EMPTY_FILTER: BlacklistFilter = { phone: '', businessId: '', status: '', startDate: '', endDate: '' };
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const blacklistExportTimeStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
 /** 轻量下拉：无「请选择」占位选项，未选时仅显示灰色提示 */
 function BlacklistSelect({
     value,
@@ -1200,7 +1207,7 @@ export default function BlacklistPage() {
                     hideFormat
                     requireName
                     simulateFailure
-                    defaultName=""
+                    defaultName={`blacklist_${blacklistExportTimeStr()}`}
                     onClose={() => setExportVisible(false)}
                     onConfirm={() => showToast('导出成功')}
                 />
