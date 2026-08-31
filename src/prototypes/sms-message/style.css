@@ -674,6 +674,48 @@ button {
 }
 
 /* 发送记录表：自适应列宽、收窄列间距，避免产生横向滚动 */
+.record-view-tabs {
+    display: flex;
+    align-items: flex-end;
+    background: #ffffff;
+    border-radius: 8px 8px 0 0;
+    padding-left: 24px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.record-view-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 48px;
+    padding: 0 18px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.record-view-tab + .record-view-tab {
+    margin-left: 36px;
+}
+
+.record-view-tab.active {
+    color: var(--primary-active);
+}
+
+.record-view-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: var(--primary-active);
+    border-radius: 3px 3px 0 0;
+}
+
 .sms-record-card .sms-table-wrap {
     overflow-x: hidden;
 }

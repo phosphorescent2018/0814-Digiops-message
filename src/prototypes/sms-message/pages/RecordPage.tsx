@@ -1,7 +1,7 @@
 /**
  * 发送记录：搜索表单 + 导出 + 数据表格 + 分页
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     RefreshCw,
     ListFilter,
@@ -26,6 +26,8 @@ const PAGE_SIZE = 10;
 
 const PLACEHOLDER_SELECT = '请选择';
 
+type RecordView = 'original' | 'resend';
+
 /** 送达状态 hover 气泡提示 */
 function DeliveryTooltip({ text, children }: { text: string; children: React.ReactNode }) {
     return (
@@ -38,10 +40,12 @@ function DeliveryTooltip({ text, children }: { text: string; children: React.Rea
 
 function SearchForm({
     filter,
+    view,
     resendType,
     onResendTypeChange,
 }: {
     filter?: RecordFilter;
+    view: RecordView;
     resendType: string;
     onResendTypeChange: (v: string) => void;
 }) {
@@ -116,16 +120,18 @@ function SearchForm({
                         <label className="sms-form-label">发送名称</label>
                         <div className="sms-form-control">{renderSelect()}</div>
                     </div>
-                    <div className="sms-form-item">
-                        <label className="sms-form-label">补发批次 ID</label>
-                        <div className="sms-form-control">
-                            <input
-                                className="sms-input sms-control-purple"
-                                placeholder="请输入"
-                                defaultValue={filter?.batchId ?? ''}
-                            />
+                    {view === 'resend' && (
+                        <div className="sms-form-item">
+                            <label className="sms-form-label">补发批次 ID</label>
+                            <div className="sms-form-control">
+                                <input
+                                    className="sms-input sms-control-purple"
+                                    placeholder="请输入"
+                                    defaultValue={filter?.batchId ?? ''}
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
                     <div className="sms-form-item">
                         <label className="sms-form-label">路径标记</label>
                         <div className="sms-form-control">
@@ -145,21 +151,22 @@ function SearchForm({
             <div className="resend-filter-last-row">
                 {!collapsed && (
                 <>
-                <div className="sms-form-item">
-                    <label className="sms-form-label">补发类型</label>
-                    <div className="sms-form-control">
-                        <select
-                            className={`sms-select sms-control-purple${resendType ? '' : ' placeholder'}`}
-                            value={resendType}
-                            onChange={(e) => onResendTypeChange(e.target.value)}
-                        >
-                            <option value="">请选择</option>
-                            <option value="原始短信">原始短信</option>
-                            <option value="人工补发">人工补发</option>
-                            <option value="计划内自动补发">计划内自动补发</option>
-                        </select>
+                {view === 'resend' && (
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">补发类型</label>
+                        <div className="sms-form-control">
+                            <select
+                                className={`sms-select sms-control-purple${resendType ? '' : ' placeholder'}`}
+                                value={resendType}
+                                onChange={(e) => onResendTypeChange(e.target.value)}
+                            >
+                                <option value="">请选择</option>
+                                <option value="人工补发">人工补发</option>
+                                <option value="计划内自动补发">计划内自动补发</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div className="sms-form-item">
                     <label className="sms-form-label">发送状态</label>
                     <div className="sms-form-control">
@@ -181,19 +188,21 @@ function SearchForm({
                         </select>
                     </div>
                 </div>
-                <div className="sms-form-item">
-                    <label className="sms-form-label">补发状态</label>
-                    <div className="sms-form-control">
-                        <select
-                            className={`sms-select sms-control-purple${filter?.resendStatus ? '' : ' placeholder'}`}
-                            defaultValue={filter?.resendStatus ?? ''}
-                        >
-                            <option value="">请选择</option>
-                            <option value="未补发过">未补发过</option>
-                            <option value="已补发过">已补发过</option>
-                        </select>
+                {view === 'original' && (
+                    <div className="sms-form-item">
+                        <label className="sms-form-label">补发状态</label>
+                        <div className="sms-form-control">
+                            <select
+                                className={`sms-select sms-control-purple${filter?.resendStatus ? '' : ' placeholder'}`}
+                                defaultValue={filter?.resendStatus ?? ''}
+                            >
+                                <option value="">请选择</option>
+                                <option value="未补发过">未补发过</option>
+                                <option value="已补发过">已补发过</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                )}
                 </>
                 )}
                 <div className="resend-filter-actions">
@@ -218,11 +227,13 @@ function SearchForm({
 function RecordTable({
     onExport,
     filter,
+    view,
     resendType,
     onOpenResend,
 }: {
     onExport: () => void;
     filter?: RecordFilter;
+    view: RecordView;
     resendType: string;
     onOpenResend?: (batchId: string) => void;
 }) {
@@ -231,6 +242,8 @@ function RecordTable({
         () => {
             const statusCodeMap: Record<string, string> = { 成功: '2', 失败: '1', 暂无数据: '0' };
             return recordRows.filter((r) => {
+                if (view === 'original' && r.resendType !== '原始短信') return false;
+                if (view === 'resend' && r.resendType === '原始短信') return false;
                 if (filter?.batchId && r.batchId !== filter.batchId) return false;
                 if (filter?.businessId && r.businessId !== filter.businessId) return false;
                 if (filter?.deliveryStatus && r.deliveryStatus !== filter.deliveryStatus) return false;
@@ -238,12 +251,16 @@ function RecordTable({
                 if (filter?.sendStatus && r.notifyStatus !== statusCodeMap[filter.sendStatus]) return false;
                 if (filter?.phone && !r.phone.includes(filter.phone)) return false;
                 if (filter?.resendStatus && r.resendStatus !== filter.resendStatus) return false;
-                if (resendType && r.resendType !== resendType) return false;
+                if (view === 'resend' && resendType && r.resendType !== resendType) return false;
                 return true;
             });
         },
-        [filter, resendType]
+        [filter, resendType, view]
     );
+    useEffect(() => {
+        setPage(1);
+    }, [filter, resendType, view]);
+
     const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
     const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
     /** 计划内自动补发序号：按发送时间排序，用于「补发类型」列展示第 N 次 */
@@ -342,8 +359,12 @@ function RecordTable({
                             <th className="sms-col-sender">发送名称</th>
                             <th className="sms-col-status">发送状态</th>
                             <th className="sms-record-col-delivery">送达状态</th>
-                            <th className="sms-record-col-resend-type">补发类型</th>
-                            <th className="sms-record-col-batch">补发批次 ID</th>
+                            {view === 'resend' && (
+                                <>
+                                    <th className="sms-record-col-resend-type">补发类型</th>
+                                    <th className="sms-record-col-batch">补发批次 ID</th>
+                                </>
+                            )}
                             <th className="sms-col-sol">路径标记</th>
                         </tr>
                     </thead>
@@ -373,20 +394,24 @@ function RecordTable({
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
                                 <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
-                                <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
-                                <td>
-                                    {row.batchId ? (
-                                        <button
-                                            type="button"
-                                            className="resend-link-btn"
-                                            onClick={() => onOpenResend?.(row.batchId as string)}
-                                        >
-                                            {row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`}
-                                        </button>
-                                    ) : (
-                                        <span className="sms-dash">—</span>
-                                    )}
-                                </td>
+                                {view === 'resend' && (
+                                    <>
+                                        <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
+                                        <td>
+                                            {row.batchId ? (
+                                                <button
+                                                    type="button"
+                                                    className="resend-link-btn"
+                                                    onClick={() => onOpenResend?.(row.batchId as string)}
+                                                >
+                                                    {row.batchId.startsWith('A') ? row.batchId : `B${row.batchId}`}
+                                                </button>
+                                            ) : (
+                                                <span className="sms-dash">—</span>
+                                            )}
+                                        </td>
+                                    </>
+                                )}
                                 <td>
                                     <span className="sms-cell sms-dash">{row.solId}</span>
                                 </td>
@@ -440,18 +465,40 @@ function RecordTable({
 
 export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
+    const [view, setView] = useState<RecordView>('original');
     const [resendType, setResendType] = useState('');
+
+    const switchView = (next: RecordView) => {
+        setView(next);
+        setResendType(next === 'resend' ? '' : '原始短信');
+    };
 
     return (
         <div>
+            <div className="record-view-tabs">
+                <div
+                    className={`record-view-tab${view === 'original' ? ' active' : ''}`}
+                    onClick={() => switchView('original')}
+                >
+                    原始短信
+                </div>
+                <div
+                    className={`record-view-tab${view === 'resend' ? ' active' : ''}`}
+                    onClick={() => switchView('resend')}
+                >
+                    补发短信
+                </div>
+            </div>
             <SearchForm
                 filter={filter}
+                view={view}
                 resendType={resendType}
                 onResendTypeChange={setResendType}
             />
             <RecordTable
                 onExport={() => setExportVisible(true)}
                 filter={filter}
+                view={view}
                 resendType={resendType}
                 onOpenResend={onOpenResend}
             />
