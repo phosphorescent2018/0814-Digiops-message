@@ -22,6 +22,8 @@ export interface RecordFilter {
     deliveryStatus?: string;
     batchId?: string;
     resendStatus?: string;
+    /** 跳转到发送记录页时默认选中的视图 */
+    view?: 'original' | 'resend';
 }
 
 interface DetailRow {

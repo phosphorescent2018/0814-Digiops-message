@@ -483,8 +483,15 @@ const exportTimeStr = () => {
 
 export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPageProps) {
     const [exportVisible, setExportVisible] = useState(false);
-    const [view, setView] = useState<RecordView>('original');
-    const [resendType, setResendType] = useState('');
+    const [view, setView] = useState<RecordView>(filter?.view === 'resend' ? 'resend' : 'original');
+    const [resendType, setResendType] = useState(filter?.view === 'resend' ? '' : '原始短信');
+
+    useEffect(() => {
+        if (filter?.view) {
+            setView(filter.view);
+            setResendType(filter.view === 'resend' ? '' : '原始短信');
+        }
+    }, [filter?.view]);
 
     const switchView = (next: RecordView) => {
         setView(next);

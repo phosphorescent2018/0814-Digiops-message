@@ -415,6 +415,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
         if (batchId) filter.batchId = batchId;
         if (resendStatus) filter.resendStatus = resendStatus;
+        filter.view = 'original';
         onSwitchTab?.('record', filter);
     };
 
@@ -1166,7 +1167,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                     onTerminate={openTerminate}
                     onViewRecords={(filter) => {
                         setDetailBatch(null);
-                        onSwitchTab?.('record', filter);
+                        onSwitchTab?.('record', { ...filter, view: 'resend' });
                     }}
                 />
             )}
