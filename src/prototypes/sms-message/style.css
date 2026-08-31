@@ -797,6 +797,10 @@ button {
     width: 90px;
 }
 
+.sms-record-table .sms-record-col-resend-status {
+    width: 7.5%;
+}
+
 .sms-record-table .sms-record-col-resend-type {
     width: 150px;
 }

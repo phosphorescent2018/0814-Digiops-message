@@ -360,6 +360,9 @@ function RecordTable({
                             <th className="sms-col-sender">发送名称</th>
                             <th className="sms-col-status">发送状态</th>
                             <th className="sms-record-col-delivery">送达状态</th>
+                            {view === 'original' && (
+                                <th className="sms-record-col-resend-status">补发状态</th>
+                            )}
                             {view === 'resend' && (
                                 <>
                                     <th className="sms-record-col-resend-type">补发类型</th>
@@ -395,6 +398,13 @@ function RecordTable({
                                 <td>{row.sender}</td>
                                 <td>{renderStatus(row.notifyStatus)}</td>
                                 <td className="sms-record-col-delivery">{renderDelivery(row)}</td>
+                                {view === 'original' && (
+                                    <td className="sms-record-col-resend-status">
+                                        <span className={`sms-status${row.resendStatus === '已补发过' ? ' sms-status-success' : ' sms-status-unknown'}`}>
+                                            {row.resendStatus || '—'}
+                                        </span>
+                                    </td>
+                                )}
                                 {view === 'resend' && (
                                     <>
                                         <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
