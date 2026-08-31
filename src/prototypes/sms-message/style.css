@@ -4500,25 +4500,42 @@ button {
 
 .blacklist-import-drawer-body {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 16px 24px 24px;
-}
-
-.blacklist-import-drawer-body,
-.blacklist-import-batch-table {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.blacklist-import-drawer-body::-webkit-scrollbar,
-.blacklist-import-batch-table::-webkit-scrollbar {
-    display: none;
 }
 
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table {
     width: 100%;
-    min-width: 680px;
-    table-layout: auto;
+    table-layout: fixed;
+}
+
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th,
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td {
+    padding: 10px 6px;
+}
+
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(1),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(1) {
+    width: 26%;
+}
+
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(2),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(2) {
+    width: 22%;
+}
+
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(3),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(3) {
+    width: 10%;
+}
+
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(4),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(4),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(5),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(5),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(6),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(6) {
+    width: 14%;
 }
 
 .blacklist-import-drawer .blacklist-import-batch-file {
@@ -4544,7 +4561,7 @@ button {
 }
 
 .blacklist-import-batch-table {
-    overflow-x: auto;
+    overflow: hidden;
 }
 
 .blacklist-import-batch-table .sms-table th,
