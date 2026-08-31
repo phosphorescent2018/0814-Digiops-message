@@ -372,6 +372,7 @@ export interface ImportBatch {
     failReason?: string;
 }
 
+/** 每个导入批次仅允许“跳过”或“覆盖”一种已有号码策略，因此 skipCount 与 overwriteCount 互斥。 */
 export const initialImportBatches: ImportBatch[] = [
     {
         id: 'B20260828001',
@@ -382,7 +383,7 @@ export const initialImportBatches: ImportBatch[] = [
         completedAt: '2026-08-28 10:31:45',
         successCount: 1268300,
         skipCount: 8900,
-        overwriteCount: 6800,
+        overwriteCount: 0,
         failCount: 700,
     },
     {
