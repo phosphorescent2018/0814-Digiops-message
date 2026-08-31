@@ -882,8 +882,8 @@ function ImportBatchPanel() {
                                         </span>
                                     </td>
                                     <td>{hasResult ? b.successCount.toLocaleString() : '-'}</td>
-                                    <td>{hasResult ? b.skipCount.toLocaleString() : '-'}</td>
-                                    <td>{hasResult ? b.overwriteCount.toLocaleString() : '-'}</td>
+                                    <td>{hasResult && b.duplicateStrategy === 'skip' ? b.skipCount.toLocaleString() : '-'}</td>
+                                    <td>{hasResult && b.duplicateStrategy === 'overwrite' ? b.overwriteCount.toLocaleString() : '-'}</td>
                                 </tr>
                             );
                         })}

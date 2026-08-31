@@ -358,12 +358,16 @@ export const blacklistRows: BlacklistRow[] = [
 /** 黑名单导入批次：状态机 待处理 → 处理中 → 已完成 / 失败 */
 export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
+/** 已有号码处理策略：跳过 / 覆盖，每个批次只使用一种 */
+export type ImportDuplicateStrategy = 'skip' | 'overwrite';
+
 export interface ImportBatch {
     id: string;
     fileName: string;
     total: number;
     submittedAt: string;
     status: ImportBatchStatus;
+    duplicateStrategy: ImportDuplicateStrategy;
     completedAt: string;
     successCount: number;
     skipCount: number;
@@ -380,6 +384,7 @@ export const initialImportBatches: ImportBatch[] = [
         total: 1284700,
         submittedAt: '2026-08-28 10:02:18',
         status: 'completed',
+        duplicateStrategy: 'skip',
         completedAt: '2026-08-28 10:31:45',
         successCount: 1268300,
         skipCount: 8900,
@@ -392,6 +397,7 @@ export const initialImportBatches: ImportBatch[] = [
         total: 860000,
         submittedAt: '2026-08-28 11:20:03',
         status: 'processing',
+        duplicateStrategy: 'skip',
         completedAt: '',
         successCount: 0,
         skipCount: 0,
@@ -404,10 +410,11 @@ export const initialImportBatches: ImportBatch[] = [
         total: 1000000,
         submittedAt: '2026-08-27 15:40:26',
         status: 'failed',
+        duplicateStrategy: 'overwrite',
         completedAt: '2026-08-27 15:42:11',
         successCount: 214300,
-        skipCount: 1200,
-        overwriteCount: 0,
+        skipCount: 0,
+        overwriteCount: 1200,
         failCount: 784500,
         failReason: '文件第 214301 行手机号码格式异常，任务中断',
     },
@@ -417,6 +424,7 @@ export const initialImportBatches: ImportBatch[] = [
         total: 320000,
         submittedAt: '2026-08-26 09:15:47',
         status: 'pending',
+        duplicateStrategy: 'skip',
         completedAt: '',
         successCount: 0,
         skipCount: 0,
