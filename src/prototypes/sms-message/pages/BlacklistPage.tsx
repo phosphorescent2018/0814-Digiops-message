@@ -699,12 +699,16 @@ function AddModal({ onClose }: { onClose: () => void }) {
                             <span className="blacklist-required">*</span>BusinessID
                         </label>
                         <div className="sms-form-control">
-                            <input
-                                className="sms-input"
-                                placeholder="请输入 BusinessID"
+                            <select
+                                className={`sms-select${!businessId ? ' placeholder' : ''}`}
                                 value={businessId}
                                 onChange={(e) => setBusinessId(e.target.value)}
-                            />
+                            >
+                                <option value="">请选择</option>
+                                {Array.from(new Set(blacklistRows.map((r) => r.businessId))).sort().map((id) => (
+                                    <option key={id} value={id}>{id}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="sms-form-item blacklist-expire-item">
