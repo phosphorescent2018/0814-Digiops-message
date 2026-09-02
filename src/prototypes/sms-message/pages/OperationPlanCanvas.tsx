@@ -5,6 +5,7 @@
  * 判断节点支持配置为前置校验 / 补发控制，保存后展示配置摘要
  */
 import React, { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     ArrowLeft,
     Pencil,
@@ -130,7 +131,34 @@ interface SmsBasicConfig {
     sender: string;
     channel: string;
     template: string;
+    sendMode: 'single' | 'polling';
+    templateIds: string[];
 }
+
+interface SmsTemplateOption {
+    id: string;
+    name: string;
+    meta: string;
+    channel: string;
+    contentType: string;
+    content: string;
+}
+
+const SMS_TEMPLATE_POOL: SmsTemplateOption[] = [
+    { id: 'BL_RepeatLoan_02', name: 'BL_RepeatLoan_02', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '恭喜您获得 Momo Advance 额度，详情请查看 APP。' },
+    { id: 'BL_RepeatLoan_02_01', name: 'BL_RepeatLoan_02_01', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您的额度已更新，点击立即借款。' },
+    { id: 'BL_RepeatLoan_02_02', name: 'BL_RepeatLoan_02_02', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您的专属额度已到账，限时有效。' },
+    { id: 'BL_RepeatLoan_02_03', name: 'BL_RepeatLoan_02_03', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您有一笔借款待确认，请及时处理。' },
+    { id: 'BL_RepeatLoan_03', name: 'BL_RepeatLoan_03', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的借款已还款，感谢使用。' },
+    { id: 'BL_RepeatLoan_04', name: 'BL_RepeatLoan_04', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的账单已生成，请留意还款日。' },
+    { id: 'BL_RepeatLoan_05', name: 'BL_RepeatLoan_05', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您有一笔账单即将到期。' },
+    { id: 'BL_RepeatLoan_06', name: 'BL_RepeatLoan_06', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的分期计划已生效。' },
+];
+
+const templateById = (id: string): SmsTemplateOption => {
+    const t = SMS_TEMPLATE_POOL.find((x) => x.id === id);
+    return t ?? { id, name: id, meta: '', channel: '短信', contentType: '营销类', content: '' };
+};
 
 interface SmsConfig {
     basic: SmsBasicConfig;
@@ -144,7 +172,7 @@ interface SmsConfig {
 }
 
 const DEFAULT_SMS_CONFIG: SmsConfig = {
-    basic: { nodeName: '', sender: '', channel: '', template: '' },
+    basic: { nodeName: '', sender: '', channel: '', template: '', sendMode: 'single', templateIds: [] },
     precheck: { checks: [], dailyWindows: emptyDailyWindows(), strategy: 'wait' },
     resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
 };
@@ -213,7 +241,7 @@ const DEFAULT_PLAN_NODES: CanvasNode[] = [
         x: 200,
         y: 180,
         config: {
-            basic: { nodeName: '', sender: '', channel: '', template: '' },
+            basic: { nodeName: '', sender: '', channel: '', template: '', sendMode: 'single', templateIds: [] },
             precheck: { checks: [], dailyWindows: emptyDailyWindows(), strategy: 'wait' as const },
             resend: { enabled: false, triggers: [], maxResend: '', interval: '' },
         },
@@ -268,6 +296,12 @@ function loadPersistedCanvas(): PersistedCanvas | null {
                         sender: sms.basic?.sender ?? '',
                         channel: sms.basic?.channel ?? '',
                         template: sms.basic?.template ?? '',
+                        sendMode: sms.basic?.sendMode ?? 'single',
+                        templateIds: Array.isArray(sms.basic?.templateIds)
+                            ? sms.basic.templateIds
+                            : sms.basic?.template
+                                ? [sms.basic.template]
+                                : [],
                     },
                    precheck: {
                        checks: Array.isArray(sms.precheck?.checks) ? sms.precheck.checks : [],
@@ -389,6 +423,88 @@ function JudgeConfigModal({ initial, onClose, onSave }: JudgeModalProps) {
 }
 
 
+function TemplatePickerModal({
+    selectedIds,
+    onClose,
+    onConfirm,
+}: {
+    selectedIds: string[];
+    onClose: () => void;
+    onConfirm: (ids: string[]) => void;
+}) {
+    const [query, setQuery] = useState('');
+    const [picked, setPicked] = useState<string[]>(selectedIds);
+
+    const filtered = SMS_TEMPLATE_POOL.filter((t) => {
+        const q = query.trim().toLowerCase();
+        return !q || t.id.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
+    });
+    const sorted = filtered.slice().sort((a, b) => {
+        const ia = picked.indexOf(a.id);
+        const ib = picked.indexOf(b.id);
+        return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
+    });
+
+    const toggle = (id: string) => {
+        setPicked((prev) => {
+            const i = prev.indexOf(id);
+            if (i >= 0) return prev.filter((x) => x !== id);
+            return [...prev, id];
+        });
+    };
+
+    return createPortal(
+        <div className="sms-mask sms-tpl-picker-mask" onClick={onClose}>
+            <div className="sms-modal sms-tpl-picker" onClick={(e) => e.stopPropagation()}>
+                <div className="sms-modal-header sms-tpl-picker-header">
+                    <span>选择发送模板</span>
+                    <button type="button" className="sms-tpl-picker-close" onClick={onClose} title="关闭">
+                        <X size={16} />
+                    </button>
+                </div>
+                <div className="sms-modal-body">
+                    <div className="sms-tpl-search">
+                        <input
+                            className="sms-input"
+                            placeholder="搜索模板名称 / ID"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                    </div>
+                    <div className="sms-tpl-picker-list">
+                        {sorted.length === 0 && <div className="sms-tpl-picker-empty">无匹配模板</div>}
+                        {sorted.map((t) => {
+                            const idx = picked.indexOf(t.id);
+                            const pickedFlag = idx >= 0;
+                            return (
+                                <div
+                                    key={t.id}
+                                    className={`sms-tpl-picker-item${pickedFlag ? ' picked' : ''}`}
+                                    onClick={() => toggle(t.id)}
+                                >
+                                    <span className={`sms-tpl-picker-check${pickedFlag ? ' checked' : ''}`}>
+                                        {pickedFlag ? '✓' : ''}
+                                    </span>
+                                    <div className="sms-tpl-picker-info">
+                                        <div className="sms-tpl-picker-name">{t.name}</div>
+                                        <div className="sms-tpl-picker-meta">{t.meta} · {t.channel}</div>
+                                    </div>
+                                    {pickedFlag && <span className="sms-tpl-picker-order">第{idx + 1}位</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+                <div className="sms-modal-actions">
+                    <button type="button" className="sms-btn" onClick={onClose}>取 消</button>
+                    <button type="button" className="sms-btn sms-btn-primary" onClick={() => onConfirm(picked)}>确 定</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+}
+
 /* ================= 短信节点配置面板（右抽屉） ================= */
 
 interface SmsConfigModalProps {
@@ -418,6 +534,8 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         precheck: false,
         resend: false,
     });
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [singleTemplateId, setSingleTemplateId] = useState(initial.basic.template);
 
     const toggleSection = (key: 'basic' | 'precheck' | 'resend') =>
         setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -425,6 +543,14 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     const updateBasic = (key: keyof SmsBasicConfig, value: string) => {
         setDraft((prev) => ({ ...prev, basic: { ...prev.basic, [key]: value } }));
     };
+
+    const updateSingleTemplate = (id: string) => {
+        setSingleTemplateId(id);
+        setDraft((prev) => ({ ...prev, basic: { ...prev.basic, template: id, templateIds: id ? [id] : [] } }));
+    };
+
+    const updateTemplateIds = (ids: string[]) =>
+        setDraft((prev) => ({ ...prev, basic: { ...prev.basic, templateIds: ids } }));
 
     const togglePrecheckCheck = (key: string) => {
         setDraft((prev) => {
@@ -497,7 +623,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         !draft.basic.nodeName.trim() ||
         !draft.basic.sender.trim() ||
         !draft.basic.channel.trim() ||
-        !draft.basic.template.trim();
+        (draft.basic.sendMode === 'single' ? !draft.basic.template : draft.basic.templateIds.length === 0);
 
     // 保存可用性由基础信息必填 + 「启用后未配全」决定；校验与补发控制本身不作为必选项
     const saveDisabled = basicMissing || precheckIncomplete || resendIncomplete;
@@ -577,26 +703,160 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                         </select>
                                     </div>
                                 </div>
-                                <div className="sms-form-item">
+                                <div className="sms-form-item sms-tpl-mode-item">
                                     <label className="sms-form-label">
                                         <span className="resend-required">*</span>短信模板
                                     </label>
                                     <div className="sms-form-control">
-                                        <select
-                                            className={`sms-select${!draft.basic.template ? ' placeholder' : ''}`}
-                                            value={draft.basic.template}
-                                            onChange={(e) => updateBasic('template', e.target.value)}
-                                        >
-                                            <option value="">请选择模板</option>
-                                            <option value="还款提醒-逾期">还款提醒-逾期</option>
-                                            <option value="放款成功通知">放款成功通知</option>
-                                            <option value="营销活动-新客">营销活动-新客</option>
-                                        </select>
-                                        {!draft.basic.template && (
-                                            <div className="plan-canvas-time-error">请选择短信模板</div>
-                                        )}
+                                        <div className="sms-tpl-mode">
+                                            <button
+                                                type="button"
+                                                className={`sms-tpl-mode-btn${draft.basic.sendMode === 'single' ? ' active' : ''}`}
+                                                onClick={() => updateBasic('sendMode', 'single')}
+                                            >
+                                                单一模板
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`sms-tpl-mode-btn${draft.basic.sendMode === 'polling' ? ' active' : ''}`}
+                                                onClick={() => updateBasic('sendMode', 'polling')}
+                                            >
+                                                轮询发送
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                                {draft.basic.sendMode === 'single' ? (
+                                    <>
+                                        <div className="sms-form-item">
+                                            <label className="sms-form-label">
+                                                <span className="resend-required">*</span>发送模板
+                                            </label>
+                                            <div className="sms-form-control">
+                                                <select
+                                                    className={`sms-select${!singleTemplateId ? ' placeholder' : ''}`}
+                                                    value={singleTemplateId}
+                                                    onChange={(e) => updateSingleTemplate(e.target.value)}
+                                                >
+                                                    <option value="">请选择模板</option>
+                                                    {SMS_TEMPLATE_POOL.map((t) => (
+                                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                                    ))}
+                                                </select>
+                                                {!singleTemplateId && (
+                                                    <div className="plan-canvas-time-error">请选择短信模板</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {singleTemplateId && (
+                                            <>
+                                                <div className="sms-form-item">
+                                                    <label className="sms-form-label">模板名称</label>
+                                                    <div className="sms-form-control">
+                                                        <input className="sms-input" value={templateById(singleTemplateId).name} readOnly />
+                                                    </div>
+                                                </div>
+                                                <div className="sms-form-item">
+                                                    <label className="sms-form-label">内容类型</label>
+                                                    <div className="sms-form-control">
+                                                        <input className="sms-input" value={templateById(singleTemplateId).contentType} readOnly />
+                                                    </div>
+                                                </div>
+                                                <div className="sms-form-item">
+                                                    <label className="sms-form-label">短信内容</label>
+                                                    <div className="sms-form-control">
+                                                        <textarea
+                                                            className="sms-textarea sms-tpl-content"
+                                                            value={templateById(singleTemplateId).content}
+                                                            readOnly
+                                                            rows={3}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="sms-form-item">
+                                            <label className="sms-form-label">
+                                                <span className="resend-required">*</span>模板列表
+                                                <span className="sms-tpl-list-head-tip">（按发送顺序）</span>
+                                            </label>
+                                            <div className="sms-form-control">
+                                                <div className="sms-tpl-list">
+                                                    {draft.basic.templateIds.length === 0 ? (
+                                                        <div className="sms-tpl-empty">尚未添加模板，请点击下方「添加模板」。</div>
+                                                    ) : (
+                                                        draft.basic.templateIds.map((id, i) => {
+                                                            const t = templateById(id);
+                                                            return (
+                                                                <div className="sms-tpl-row" key={id}>
+                                                                    <span className="sms-tpl-order">{i + 1}</span>
+                                                                    <div className="sms-tpl-row-info">
+                                                                        <div className="sms-tpl-row-name">{t.name}</div>
+                                                                        <div className="sms-tpl-row-meta">{t.meta}</div>
+                                                                        <div className="sms-tpl-row-tags"><span className="sms-tpl-tag">{t.channel}</span></div>
+                                                                    </div>
+                                                                    <div className="sms-tpl-row-actions">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="sms-tpl-mini"
+                                                                            disabled={i === 0}
+                                                                            title="上移"
+                                                                            onClick={() => {
+                                                                                const next = [...draft.basic.templateIds];
+                                                                                [next[i - 1], next[i]] = [next[i], next[i - 1]];
+                                                                                updateTemplateIds(next);
+                                                                            }}
+                                                                        >↑</button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="sms-tpl-mini"
+                                                                            disabled={i === draft.basic.templateIds.length - 1}
+                                                                            title="下移"
+                                                                            onClick={() => {
+                                                                                const next = [...draft.basic.templateIds];
+                                                                                [next[i + 1], next[i]] = [next[i], next[i + 1]];
+                                                                                updateTemplateIds(next);
+                                                                            }}
+                                                                        >↓</button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="sms-tpl-mini sms-tpl-mini-del"
+                                                                            title="移除"
+                                                                            onClick={() => updateTemplateIds(draft.basic.templateIds.filter((x) => x !== id))}
+                                                                        >✕</button>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    )}
+                                                </div>
+                                                <button type="button" className="sms-btn sms-tpl-add" onClick={() => setPickerOpen(true)}>
+                                                    ＋ 添加模板
+                                                </button>
+                                                {draft.basic.templateIds.length === 0 && (
+                                                    <div className="plan-canvas-time-error">请至少添加一个模板</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {draft.basic.templateIds.length > 0 && (
+                                            <div className="sms-tpl-cycle">
+                                                <span className="sms-tpl-cycle-label">发送顺序：</span>
+                                                {draft.basic.templateIds.map((id, i) => (
+                                                    <span key={id}>
+                                                        <span className="sms-tpl-cycle-pv">{templateById(id).name}</span>
+                                                        {i < draft.basic.templateIds.length - 1 && <span className="sms-tpl-cycle-arrow">→</span>}
+                                                    </span>
+                                                ))}
+                                                <span className="sms-tpl-cycle-arrow">→</span>
+                                                <span className="sms-tpl-cycle-pv">{templateById(draft.basic.templateIds[0]).name}</span>
+                                                <span className="sms-tpl-cycle-dot">…</span>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
@@ -854,6 +1114,16 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                         保 存
                     </button>
                 </div>
+                {pickerOpen && (
+                    <TemplatePickerModal
+                        selectedIds={draft.basic.templateIds}
+                        onClose={() => setPickerOpen(false)}
+                        onConfirm={(ids) => {
+                            updateTemplateIds(ids);
+                            setPickerOpen(false);
+                        }}
+                    />
+                )}
             </div>
         </div>
     );

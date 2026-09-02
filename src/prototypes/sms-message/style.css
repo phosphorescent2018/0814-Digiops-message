@@ -4965,6 +4965,331 @@ button {
     padding: 4px 0 18px;
 }
 
+.sms-tpl-mode-item {
+    margin-bottom: 16px;
+}
+
+.sms-tpl-mode {
+    display: inline-flex;
+    background: var(--bg-page, #f0f2f5);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 3px;
+}
+
+.sms-tpl-mode-btn {
+    height: 30px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sms-tpl-mode-btn.active {
+    background: #ffffff;
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.sms-tpl-list-head-tip {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.sms-tpl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sms-tpl-empty {
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    background: #fafafa;
+}
+
+.sms-tpl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    background: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sms-tpl-row:hover {
+    border-color: #91caff;
+}
+
+.sms-tpl-order {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+}
+
+.sms-tpl-row-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sms-tpl-row-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sms-tpl-row-meta {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.sms-tpl-row-tags {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.sms-tpl-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #f6ffed;
+    color: #389e0d;
+}
+
+.sms-tpl-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.sms-tpl-mini {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sms-tpl-mini:hover:not(:disabled) {
+    background: #f0f2f5;
+    color: var(--text-main);
+}
+
+.sms-tpl-mini:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.sms-tpl-mini-del:hover:not(:disabled) {
+    background: #fff1f0;
+    color: #cf1322;
+}
+
+.sms-tpl-add {
+    width: 100%;
+    margin-top: 8px;
+    border-style: dashed;
+    background: #fafafa;
+    color: var(--text-muted);
+}
+
+.sms-tpl-add:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #f0f7ff;
+}
+
+.sms-tpl-cycle {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.sms-tpl-cycle-label {
+    color: var(--text-muted);
+}
+
+.sms-tpl-cycle-pv {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: #e6f4ff;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sms-tpl-cycle-arrow {
+    color: var(--text-muted);
+}
+
+.sms-tpl-cycle-dot {
+    color: var(--text-muted);
+}
+
+.sms-tpl-content {
+    width: 100%;
+    min-height: 84px;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fafafa;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    color: var(--text-main);
+}
+
+.sms-tpl-picker-mask {
+    z-index: 120;
+    justify-content: center;
+}
+
+.sms-tpl-picker {
+    width: 520px;
+    max-width: 92vw;
+}
+
+.sms-tpl-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sms-tpl-picker-close {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.sms-tpl-picker-close:hover {
+    background: #f0f2f5;
+    color: var(--text-main);
+}
+
+.sms-tpl-search {
+    margin-bottom: 12px;
+}
+
+.sms-tpl-picker-list {
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sms-tpl-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-soft);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sms-tpl-picker-item:last-child {
+    border-bottom: none;
+}
+
+.sms-tpl-picker-item:hover {
+    background: #f5f7fa;
+}
+
+.sms-tpl-picker-item.picked {
+    background: #f0f7ff;
+}
+
+.sms-tpl-picker-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex: 0 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.sms-tpl-picker-check.checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.sms-tpl-picker-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sms-tpl-picker-name {
+    font-size: 14px;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sms-tpl-picker-meta {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.sms-tpl-picker-order {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.sms-tpl-picker-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
 .sms-config-drawer-hint {
     font-size: 12px;
     color: var(--text-muted);
