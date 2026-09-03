@@ -800,12 +800,12 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                     </>
                                 ) : (
                                     <>
-                                        <div className="sms-form-item">
+                                        <div className="sms-form-item sms-tpl-list-item">
                                             <label className="sms-form-label">
                                                 <span className="resend-required">*</span>模板列表
-                                                <span className="sms-tpl-list-head-tip">（按发送顺序，最多 {MAX_TEMPLATES} 个）</span>
                                             </label>
                                             <div className="sms-form-control">
+                                                <div className="sms-tpl-list-tip">按发送顺序，最多 {MAX_TEMPLATES} 个</div>
                                                 <div className="sms-tpl-list">
                                                     {draft.basic.templateIds.length === 0 ? (
                                                         <div className="sms-tpl-empty">尚未添加模板，请点击下方「添加模板」。</div>

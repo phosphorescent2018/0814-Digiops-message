@@ -5001,6 +5001,22 @@ button {
     font-weight: 400;
 }
 
+.sms-tpl-list-item {
+    align-items: flex-start;
+}
+
+.sms-tpl-list-item .sms-form-label {
+    padding-top: 7px;
+    white-space: normal;
+    line-height: 1.4;
+}
+
+.sms-tpl-list-tip {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
 .sms-tpl-list {
     display: flex;
     flex-direction: column;
