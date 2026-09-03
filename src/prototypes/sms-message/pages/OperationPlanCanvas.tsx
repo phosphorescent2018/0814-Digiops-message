@@ -153,7 +153,14 @@ const SMS_TEMPLATE_POOL: SmsTemplateOption[] = [
     { id: 'BL_RepeatLoan_04', name: 'BL_RepeatLoan_04', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的账单已生成，请留意还款日。' },
     { id: 'BL_RepeatLoan_05', name: 'BL_RepeatLoan_05', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您有一笔账单即将到期。' },
     { id: 'BL_RepeatLoan_06', name: 'BL_RepeatLoan_06', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的分期计划已生效。' },
+    { id: 'BL_RepeatLoan_07', name: 'BL_RepeatLoan_07', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的首期还款即将到期，请按时还款。' },
+    { id: 'BL_RepeatLoan_08', name: 'BL_RepeatLoan_08', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的本期账单已生成，请及时还款。' },
+    { id: 'BL_RepeatLoan_09', name: 'BL_RepeatLoan_09', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的借款已成功展期。' },
+    { id: 'BL_RepeatLoan_10', name: 'BL_RepeatLoan_10', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您有一笔专享额度待领取。' },
+    { id: 'BL_Early_retention_01', name: 'BL_Early_retention_01', meta: '提前还款提醒 · 短信', channel: '短信', contentType: '通知类', content: '您可提前结清当前借款，节省利息。' },
 ];
+
+const MAX_TEMPLATES = 10;
 
 const templateById = (id: string): SmsTemplateOption => {
     const t = SMS_TEMPLATE_POOL.find((x) => x.id === id);
@@ -297,11 +304,11 @@ function loadPersistedCanvas(): PersistedCanvas | null {
                         channel: sms.basic?.channel ?? '',
                         template: sms.basic?.template ?? '',
                         sendMode: sms.basic?.sendMode ?? 'single',
-                        templateIds: Array.isArray(sms.basic?.templateIds)
+                        templateIds: (Array.isArray(sms.basic?.templateIds)
                             ? sms.basic.templateIds
                             : sms.basic?.template
                                 ? [sms.basic.template]
-                                : [],
+                                : []).slice(0, MAX_TEMPLATES),
                     },
                    precheck: {
                        checks: Array.isArray(sms.precheck?.checks) ? sms.precheck.checks : [],
@@ -434,6 +441,7 @@ function TemplatePickerModal({
 }) {
     const [query, setQuery] = useState('');
     const [picked, setPicked] = useState<string[]>(selectedIds);
+    const [notice, setNotice] = useState('');
 
     const filtered = SMS_TEMPLATE_POOL.filter((t) => {
         const q = query.trim().toLowerCase();
@@ -446,6 +454,11 @@ function TemplatePickerModal({
     });
 
     const toggle = (id: string) => {
+        if (!picked.includes(id) && picked.length >= MAX_TEMPLATES) {
+            setNotice('最多只能选择 10 个模板');
+            window.setTimeout(() => setNotice(''), 2200);
+            return;
+        }
         setPicked((prev) => {
             const i = prev.indexOf(id);
             if (i >= 0) return prev.filter((x) => x !== id);
@@ -471,6 +484,8 @@ function TemplatePickerModal({
                             onChange={(e) => setQuery(e.target.value)}
                         />
                     </div>
+                    <div className="sms-tpl-picker-hint">已选 <b>{picked.length}</b> / {MAX_TEMPLATES} 个</div>
+                    {notice && <div className="sms-tpl-picker-warn">{notice}</div>}
                     <div className="sms-tpl-picker-list">
                         {sorted.length === 0 && <div className="sms-tpl-picker-empty">无匹配模板</div>}
                         {sorted.map((t) => {
@@ -630,7 +645,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         !draft.basic.nodeName.trim() ||
         !draft.basic.sender.trim() ||
         !draft.basic.channel.trim() ||
-        (draft.basic.sendMode === 'single' ? !draft.basic.template : draft.basic.templateIds.length < 2);
+        (draft.basic.sendMode === 'single' ? !draft.basic.template : draft.basic.templateIds.length < 2 || draft.basic.templateIds.length > MAX_TEMPLATES);
 
     // 保存可用性由基础信息必填 + 「启用后未配全」决定；校验与补发控制本身不作为必选项
     const saveDisabled = basicMissing || precheckIncomplete || resendIncomplete;
@@ -788,7 +803,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                         <div className="sms-form-item">
                                             <label className="sms-form-label">
                                                 <span className="resend-required">*</span>模板列表
-                                                <span className="sms-tpl-list-head-tip">（按发送顺序）</span>
+                                                <span className="sms-tpl-list-head-tip">（按发送顺序，最多 {MAX_TEMPLATES} 个）</span>
                                             </label>
                                             <div className="sms-form-control">
                                                 <div className="sms-tpl-list">
@@ -840,9 +855,17 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                         })
                                                     )}
                                                 </div>
-                                                <button type="button" className="sms-btn sms-tpl-add" onClick={() => setPickerOpen(true)}>
+                                                <button
+                                                    type="button"
+                                                    className="sms-btn sms-tpl-add"
+                                                    disabled={draft.basic.templateIds.length >= MAX_TEMPLATES}
+                                                    onClick={() => setPickerOpen(true)}
+                                                >
                                                     ＋ 添加模板
                                                 </button>
+                                                {draft.basic.templateIds.length >= MAX_TEMPLATES && (
+                                                    <div className="sms-tpl-max-tip">最多只能选择 {MAX_TEMPLATES} 个模板</div>
+                                                )}
                                                 {draft.basic.templateIds.length < 2 && (
                                                     <div className="plan-canvas-time-error">请至少添加两个模板</div>
                                                 )}
