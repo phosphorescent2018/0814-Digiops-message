@@ -5006,15 +5006,19 @@ button {
 }
 
 .sms-tpl-list-item .sms-form-label {
-    padding-top: 7px;
-    white-space: normal;
-    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    min-width: 168px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
-.sms-tpl-list-tip {
-    margin-bottom: 6px;
+.sms-tpl-list-head-tip {
     font-size: 12px;
     color: var(--text-muted);
+    font-weight: 400;
 }
 
 .sms-tpl-list {
