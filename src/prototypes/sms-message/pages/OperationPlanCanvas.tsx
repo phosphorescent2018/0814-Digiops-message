@@ -497,7 +497,14 @@ function TemplatePickerModal({
                 </div>
                 <div className="sms-modal-actions">
                     <button type="button" className="sms-btn" onClick={onClose}>取 消</button>
-                    <button type="button" className="sms-btn sms-btn-primary" onClick={() => onConfirm(picked)}>确 定</button>
+                    <button
+                        type="button"
+                        className="sms-btn sms-btn-primary"
+                        disabled={picked.length < 2}
+                        onClick={() => onConfirm(picked)}
+                    >
+                        确 定
+                    </button>
                 </div>
             </div>
         </div>,
@@ -623,7 +630,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
         !draft.basic.nodeName.trim() ||
         !draft.basic.sender.trim() ||
         !draft.basic.channel.trim() ||
-        (draft.basic.sendMode === 'single' ? !draft.basic.template : draft.basic.templateIds.length === 0);
+        (draft.basic.sendMode === 'single' ? !draft.basic.template : draft.basic.templateIds.length < 2);
 
     // 保存可用性由基础信息必填 + 「启用后未配全」决定；校验与补发控制本身不作为必选项
     const saveDisabled = basicMissing || precheckIncomplete || resendIncomplete;
@@ -836,8 +843,8 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 <button type="button" className="sms-btn sms-tpl-add" onClick={() => setPickerOpen(true)}>
                                                     ＋ 添加模板
                                                 </button>
-                                                {draft.basic.templateIds.length === 0 && (
-                                                    <div className="plan-canvas-time-error">请至少添加一个模板</div>
+                                                {draft.basic.templateIds.length < 2 && (
+                                                    <div className="plan-canvas-time-error">请至少添加两个模板</div>
                                                 )}
                                             </div>
                                         </div>
