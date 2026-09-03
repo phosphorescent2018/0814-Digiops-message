@@ -5002,17 +5002,20 @@ button {
 }
 
 .sms-tpl-list-item {
-    align-items: flex-start;
+    display: block;
 }
 
 .sms-tpl-list-item .sms-form-label {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    width: auto;
-    min-width: 168px;
-    flex-shrink: 0;
+    margin-bottom: 8px;
     white-space: nowrap;
+}
+
+.sms-tpl-list-item .sms-form-control {
+    width: 100%;
+    padding-right: 8px;
 }
 
 .sms-tpl-list-head-tip {
