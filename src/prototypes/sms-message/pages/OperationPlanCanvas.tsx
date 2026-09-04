@@ -815,8 +815,6 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                                     <span className="sms-tpl-order">{i + 1}</span>
                                                                     <div className="sms-tpl-row-info">
                                                                         <div className="sms-tpl-row-name">{t.name}</div>
-                                                                        <div className="sms-tpl-row-meta">{t.meta}</div>
-                                                                        <div className="sms-tpl-row-tags"><span className="sms-tpl-tag">{t.channel}</span></div>
                                                                     </div>
                                                                     <div className="sms-tpl-row-actions">
                                                                         <button
