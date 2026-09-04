@@ -450,11 +450,7 @@ function TemplatePickerModal({
         const q = query.trim().toLowerCase();
         return !q || t.id.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
     });
-    const sorted = filtered.slice().sort((a, b) => {
-        const ia = picked.indexOf(a.id);
-        const ib = picked.indexOf(b.id);
-        return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
-    });
+    const sorted = filtered;
 
     const toggle = (id: string) => {
         if (!picked.includes(id) && picked.length >= MAX_TEMPLATES) {
