@@ -1111,6 +1111,20 @@ button {
     cursor: not-allowed;
 }
 
+.sms-tooltip-portal {
+    position: fixed;
+    left: 50%;
+    bottom: auto;
+    transform: translate(-50%, calc(-100% - 8px));
+    opacity: 1;
+    visibility: visible;
+    z-index: 1000;
+    width: max-content;
+    max-width: 360px;
+    white-space: normal;
+    pointer-events: none;
+}
+
 .sms-action-link:hover {
     color: #40a9ff;
 }

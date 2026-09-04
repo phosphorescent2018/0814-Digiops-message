@@ -1,9 +1,44 @@
 /**
  * 短信模版：搜索 + 新建模版 + 数据表格
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, RefreshCw, ListFilter, RotateCcw, Search, ChevronUp, Calendar, Trash2 } from 'lucide-react';
 import { templateRows } from '../mockData';
+
+function DisabledDeleteHint({ text, children }: { text: string; children: React.ReactNode }) {
+    const ref = useRef<HTMLSpanElement>(null);
+    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+    const show = () => {
+        const r = ref.current?.getBoundingClientRect();
+        if (!r) return;
+        const center = r.left + r.width / 2;
+        const left = Math.max(180, Math.min(center, window.innerWidth - 180));
+        setPos({ top: r.top, left });
+    };
+    const hide = () => setPos(null);
+
+    return (
+        <span
+            ref={ref}
+            className="sms-tooltip-wrap"
+            onMouseEnter={show}
+            onMouseLeave={hide}
+            onFocus={show}
+            onBlur={hide}
+        >
+            {children}
+            {pos &&
+                createPortal(
+                    <span className="sms-tooltip sms-tooltip-portal" style={{ left: pos.left, top: pos.top }}>
+                        {text}
+                    </span>,
+                    document.body
+                )}
+        </span>
+    );
+}
 
 const PAGE_SIZE = 10;
 
@@ -80,14 +115,13 @@ function TemplateTable() {
                                         编辑
                                     </button>
                                     {row.usedPlan ? (
-                                        <span
-                                            className="sms-tooltip-wrap"
-                                            title={`当前短信模板已在运营计划「${row.usedPlan}」中配置，请先删除对应的运营计划后再删除模板。`}
+                                        <DisabledDeleteHint
+                                            text={`当前短信模板已在运营计划「${row.usedPlan}」中配置，请先删除对应的运营计划后再删除模板。`}
                                         >
                                             <button type="button" className="sms-action-icon" disabled title="">
                                                 <Trash2 size={15} />
                                             </button>
-                                        </span>
+                                        </DisabledDeleteHint>
                                     ) : (
                                         <button type="button" className="sms-action-icon" title="删除">
                                             <Trash2 size={15} />
