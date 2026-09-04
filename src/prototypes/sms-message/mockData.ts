@@ -257,9 +257,26 @@ export interface TemplateRow {
     content: string;
     operator: string;
     status: string;
+    /** 该模板已被哪个运营计划引用（存在则删除按钮置灰） */
+    usedPlan?: string;
 }
 
-export const templateRows: TemplateRow[] = [];
+export const templateRows: TemplateRow[] = [
+    {
+        index: 1,
+        createTime: '2026-08-11 10:00:00',
+        updateTime: '2026-08-11 10:00:00',
+        businessId: 'MTN_UG_Account_id',
+        templateName: 'BL_RepeatLoan_02',
+        triggerWay: '短信',
+        supplierType: 'SMPP',
+        contentType: '营销类',
+        content: '恭喜您获得 Momo Advance 额度，详情请查看 APP。',
+        operator: 'bohua',
+        status: '审核成功',
+        usedPlan: 'July2_Acquisition_A_1_8_260810',
+    },
+];
 
 export interface ReportRow {
     index: number;

@@ -2,7 +2,7 @@
  * 短信模版：搜索 + 新建模版 + 数据表格
  */
 import React, { useMemo, useState } from 'react';
-import { Plus, RefreshCw, ListFilter, RotateCcw, Search, ChevronUp, Calendar } from 'lucide-react';
+import { Plus, RefreshCw, ListFilter, RotateCcw, Search, ChevronUp, Calendar, Trash2 } from 'lucide-react';
 import { templateRows } from '../mockData';
 
 const PAGE_SIZE = 10;
@@ -79,9 +79,20 @@ function TemplateTable() {
                                     <button type="button" className="sms-action-link">
                                         编辑
                                     </button>
-                                    <button type="button" className="sms-action-link">
-                                        删除
-                                    </button>
+                                    {row.usedPlan ? (
+                                        <span className="sms-tooltip-wrap">
+                                            <button type="button" className="sms-action-icon" disabled title="">
+                                                <Trash2 size={15} />
+                                            </button>
+                                            <span className="sms-tooltip">
+                                                当前短信模板已在运营计划「{row.usedPlan}」中配置，请先删除对应的运营计划后再删除模板。
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <button type="button" className="sms-action-icon" title="删除">
+                                            <Trash2 size={15} />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

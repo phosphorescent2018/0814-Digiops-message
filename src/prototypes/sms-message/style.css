@@ -1073,6 +1073,28 @@ button {
     font-size: 14px;
 }
 
+.sms-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.sms-action-icon:hover:not(:disabled) {
+    background: #f0f2f5;
+}
+
+.sms-action-icon:disabled {
+    color: #c0c4cc;
+    cursor: not-allowed;
+}
+
 .sms-action-link:hover {
     color: #40a9ff;
 }
