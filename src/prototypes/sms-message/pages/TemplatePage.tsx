@@ -80,13 +80,13 @@ function TemplateTable() {
                                         编辑
                                     </button>
                                     {row.usedPlan ? (
-                                        <span className="sms-tooltip-wrap">
+                                        <span
+                                            className="sms-tooltip-wrap"
+                                            title={`当前短信模板已在运营计划「${row.usedPlan}」中配置，请先删除对应的运营计划后再删除模板。`}
+                                        >
                                             <button type="button" className="sms-action-icon" disabled title="">
                                                 <Trash2 size={15} />
                                             </button>
-                                            <span className="sms-tooltip">
-                                                当前短信模板已在运营计划「{row.usedPlan}」中配置，请先删除对应的运营计划后再删除模板。
-                                            </span>
                                         </span>
                                     ) : (
                                         <button type="button" className="sms-action-icon" title="删除">
