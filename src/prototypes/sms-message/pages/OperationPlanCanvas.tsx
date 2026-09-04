@@ -156,9 +156,14 @@ const SMS_TEMPLATE_POOL: SmsTemplateOption[] = [
     { id: 'BL_RepeatLoan_07', name: 'BL_RepeatLoan_07', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的首期还款即将到期，请按时还款。' },
     { id: 'BL_RepeatLoan_08', name: 'BL_RepeatLoan_08', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的本期账单已生成，请及时还款。' },
     { id: 'BL_RepeatLoan_09', name: 'BL_RepeatLoan_09', meta: '还款后提醒 · 短信', channel: '短信', contentType: '通知类', content: '您的借款已成功展期。' },
+    { id: 'BL_RepeatLoan_10', name: 'BL_RepeatLoan_10', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您有一笔专享额度待领取。' },
+    { id: 'BL_RepeatLoan_11', name: 'BL_RepeatLoan_11', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您的额度又升级了，快来查看。' },
+    { id: 'BL_RepeatLoan_12', name: 'BL_RepeatLoan_12', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '限时借款优惠已到账。' },
+    { id: 'BL_RepeatLoan_13', name: 'BL_RepeatLoan_13', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您有一笔专属额度待使用。' },
+    { id: 'BL_RepeatLoan_14', name: 'BL_RepeatLoan_14', meta: '复借营销 · 短信', channel: '短信', contentType: '营销类', content: '您可再次借款，快去看看。' },
 ];
 
-const MAX_TEMPLATES = 10;
+const MAX_TEMPLATES = 15;
 
 const templateById = (id: string): SmsTemplateOption => {
     const t = SMS_TEMPLATE_POOL.find((x) => x.id === id);
@@ -453,7 +458,7 @@ function TemplatePickerModal({
 
     const toggle = (id: string) => {
         if (!picked.includes(id) && picked.length >= MAX_TEMPLATES) {
-            setNotice('最多只能选择 10 个模板');
+            setNotice('最多只能选择 15 个模板');
             window.setTimeout(() => setNotice(''), 2200);
             return;
         }
@@ -500,7 +505,6 @@ function TemplatePickerModal({
                                     </span>
                                     <div className="sms-tpl-picker-info">
                                         <div className="sms-tpl-picker-name">{t.name}</div>
-                                        <div className="sms-tpl-picker-meta">{t.meta} · {t.channel}</div>
                                     </div>
                                     {pickedFlag && <span className="sms-tpl-picker-order">第{idx + 1}位</span>}
                                 </div>
