@@ -1022,7 +1022,7 @@ button {
 }
 
 .sms-template-table .sms-col-sendtime {
-    width: 10%;
+    width: 8%;
 }
 
 .sms-template-table .sms-col-business {
@@ -1030,7 +1030,7 @@ button {
 }
 
 .sms-template-table .sms-col-plan {
-    width: 10%;
+    width: 14%;
 }
 
 .sms-template-table .sms-col-type {
@@ -1051,6 +1051,22 @@ button {
 
 .sms-template-table .sms-col-action {
     width: 15%;
+}
+
+.sms-template-table .sms-tooltip {
+    left: auto;
+    right: 0;
+    transform: none;
+    width: 340px;
+    max-width: 340px;
+    white-space: normal;
+    text-align: left;
+}
+
+.sms-template-table .sms-tooltip::after {
+    left: auto;
+    right: 36px;
+    transform: none;
 }
 
 .sms-col-operator {
