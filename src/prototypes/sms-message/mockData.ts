@@ -276,6 +276,32 @@ export const templateRows: TemplateRow[] = [
         status: '审核成功',
         usedPlan: 'July2_Acquisition_A_1_8_260810',
     },
+    {
+        index: 2,
+        createTime: '2026-08-05 09:30:00',
+        updateTime: '2026-08-05 09:30:00',
+        businessId: 'MTN_UG_Account_id',
+        templateName: 'BL_RepeatLoan_02_01',
+        triggerWay: '短信',
+        supplierType: 'SMPP',
+        contentType: '营销类',
+        content: '您的额度已更新，点击立即借款。',
+        operator: 'bohua',
+        status: '审核成功',
+    },
+    {
+        index: 3,
+        createTime: '2026-07-30 16:20:00',
+        updateTime: '2026-07-30 16:20:00',
+        businessId: 'MTN_UG_Account_id',
+        templateName: 'BL_RepeatLoan_03',
+        triggerWay: '短信',
+        supplierType: 'SMPP',
+        contentType: '通知类',
+        content: '您的借款已还款，感谢使用。',
+        operator: 'bohua',
+        status: '审核成功',
+    },
 ];
 
 export interface ReportRow {
