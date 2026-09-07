@@ -590,6 +590,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                     <option value="回执中">回执中</option>
                                                     <option value="已送达">已送达</option>
                                                     <option value="回执超时">回执超时</option>
+                                                    <option value="未送达">未送达</option>
                                                     <option value="--">--</option>
                                                 </>
                                             )}
@@ -645,6 +646,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                     <option value="回执中">回执中</option>
                                     <option value="已送达">已送达</option>
                                     <option value="回执超时">回执超时</option>
+                                    <option value="未送达">未送达</option>
                                     <option value="--">--</option>
                                 </select>
                             </div>

@@ -185,6 +185,7 @@ function SearchForm({
                             <option value="回执中">回执中</option>
                             <option value="已送达">已送达</option>
                             <option value="回执超时">回执超时</option>
+                            <option value="未送达">未送达</option>
                             <option value="--">--</option>
                         </select>
                     </div>
@@ -315,11 +316,13 @@ function RecordTable({
             回执中: 'sms-status-delivering',
             已送达: 'sms-status-success',
             回执超时: 'sms-status-timeout',
+            未送达: 'sms-status-fail',
         };
         const tipMap: Record<string, string> = {
             回执中: '正在等待运营商回执',
             已送达: '短信投递成功',
             回执超时: '1 小时内无明确回执',
+            未送达: '短信未投递成功',
         };
         const className = classMap[row.deliveryStatus] ?? 'sms-status-unknown';
         return (
