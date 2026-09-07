@@ -264,7 +264,6 @@ export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完�
 
 type ModalType = 'immediate' | 'scheduled' | null;
 type IgnoreBlacklist = 'yes' | 'no' | 'unset';
-type IncludeResent = 'yes' | 'no' | 'unset';
 
 const MANUAL_COLUMNS: ColumnDef[] = [
     { key: 'batchId', label: '补发批次 ID' },
@@ -285,7 +284,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     const [queryCount, setQueryCount] = useState(0);
     const [modal, setModal] = useState<ModalType>(null);
     const [ignoreBlacklist, setIgnoreBlacklist] = useState<IgnoreBlacklist>('unset');
-    const [includeResent, setIncludeResent] = useState<IncludeResent>('unset');
     const [scheduledTime, setScheduledTime] = useState('');
     const [validating, setValidating] = useState(false);
     const [validated, setValidated] = useState(false);
@@ -359,7 +357,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
 
     const resetResendForm = () => {
         setIgnoreBlacklist('unset');
-        setIncludeResent('unset');
         setScheduledTime('');
         setValidated(false);
         setVerifiedCount(null);
@@ -379,7 +376,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         if (
             validating ||
             ignoreBlacklist === 'unset' ||
-            includeResent === 'unset' ||
             (modal === 'scheduled' && !scheduledTimeValid)
         ) {
             return;
@@ -420,7 +416,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
     };
 
     const confirmFinal = () => {
-        if (!validated || verifiedCount === null || includeResent === 'unset') return;
+        if (!validated || verifiedCount === null) return;
         const isImmediate = modal === 'immediate';
         const submitTime = nowStr();
         const newId = `20260812${String(100 + batches.length + 1).slice(-3)}`;
@@ -441,7 +437,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         setValidated(false);
         setVerifiedCount(null);
         setIgnoreBlacklist('unset');
-        setIncludeResent('unset');
         setScheduledTime('');
         const newBatch: BatchRow = {
             id: newId,
@@ -1015,39 +1010,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                     </label>
                                 </div>
                             </div>
-                            <div className="resend-confirm-row">
-                                <span className="resend-confirm-label">
-                                    <span className="resend-required">*</span>已补发短信是否发送
-                                </span>
-                                <div className="resend-radio-group">
-                                    <label className={`resend-radio-item${includeResent === 'no' ? ' checked' : ''}`}>
-                                        <input
-                                            type="radio"
-                                            name="includeResent"
-                                            checked={includeResent === 'no'}
-                                            onChange={() => {
-                                                setIncludeResent('no');
-                                                setValidated(false);
-                                                setVerifiedCount(null);
-                                            }}
-                                        />
-                                        否
-                                    </label>
-                                    <label className={`resend-radio-item${includeResent === 'yes' ? ' checked' : ''}`}>
-                                        <input
-                                            type="radio"
-                                            name="includeResent"
-                                            checked={includeResent === 'yes'}
-                                            onChange={() => {
-                                                setIncludeResent('yes');
-                                                setValidated(false);
-                                                setVerifiedCount(null);
-                                            }}
-                                        />
-                                        是
-                                    </label>
-                                </div>
-                            </div>
                             {ignoreBlacklist !== 'unset' && (
                                 <div className={`resend-blacklist-tip${ignoreBlacklist === 'yes' ? ' warn' : ''}`}>
                                     {ignoreBlacklist === 'yes'
@@ -1055,6 +1017,9 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                         : '所补发用户将不含有黑名单用户'}
                                 </div>
                             )}
+                            <div className="resend-blacklist-tip">
+                                已存在成功补发记录的短信将自动排除，不重复发送
+                            </div>
                             <div className="resend-confirm-row">
                                 <span className="resend-confirm-label">补发数量</span>
                                 <div className="resend-verify-wrap">
@@ -1071,21 +1036,17 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 disabled={
                                                     validating ||
                                                     ignoreBlacklist === 'unset' ||
-                                                    includeResent === 'unset' ||
                                                     (modal === 'scheduled' && !scheduledTimeValid)
                                                 }
                                             >
                                                 {validating ? '校验中…' : '点击校验'}
                                             </button>
                                             {(ignoreBlacklist === 'unset' ||
-                                                includeResent === 'unset' ||
                                                 (modal === 'scheduled' && !scheduledTimeValid)) && (
                                                 <span className="sms-tooltip">
                                                     {ignoreBlacklist === 'unset'
                                                         ? '请先选择黑名单用户是否发送'
-                                                        : includeResent === 'unset'
-                                                            ? '请先选择已补发短信是否发送'
-                                                            : '请先选择晚于当前时间的补发时间'}
+                                                        : '请先选择晚于当前时间的补发时间'}
                                                 </span>
                                             )}
                                         </span>
@@ -1103,7 +1064,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 disabled={
                                     !validated ||
                                     ignoreBlacklist === 'unset' ||
-                                    includeResent === 'unset' ||
                                     (modal === 'scheduled' && !scheduledTimeValid)
                                 }
                                 onClick={confirmFinal}
