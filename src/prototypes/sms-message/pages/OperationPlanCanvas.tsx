@@ -1048,7 +1048,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                     <div className="resend-cond-group">
                                                         <div className="resend-cond-group-head">
                                                             <span className="resend-cond-group-title">回执判定后</span>
-                                                            <span className="resend-cond-group-desc">1 小时内无明确回执</span>
+                                                            <span className="resend-cond-group-desc">回执返回后自动判定</span>
                                                         </div>
                                                         <div className="resend-cond-options">
                                                             <label className="resend-cond-option">
@@ -1058,6 +1058,14 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                                     onChange={() => toggleResendTrigger('receiptTimeout')}
                                                                 />
                                                                 <span className="resend-cond-option-text">回执超时</span>
+                                                            </label>
+                                                            <label className="resend-cond-option">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={draft.resend.triggers.includes('undelivered')}
+                                                                    onChange={() => toggleResendTrigger('undelivered')}
+                                                                />
+                                                                <span className="resend-cond-option-text">未送达</span>
                                                             </label>
                                                         </div>
                                                     </div>
