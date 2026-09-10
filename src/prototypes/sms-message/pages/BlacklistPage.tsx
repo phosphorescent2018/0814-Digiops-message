@@ -1054,7 +1054,7 @@ function DetailModal({ row, onClose }: { row: BlacklistRow; onClose: () => void 
                             <span className="blacklist-detail-value">{row.remark}</span>
                         </div>
                     </div>
-                    <div className="blacklist-hit-title">最近拦截记录</div>
+                    <div className="blacklist-hit-title">最近 5 条拦截记录</div>
                     <div className="blacklist-hit-list">
                         {hits.map((hit, i) => (
                             <div className="blacklist-hit-item" key={i}>
