@@ -44,18 +44,59 @@ function SearchForm({
     view,
     resendType,
     onResendTypeChange,
+    onQuery,
 }: {
     filter?: RecordFilter;
     view: RecordView;
     resendType: string;
     onResendTypeChange: (v: string) => void;
+    onQuery: (next: RecordFilter) => void;
 }) {
     const [collapsed, setCollapsed] = useState(true);
+    const formRef = React.useRef<HTMLFormElement>(null);
 
-    const renderSelect = (placeholder = PLACEHOLDER_SELECT, options?: string[], defaultValue?: string) => (
+    const readValue = (name: string) => {
+        const el = formRef.current?.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`);
+        return el?.value ?? '';
+    };
+
+    /** 收集表单值，构造发送记录筛选条件 */
+    const buildFilter = (): RecordFilter => {
+        const next: RecordFilter = { view };
+        const businessId = readValue('BusinessID');
+        const phone = readValue('手机号码');
+        const contentType = readValue('内容类型');
+        const sendStatus = readValue('发送状态');
+        const deliveryStatus = readValue('送达状态');
+        const resendStatus = readValue('补发状态');
+        const batchId = readValue('补发批次 ID').replace(/^B/, '');
+        if (businessId) next.businessId = businessId;
+        if (phone) next.phone = phone;
+        if (contentType) next.contentType = contentType;
+        if (sendStatus) next.sendStatus = sendStatus;
+        if (deliveryStatus) next.deliveryStatus = deliveryStatus;
+        if (resendStatus) next.resendStatus = resendStatus;
+        if (batchId) next.batchId = batchId;
+        return next;
+    };
+
+    const handleReset = () => {
+        const form = formRef.current;
+        if (form) {
+            Array.from(form.elements).forEach((el) => {
+                if (el instanceof HTMLInputElement || el instanceof HTMLSelectElement) {
+                    el.value = '';
+                }
+            });
+        }
+        onQuery({ view });
+    };
+
+    const renderSelect = (placeholder = PLACEHOLDER_SELECT, options?: string[], defaultValue?: string, name?: string) => (
         <select
             className={`sms-select${defaultValue ? '' : ' placeholder'}`}
             defaultValue={defaultValue ?? ''}
+            name={name}
         >
             {defaultValue ? (
                 <option value={defaultValue}>{defaultValue}</option>
@@ -95,31 +136,44 @@ function SearchForm({
             </div>
             <div className="sms-form-item">
                 <label className="sms-form-label">BusinessID</label>
-                <div className="sms-form-control">{renderSelect('', undefined, filter?.businessId)}</div>
+                <div className="sms-form-control">{renderSelect('', undefined, filter?.businessId, 'BusinessID')}</div>
             </div>
             {!collapsed && (
                 <>
                     <div className="sms-form-item">
                         <label className="sms-form-label">计划名称</label>
-                        <div className="sms-form-control">{renderSelect()}</div>
+                        <div className="sms-form-control">
+                            {renderSelect(undefined, undefined, undefined, '计划名称')}
+                        </div>
                     </div>
                     <div className="sms-form-item">
                         <label className="sms-form-label">用户分组</label>
-                        <div className="sms-form-control">{renderSelect()}</div>
+                        <div className="sms-form-control">
+                            {renderSelect(undefined, undefined, undefined, '用户分组')}
+                        </div>
                     </div>
                     <div className="sms-form-item">
                         <label className="sms-form-label">手机号码</label>
                         <div className="sms-form-control">
-                            <input className="sms-input" placeholder="请输入" defaultValue={filter?.phone ?? ''} />
+                            <input
+                                className="sms-input"
+                                placeholder="请输入"
+                                name="手机号码"
+                                defaultValue={filter?.phone ?? ''}
+                            />
                         </div>
                     </div>
                     <div className="sms-form-item">
                         <label className="sms-form-label">内容类型</label>
-                        <div className="sms-form-control">{renderSelect(undefined, contentTypeOptions.slice(1), filter?.contentType)}</div>
+                        <div className="sms-form-control">
+                            {renderSelect(undefined, contentTypeOptions.slice(1), filter?.contentType, '内容类型')}
+                        </div>
                     </div>
                     <div className="sms-form-item">
                         <label className="sms-form-label">发送名称</label>
-                        <div className="sms-form-control">{renderSelect()}</div>
+                        <div className="sms-form-control">
+                            {renderSelect(undefined, undefined, undefined, '发送名称')}
+                        </div>
                     </div>
                     {view === 'resend' && (
                         <div className="sms-form-item">
@@ -128,6 +182,7 @@ function SearchForm({
                                 <input
                                     className="sms-input sms-control-purple"
                                     placeholder="请输入"
+                                    name="补发批次 ID"
                                     defaultValue={filter?.batchId ?? ''}
                                 />
                             </div>
@@ -136,7 +191,7 @@ function SearchForm({
                     <div className="sms-form-item">
                         <label className="sms-form-label">路径标记</label>
                         <div className="sms-form-control">
-                            <input className="sms-input" placeholder="请输入" />
+                            <input className="sms-input" placeholder="请输入" name="路径标记" />
                         </div>
                     </div>
                 </>
@@ -145,7 +200,14 @@ function SearchForm({
     );
 
     return (
-        <div className="sms-card sms-search">
+        <form
+            ref={formRef}
+            className="sms-card sms-search"
+            onSubmit={(e) => {
+                e.preventDefault();
+                onQuery(buildFilter());
+            }}
+        >
             <div className="sms-search-grid">
                 {fields}
             </div>
@@ -171,7 +233,7 @@ function SearchForm({
                 <div className="sms-form-item">
                     <label className="sms-form-label">发送状态</label>
                     <div className="sms-form-control">
-                        {renderSelect(undefined, statusOptions.map((s) => s.label), filter?.sendStatus)}
+                        {renderSelect(undefined, statusOptions.map((s) => s.label), filter?.sendStatus, '发送状态')}
                     </div>
                 </div>
                 <div className="sms-form-item">
@@ -180,6 +242,7 @@ function SearchForm({
                         <select
                             className={`sms-select sms-control-purple${filter?.deliveryStatus ? '' : ' placeholder'}`}
                             defaultValue={filter?.deliveryStatus ?? ''}
+                            name="送达状态"
                         >
                             <option value="">请选择</option>
                             <option value="回执中">回执中</option>
@@ -197,6 +260,7 @@ function SearchForm({
                             <select
                                 className={`sms-select sms-control-purple${filter?.resendStatus ? '' : ' placeholder'}`}
                                 defaultValue={filter?.resendStatus ?? ''}
+                                name="补发状态"
                             >
                                 <option value="">请选择</option>
                                 <option value="未补发过">未补发过</option>
@@ -208,11 +272,11 @@ function SearchForm({
                 </>
                 )}
                 <div className="resend-filter-actions">
-                    <button type="button" className="sms-btn">
+                    <button type="button" className="sms-btn" onClick={handleReset}>
                         <RotateCcw size={14} />
                         重置
                     </button>
-                    <button type="button" className="sms-btn sms-btn-primary">
+                    <button type="submit" className="sms-btn sms-btn-primary">
                         <Search size={14} />
                         查询
                     </button>
@@ -222,7 +286,7 @@ function SearchForm({
                     </button>
                 </div>
             </div>
-        </div>
+        </form>
     );
 }
 
@@ -505,6 +569,12 @@ export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPa
     const [exportVisible, setExportVisible] = useState(false);
     const [view, setView] = useState<RecordView>(filter?.view === 'resend' ? 'resend' : 'original');
     const [resendType, setResendType] = useState(filter?.view === 'resend' ? '' : '原始短信');
+    /** 已应用的筛选：初始取外部带入值，点「查询」后由表单结果覆盖 */
+    const [appliedFilter, setAppliedFilter] = useState<RecordFilter | undefined>(filter);
+
+    useEffect(() => {
+        setAppliedFilter(filter);
+    }, [filter]);
 
     useEffect(() => {
         if (filter?.view) {
@@ -535,14 +605,16 @@ export default function RecordPage({ activeKey, filter, onOpenResend }: RecordPa
                 </div>
             </div>
             <SearchForm
+                key={JSON.stringify(filter ?? {})}
                 filter={filter}
                 view={view}
                 resendType={resendType}
                 onResendTypeChange={setResendType}
+                onQuery={setAppliedFilter}
             />
             <RecordTable
                 onExport={() => setExportVisible(true)}
-                filter={filter}
+                filter={appliedFilter}
                 view={view}
                 resendType={resendType}
                 onOpenResend={onOpenResend}
