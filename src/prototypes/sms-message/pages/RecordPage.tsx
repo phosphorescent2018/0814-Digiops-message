@@ -242,7 +242,12 @@ function RecordTable({
     const [page, setPage] = useState(1);
     const filteredRows = useMemo(
         () => {
-            const statusCodeMap: Record<string, string> = { 成功: '2', 失败: '1' };
+            const statusCodeMap: Record<string, string> = {
+                成功: '2',
+                失败: '1',
+                待发送: 'waiting',
+                已过期: 'expired',
+            };
             return recordRows.filter((r) => {
                 if (view === 'original' && r.resendType !== '原始短信') return false;
                 if (view === 'resend' && r.resendType === '原始短信') return false;
@@ -289,12 +294,21 @@ function RecordTable({
         const statusMap: Record<string, { className: string; text: string }> = {
             '2': { className: 'sms-status-success', text: '成功' },
             '1': { className: 'sms-status-fail', text: '失败' },
+            waiting: { className: 'sms-status-pending', text: '待发送' },
+            expired: { className: 'sms-status-unknown', text: '已过期' },
+        };
+        const tipMap: Record<string, string> = {
+            waiting: '已进入发送队列，等待允许发送时段',
+            expired: '超出等待窗口或计划被终止',
         };
         const item = statusMap[status];
-        return <span className={`sms-status ${item?.className ?? 'sms-status-unknown'}`}>{item?.text ?? '-'}</span>;
+        const badge = (
+            <span className={`sms-status ${item?.className ?? 'sms-status-unknown'}`}>{item?.text ?? '-'}</span>
+        );
+        return tipMap[status] ? <DeliveryTooltip text={tipMap[status]}>{badge}</DeliveryTooltip> : badge;
     };
 
-    // 送达状态：历史短信一律 --；失败 --；成功按回执状态展示
+    // 送达状态：历史短信一律 --；失败 --；待发送/已过期 --；成功按回执状态展示
     const renderDelivery = (row: (typeof recordRows)[number]) => {
         if (row.isHistory || row.notifyStatus === '1') {
             const tip = row.isHistory ? '历史数据，不计算回执' : '发送失败，无回执';
@@ -303,6 +317,9 @@ function RecordTable({
                     <span className="sms-dash">--</span>
                 </DeliveryTooltip>
             );
+        }
+        if (row.notifyStatus === 'waiting' || row.notifyStatus === 'expired') {
+            return <span className="sms-dash">--</span>;
         }
         const classMap: Record<string, string> = {
             回执中: 'sms-status-delivering',
@@ -371,7 +388,9 @@ function RecordTable({
                         {rows.map((row) => (
                             <tr key={row.index}>
                                 <td className="sms-col-index">{row.index}</td>
-                                <td>{row.sendTime}</td>
+                                <td>
+                                    {row.sendTime ? row.sendTime : <span className="sms-dash">--</span>}
+                                </td>
                                 <td>
                                     <span className="sms-cell">{row.businessId}</span>
                                 </td>

@@ -13,7 +13,8 @@ export interface RecordRow {
     contentType: string;
     content: string;
     sender: string;
-    notifyStatus: '1' | '2';
+    /** 发送状态：'2'=成功 '1'=失败 waiting=待发送 expired=已过期 */
+    notifyStatus: '1' | '2' | 'waiting' | 'expired';
     /** 送达状态：回执中 / 已送达 / 回执超时 / 未送达 / --（无回执，含失败、历史） */
     deliveryStatus: string;
     /** 关联补发批次 ID（无批次则无） */
@@ -243,6 +244,74 @@ export const recordRows: RecordRow[] = [
         resendType: '原始短信',
         resendStatus: '已补发过',
     },
+    {
+        index: 13,
+        sendTime: '',
+        businessId: 'MTN_UG_Account_id',
+        planName: '新客激活活动',
+        groupName: '-',
+        phone: 'gT7yKu8Pl4Xm2Qd9Wz3RkA==',
+        contentType: '营销类',
+        content: "Y'ello! You have an unclaimed MoMo Advance offer waiting. Dial *165*30# to check your limit.",
+        sender: 'MOMOADVANCE',
+        notifyStatus: 'waiting',
+        deliveryStatus: '--',
+        resendType: '原始短信',
+        resendStatus: '未补发过',
+        isHistory: false,
+        solId: '-',
+    },
+    {
+        index: 14,
+        sendTime: '',
+        businessId: 'MTN_UG_Account_id',
+        planName: '逾期提醒-账单催收',
+        groupName: '-',
+        phone: 'xR2mAt6Vq8Lc4Ph1Ns7YdQ==',
+        contentType: '服务类',
+        content: "Y'ello! Your MoMo Advance payment is due...",
+        sender: 'MOMOADVANCE',
+        notifyStatus: 'waiting',
+        deliveryStatus: '--',
+        batchId: '',
+        resendType: '计划内自动补发',
+        isHistory: false,
+        solId: '-',
+    },
+    {
+        index: 15,
+        sendTime: '',
+        businessId: 'MTN_UG_Account_id',
+        planName: '逾期提醒-账单催收',
+        groupName: '-',
+        phone: 'bN8sWz3Qv5Km1Rd6Tg2LpA==',
+        contentType: '服务类',
+        content: "Y'ello! Your MoMo Advance payment is due...",
+        sender: 'MOMOADVANCE',
+        notifyStatus: 'expired',
+        deliveryStatus: '--',
+        batchId: '',
+        resendType: '计划内自动补发',
+        isHistory: false,
+        solId: '-',
+    },
+    {
+        index: 16,
+        sendTime: '',
+        businessId: 'MTN_UG_Account_id',
+        planName: '新客激活活动',
+        groupName: '-',
+        phone: 'cV4nJp7Rt2Zq9Mw5Sx1HbA==',
+        contentType: '营销类',
+        content: "Y'ello! You have an unclaimed MoMo Advance offer waiting. Dial *165*30# to check your limit.",
+        sender: 'MOMOADVANCE',
+        notifyStatus: 'expired',
+        deliveryStatus: '--',
+        resendType: '原始短信',
+        resendStatus: '未补发过',
+        isHistory: false,
+        solId: '-',
+    },
 ];
 
 export interface TemplateRow {
@@ -368,6 +437,8 @@ export const contentTypeOptions = ['请选择', '营销类', '通知类', '服�
 export const statusOptions = [
     { value: '2', label: '成功' },
     { value: '1', label: '失败' },
+    { value: 'waiting', label: '待发送' },
+    { value: 'expired', label: '已过期' },
 ];
 
 /** 黑名单：名单库资产，供人工补发 / 计划内自动补发 / 运营计划前置校验使用 */
