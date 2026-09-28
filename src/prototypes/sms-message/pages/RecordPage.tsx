@@ -275,7 +275,13 @@ function RecordTable({
         const map: Record<string, number> = {};
         filteredRows
             .filter((r) => r.resendType === '计划内自动补发')
-            .sort((a, b) => a.sendTime.localeCompare(b.sendTime))
+            .sort((a, b) => {
+                // 待发送 / 已过期没有发送时间，排在最后，避免打乱已有序号
+                if (!a.sendTime && !b.sendTime) return a.index - b.index;
+                if (!a.sendTime) return 1;
+                if (!b.sendTime) return -1;
+                return a.sendTime.localeCompare(b.sendTime);
+            })
             .forEach((r, i) => {
                 map[`${r.index}-${r.sendTime}`] = i + 1;
             });
@@ -285,7 +291,7 @@ function RecordTable({
     const renderResendType = (row: (typeof recordRows)[number]) => {
         if (row.resendType === '计划内自动补发') {
             const seq = resendSeqMap[`${row.index}-${row.sendTime}`];
-            return `计划内自动补发·第 ${seq} 次`;
+            return seq ? `计划内自动补发·第 ${seq} 次` : row.resendType;
         }
         return row.resendType;
     };

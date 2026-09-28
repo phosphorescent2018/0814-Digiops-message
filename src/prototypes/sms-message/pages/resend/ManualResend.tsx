@@ -406,7 +406,12 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         if (businessId) filter.businessId = businessId;
         if (phone) filter.phone = phone;
         if (contentType) filter.contentType = contentType;
-        const sendStatusMap: Record<string, string> = { '2': '成功', '1': '失败' };
+        const sendStatusMap: Record<string, string> = {
+            '2': '成功',
+            '1': '失败',
+            waiting: '待发送',
+            expired: '已过期',
+        };
         if (sendStatusCode && sendStatusMap[sendStatusCode]) filter.sendStatus = sendStatusMap[sendStatusCode];
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
         if (batchId) filter.batchId = batchId;
@@ -582,6 +587,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 <>
                                                     <option value="2">成功</option>
                                                     <option value="1">失败</option>
+                                                    <option value="waiting">待发送</option>
+                                                    <option value="expired">已过期</option>
                                                 </>
                                             )}
                                             {label === '送达状态' && (
@@ -626,6 +633,8 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                     <option value="">请选择</option>
                                     <option value="2">成功</option>
                                     <option value="1">失败</option>
+                                    <option value="waiting">待发送</option>
+                                    <option value="expired">已过期</option>
                                 </select>
                             </div>
                         </div>
