@@ -101,6 +101,15 @@ interface DailyTimeWindow {
 
 const DAILY_LABELS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] as const;
 
+/** 单日发送窗口最短时长（分钟）：填了时段就必须大于 239 分钟，即至少 240 分钟 */
+const MIN_DAILY_WINDOW_MINUTES = 240;
+
+/** "HH:MM" 转当天分钟数 */
+const timeToMinutes = (t: string) => {
+    const [h, m] = t.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+};
+
 const emptyDailyWindows = (): DailyTimeWindow[] => Array.from({ length: 7 }, () => ({ start: '', end: '' }));
 
 /** 归一化按天时段：优先新结构 dailyWindows（逐索引取），否则兼容旧 windows（取第一段复制到每天） */
@@ -627,11 +636,18 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
     const precheckEnabled = draft.precheck.checks.length > 0;
     const dayWindowValid = (w: { start: string; end: string }) => !!w.start && !!w.end;
     const dayWindowEndBeforeStart = (w: { start: string; end: string }) => !!w.start && !!w.end && w.end < w.start;
+    // 填了完整时段且结束不早于开始，但时长不足最短限制
+    const dayWindowTooShort = (w: { start: string; end: string }) =>
+        !!w.start &&
+        !!w.end &&
+        w.end >= w.start &&
+        timeToMinutes(w.end) - timeToMinutes(w.start) < MIN_DAILY_WINDOW_MINUTES;
     const hasTimeOrderError = draft.precheck.dailyWindows.some(dayWindowEndBeforeStart);
+    const hasWindowTooShort = draft.precheck.dailyWindows.some(dayWindowTooShort);
     // 至少完整配置 1 天的时段，否则时段校验视为未完成；留空的天 = 该天不发送
     const precheckTimeMissing = precheckTimeSelected && !draft.precheck.dailyWindows.some(dayWindowValid);
     // 启用校验后若勾了时段校验则必须配全时段，否则拦截保存
-    const precheckIncomplete = precheckEnabled && (precheckTimeMissing || hasTimeOrderError);
+    const precheckIncomplete = precheckEnabled && (precheckTimeMissing || hasTimeOrderError || hasWindowTooShort);
 
     const resendTriggersMissing = draft.resend.enabled && draft.resend.triggers.length === 0;
     const resendCountMissing = draft.resend.enabled && !draft.resend.maxResend;
@@ -941,6 +957,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 {draft.precheck.dailyWindows.map((w, day) => {
                                                     const partial = (!!w.start || !!w.end) && !dayWindowValid(w);
                                                     const endBeforeStart = dayWindowEndBeforeStart(w);
+                                                    const tooShort = dayWindowTooShort(w);
                                                     return (
                                                         <div className="plan-canvas-time-day-row" key={day}>
                                                             <span className="plan-canvas-time-day">{DAILY_LABELS[day]}</span>
@@ -963,6 +980,9 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                             {endBeforeStart && (
                                                                 <span className="plan-canvas-time-day-error">结束不能早于开始</span>
                                                             )}
+                                                            {tooShort && (
+                                                                <span className="plan-canvas-time-day-error">时段需大于 239 分钟</span>
+                                                            )}
                                                             {day > 0 && (
                                                                 <button
                                                                     type="button"
@@ -978,7 +998,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 })}
                                             </div>
                                             <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
-                                                每天仅 1 段；留空的天表示该天不发送；结束时间不能早于开始
+                                                每天仅 1 段；留空的天表示该天不发送；结束时间不能早于开始；单日时段需大于 239 分钟
                                             </div>
                                             {precheckTimeMissing && (
                                                 <div className="plan-canvas-time-error plan-canvas-time-error-gap">
