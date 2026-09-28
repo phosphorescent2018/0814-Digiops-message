@@ -101,7 +101,7 @@ interface DailyTimeWindow {
 
 const DAILY_LABELS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] as const;
 
-/** 单日发送窗口最短时长（分钟）：填了时段就必须大于 239 分钟，即至少 240 分钟 */
+/** 单日发送窗口最短时长（分钟）：填了时段就必须不小于 240 分钟 */
 const MIN_DAILY_WINDOW_MINUTES = 240;
 
 /** "HH:MM" 转当天分钟数 */
@@ -981,7 +981,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                                 <span className="plan-canvas-time-day-error">结束不能早于开始</span>
                                                             )}
                                                             {tooShort && (
-                                                                <span className="plan-canvas-time-day-error">时段需大于 239 分钟</span>
+                                                                <span className="plan-canvas-time-day-error">时段需不小于 240 分钟</span>
                                                             )}
                                                             {day > 0 && (
                                                                 <button
@@ -998,7 +998,7 @@ function SmsConfigModal({ initial, onClose, onSave, onOpenBlacklist }: SmsConfig
                                                 })}
                                             </div>
                                             <div className="plan-canvas-time-hint plan-canvas-time-hint-gap">
-                                                每天仅 1 段；留空的天表示该天不发送；结束时间不能早于开始；单日时段需大于 239 分钟
+                                                每天仅 1 段；留空的天表示该天不发送；结束时间不能早于开始；单日时段需不小于 240 分钟
                                             </div>
                                             {precheckTimeMissing && (
                                                 <div className="plan-canvas-time-error plan-canvas-time-error-gap">
