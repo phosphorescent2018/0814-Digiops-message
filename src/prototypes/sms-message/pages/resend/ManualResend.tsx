@@ -406,7 +406,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
         if (businessId) filter.businessId = businessId;
         if (phone) filter.phone = phone;
         if (contentType) filter.contentType = contentType;
-        const sendStatusMap: Record<string, string> = { '2': '成功', '1': '失败', '0': '暂无数据' };
+        const sendStatusMap: Record<string, string> = { '2': '成功', '1': '失败' };
         if (sendStatusCode && sendStatusMap[sendStatusCode]) filter.sendStatus = sendStatusMap[sendStatusCode];
         if (deliveryStatus) filter.deliveryStatus = deliveryStatus;
         if (batchId) filter.batchId = batchId;
@@ -582,7 +582,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 <>
                                                     <option value="2">成功</option>
                                                     <option value="1">失败</option>
-                                                    <option value="0">暂无数据</option>
                                                 </>
                                             )}
                                             {label === '送达状态' && (
@@ -592,13 +591,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                     <option value="回执超时">回执超时</option>
                                                     <option value="未送达">未送达</option>
                                                     <option value="--">--</option>
-                                                </>
-                                            )}
-                                            {label === '发送状态' && (
-                                                <>
-                                                    <option value="2">成功</option>
-                                                    <option value="1">失败</option>
-                                                    <option value="0">暂无数据</option>
                                                 </>
                                             )}
                                             {label === '内容类型' && (
@@ -634,7 +626,6 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                     <option value="">请选择</option>
                                     <option value="2">成功</option>
                                     <option value="1">失败</option>
-                                    <option value="0">暂无数据</option>
                                 </select>
                             </div>
                         </div>

@@ -13,8 +13,8 @@ export interface RecordRow {
     contentType: string;
     content: string;
     sender: string;
-    notifyStatus: '0' | '1' | '2';
-    /** 送达状态：回执中 / 已送达 / 回执超时 / 未送达 / --（无回执，含失败、暂无数据、历史） */
+    notifyStatus: '1' | '2';
+    /** 送达状态：回执中 / 已送达 / 回执超时 / 未送达 / --（无回执，含失败、历史） */
     deliveryStatus: string;
     /** 关联补发批次 ID（无批次则无） */
     batchId?: string;
@@ -129,7 +129,7 @@ export const recordRows: RecordRow[] = [
         content:
             'Congratulations! You qualify for a Momo Advance limit of UGX #total_quota_amount#. ID: #overdraft_id#. Use the momo app or dial *165*30# to opt in.',
         sender: 'MOMOADVANCE',
-        notifyStatus: '0',
+        notifyStatus: '1',
         deliveryStatus: '--',
         batchId: '20260812004',
         resendType: '人工补发',
@@ -368,7 +368,6 @@ export const contentTypeOptions = ['请选择', '营销类', '通知类', '服�
 export const statusOptions = [
     { value: '2', label: '成功' },
     { value: '1', label: '失败' },
-    { value: '0', label: '暂无数据' },
 ];
 
 /** 黑名单：名单库资产，供人工补发 / 计划内自动补发 / 运营计划前置校验使用 */

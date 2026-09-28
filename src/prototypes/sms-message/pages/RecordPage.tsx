@@ -242,7 +242,7 @@ function RecordTable({
     const [page, setPage] = useState(1);
     const filteredRows = useMemo(
         () => {
-            const statusCodeMap: Record<string, string> = { 成功: '2', 失败: '1', 暂无数据: '0' };
+            const statusCodeMap: Record<string, string> = { 成功: '2', 失败: '1' };
             return recordRows.filter((r) => {
                 if (view === 'original' && r.resendType !== '原始短信') return false;
                 if (view === 'resend' && r.resendType === '原始短信') return false;
@@ -289,25 +289,17 @@ function RecordTable({
         const statusMap: Record<string, { className: string; text: string }> = {
             '2': { className: 'sms-status-success', text: '成功' },
             '1': { className: 'sms-status-fail', text: '失败' },
-            '0': { className: 'sms-status-unknown', text: '暂无数据' },
         };
         const item = statusMap[status];
         return <span className={`sms-status ${item?.className ?? 'sms-status-unknown'}`}>{item?.text ?? '-'}</span>;
     };
 
-    // 送达状态：历史短信一律 --；失败 --；暂无数据 --；成功按回执状态展示
+    // 送达状态：历史短信一律 --；失败 --；成功按回执状态展示
     const renderDelivery = (row: (typeof recordRows)[number]) => {
         if (row.isHistory || row.notifyStatus === '1') {
             const tip = row.isHistory ? '历史数据，不计算回执' : '发送失败，无回执';
             return (
                 <DeliveryTooltip text={tip}>
-                    <span className="sms-dash">--</span>
-                </DeliveryTooltip>
-            );
-        }
-        if (row.notifyStatus === '0') {
-            return (
-                <DeliveryTooltip text="发送状态未确认">
                     <span className="sms-dash">--</span>
                 </DeliveryTooltip>
             );

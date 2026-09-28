@@ -92,16 +92,15 @@ const DETAIL_ROWS: DetailRow[] = [
         id: 7,
         phone: 'qO3Vx8yC2sTpR9wLk5eHuA==',
         content: 'Congratulations! You qualify for a Momo Advance limit...',
-        sendStatus: '暂无数据',
+        sendStatus: '失败',
         deliveryStatus: '--',
-        failReason: '',
+        failReason: '提交失败：通道异常',
     },
 ];
 
 const SEND_STATUS_CLASS: Record<string, string> = {
     成功: 'sms-status-success',
     失败: 'sms-status-fail',
-    暂无数据: 'sms-status-unknown',
 };
 
 const DELIVERY_CLASS: Record<string, string> = {
@@ -117,7 +116,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
     const [refreshing, setRefreshing] = useState(false);
 
     const stats = useMemo(() => {
-        const send: Record<string, number> = { 成功: 0, 失败: 0, 暂无数据: 0 };
+        const send: Record<string, number> = { 成功: 0, 失败: 0 };
         const delivery: Record<string, number> = {};
         DETAIL_ROWS.forEach((r) => {
             send[r.sendStatus] = (send[r.sendStatus] ?? 0) + 1;
@@ -148,7 +147,6 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
     const SEND_COLORS: Record<string, string> = {
         成功: '#52c41a',
         失败: '#f5222d',
-        暂无数据: '#98a1b8',
     };
     const DELIVERY_COLORS: Record<string, string> = {
         回执中: '#1677ff',
