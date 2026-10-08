@@ -2702,7 +2702,8 @@ button {
    用双类选择器提高特异性，避免被后面的 .sms-action-link 规则覆盖。 */
 .sms-action-link.resend-row-action {
     position: relative;
-    z-index: 10;
+    /* 提到较高层级，避免被浏览器扩展/外部注入的元素遮挡而点不到 */
+    z-index: 9999;
     padding: 4px 8px;
     margin-right: 12px;
     border-radius: 4px;
