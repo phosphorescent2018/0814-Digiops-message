@@ -900,22 +900,22 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                             </td>
                                         )}
                                         {visibleCols.includes('action') && (
-                                            <td>
+                                            <td className="resend-action-cell">
                                                 <button
                                                     type="button"
-                                                    className="sms-action-link resend-row-action"
+                                                    className="sms-action-link"
                                                     onClick={() => setDetailBatch(b)}
                                                 >
-                                                    <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                    <Eye size={13} />
                                                     详情
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    className="sms-action-link resend-terminate resend-row-action"
+                                                    className="sms-action-link resend-terminate"
                                                     disabled={!canTerminate}
                                                     onClick={() => openTerminate(b)}
                                                 >
-                                                    <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                    <Ban size={13} />
                                                     终止
                                                 </button>
                                             </td>

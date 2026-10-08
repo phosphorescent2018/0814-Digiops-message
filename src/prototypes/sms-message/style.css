@@ -622,13 +622,6 @@ button {
     text-overflow: ellipsis;
 }
 
-.resend-batch-table th:last-child,
-.resend-batch-table td:last-child {
-    width: 160px;
-    overflow: visible;
-    text-overflow: clip;
-}
-
 .sms-table tbody tr:hover td {
     background: #f5f6fa;
 }
@@ -2705,27 +2698,58 @@ button {
     color: #f5222d;
 }
 
-/* 补发记录操作列：加大点击热区，避免点到两个按钮之间的空隙。
-   用双类选择器提高特异性，避免被后面的 .sms-action-link 规则覆盖。 */
-.sms-action-link.resend-row-action {
-    padding: 4px 8px;
-    margin-right: 12px;
-    border-radius: 4px;
-    transition: background 0.15s ease, color 0.15s ease;
+/* ================================================================
+   补发记录 · 操作列（整块重写，不再叠加补丁）
+   要点：
+   1. 列宽固定且不截断 —— 否则 .sms-table td 的 text-overflow:ellipsis
+      会把「详情 + 终止」截成「...」，按钮的可点区域也被裁掉
+   2. 按钮用 inline-flex 排版，图标与文字对齐
+   3. 不使用 position/z-index —— 避免浮到 .sms-mask（z-index:100）之上，
+      导致详情抽屉打开时按钮仍可点击
+   ================================================================ */
+.resend-batch-table th:last-child,
+.resend-batch-table td:last-child {
+    width: 170px;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
 }
 
-.sms-action-link.resend-row-action:hover {
-    background: #e6f4ff;
-    text-decoration: none;
+.resend-action-cell .sms-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    margin: 0 16px 0 0;
+    background: none;
+    border: none;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--primary);
+    cursor: pointer;
 }
 
-.sms-action-link.resend-row-action:disabled:hover {
-    background: transparent;
+.resend-action-cell .sms-action-link:last-child {
+    margin-right: 0;
 }
 
-.resend-terminate:disabled {
+.resend-action-cell .sms-action-link:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+}
+
+.resend-action-cell .resend-terminate {
+    color: #f5222d;
+}
+
+.resend-action-cell .resend-terminate:hover {
+    color: #ff4d4f;
+}
+
+.resend-action-cell .sms-action-link:disabled {
     color: #cbd0db;
     cursor: not-allowed;
+    text-decoration: none;
 }
 
 .resend-danger-btn {
