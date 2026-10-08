@@ -622,6 +622,13 @@ button {
     text-overflow: ellipsis;
 }
 
+.resend-batch-table th:last-child,
+.resend-batch-table td:last-child {
+    width: 160px;
+    overflow: visible;
+    text-overflow: clip;
+}
+
 .sms-table tbody tr:hover td {
     background: #f5f6fa;
 }
@@ -2702,8 +2709,8 @@ button {
    用双类选择器提高特异性，避免被后面的 .sms-action-link 规则覆盖。 */
 .sms-action-link.resend-row-action {
     position: relative;
-    /* 提到较高层级，避免被浏览器扩展/外部注入的元素遮挡而点不到 */
-    z-index: 9999;
+    /* 提到最高层级，避免被外部注入的元素遮挡而点不到 */
+    z-index: 2147483647;
     padding: 4px 8px;
     margin-right: 12px;
     border-radius: 4px;
