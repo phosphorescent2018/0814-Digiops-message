@@ -536,8 +536,6 @@
               <tbody>
                 <tr><td data-label="事件">创建批次</td><td data-label="触发方">用户</td><td data-label="状态变化">— → 待执行 / 执行中</td><td data-label="说明">定时补发或立即补发提交</td></tr>
                 <tr><td data-label="事件">终止批次</td><td data-label="触发方">用户</td><td data-label="状态变化">待执行 / 执行中 → 已终止</td><td data-label="说明">用户手动终止，可选终止原因</td></tr>
-                <tr><td data-label="事件">开始执行</td><td data-label="触发方">系统</td><td data-label="状态变化">待执行 → 执行中</td><td data-label="说明">定时补发到点后自动开始</td></tr>
-                <tr><td data-label="事件">分批校验</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 执行中</td><td data-label="说明">按批校验并发送，记录累计进度</td></tr>
                 <tr><td data-label="事件">执行完成</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 已完成</td><td data-label="说明">所有应发短信均完成发送动作</td></tr>
                 <tr><td data-label="事件">执行异常</td><td data-label="触发方">系统</td><td data-label="状态变化">执行中 → 失败 / 部分失败</td><td data-label="说明">系统异常中断，按实际发送数量判定失败或部分失败</td></tr>
               </tbody>
@@ -546,7 +544,7 @@
           <ul>
             <li>展示位置：补发记录「批次详情」抽屉新增「批次动态」板块，按事件时间倒序展示。</li>
             <li>每条动态单行展示：操作时间、加粗「操作人 + 事件类型」、状态变化（无前置状态显示「— → x 状态」，鼠标悬浮在「—」上提示「创建前无批次状态」）；不展示说明。</li>
-            <li>批次动态记录人员操作与系统自动状态流转，完整覆盖批次从创建到终态的过程。</li>
+            <li>批次动态记录人员操作与关键结果事件（执行完成 / 执行异常），覆盖批次从创建到终态的结果；中间过程事件（开始执行、分批校验）不记录。</li>
             <li>创建、终止由原型交互实时写入；终止原因选填，填写后写入事件说明。</li>
           </ul>
         </section>
