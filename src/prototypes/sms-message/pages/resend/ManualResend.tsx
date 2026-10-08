@@ -286,6 +286,39 @@ const BATCHES: BatchRow[] = [
             },
         ],
     },
+    {
+        // 定时补发：还没到计划补发时间就被手动终止（待执行 → 已终止）
+        id: '20260812006',
+        scheduledTime: '2026-08-12 16:00:00',
+        endTime: '2026-08-12 15:58:30',
+        mode: '定时补发',
+        submitTime: '2026-08-12 15:45:20',
+        isTerminated: true,
+        isFailed: false,
+        userVerifiedCount: 640,
+        systemVerifiedCount: null,
+        events: [
+            {
+                id: '20260812006-e001',
+                happenTime: '2026-08-12 15:45:20',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '创建批次',
+                toStatus: '待执行',
+                remark: '提交定时补发',
+            },
+            {
+                id: '20260812006-e002',
+                happenTime: '2026-08-12 15:58:30',
+                actorType: 'USER',
+                actorName: 'bohua',
+                eventType: '终止批次',
+                fromStatus: '待执行',
+                toStatus: '已终止',
+                remark: '未到计划补发时间，用户手动终止',
+            },
+        ],
+    },
 ];
 
 export const STATUS_CLASS: Record<string, string> = {

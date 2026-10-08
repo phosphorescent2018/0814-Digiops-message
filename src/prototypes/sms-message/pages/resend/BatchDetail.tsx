@@ -140,6 +140,10 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
     };
 
     const hasExecutionData = status !== '待执行';
+    /** 从未实际开始发送（无实际发送记录）：待执行中、或还没开始发就被终止 */
+    const neverStarted = batch.systemVerifiedCount === null;
+    /** 有真实发送数据才展示执行统计图表与「查看发送记录」入口 */
+    const showExecutionStats = hasExecutionData && !neverStarted;
 
     const deliveryTotal = Object.values(stats.delivery).reduce((a, b) => a + b, 0);
     const sendTotal = Object.values(stats.send).reduce((a, b) => a + b, 0);
@@ -185,7 +189,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             <div className="resend-detail-item">
                                 <span className="resend-detail-label">补发开始时间</span>
                                 <span className="resend-detail-value">
-                                    {status === '待执行' ? '—' : batch.scheduledTime}
+                                    {neverStarted ? '—' : batch.scheduledTime}
                                 </span>
                             </div>
                             <div className="resend-detail-item">
@@ -253,22 +257,24 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             <div className="resend-stats-header">
                                 <span className="resend-detail-section-title resend-stats-title">执行统计</span>
                                 <div className="resend-stats-actions">
-                                    <button
-                                        type="button"
-                                        className="resend-link-btn"
-                                        onClick={() =>
-                                            onViewRecords?.({
-                                                sendTimeStart: '2026-08-01',
-                                                sendTimeEnd: '2026-08-12',
-                                                businessId: 'MTN_UG_Account_id',
-                                                deliveryStatus: '回执超时',
-                                                batchId: batch.id,
-                                            })
-                                        }
-                                    >
-                                        <ExternalLink size={13} />
-                                        查看发送记录
-                                    </button>
+                                    {showExecutionStats && (
+                                        <button
+                                            type="button"
+                                            className="resend-link-btn"
+                                            onClick={() =>
+                                                onViewRecords?.({
+                                                    sendTimeStart: '2026-08-01',
+                                                    sendTimeEnd: '2026-08-12',
+                                                    businessId: 'MTN_UG_Account_id',
+                                                    deliveryStatus: '回执超时',
+                                                    batchId: batch.id,
+                                                })
+                                            }
+                                        >
+                                            <ExternalLink size={13} />
+                                            查看发送记录
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                             {status === '失败' && (
@@ -283,9 +289,12 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                             )}
                             {status === '已终止' && (
                                 <div className="resend-fail-banner resend-fail-banner-grey">
-                                    已手动终止于 {batch.endTime}，剩余未执行条数未计入实际执行
+                                    {neverStarted
+                                        ? `已手动终止于 ${batch.endTime}，未开始发送`
+                                        : `已手动终止于 ${batch.endTime}，剩余未执行条数未计入实际执行`}
                                 </div>
                             )}
+                            {showExecutionStats && (
                             <div className="resend-stats-grid">
                                 <div className="resend-stat-panel">
                                     <div className="resend-stat-panel-title">发送状态</div>
@@ -336,6 +345,7 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
                                     </div>
                                 </div>
                             </div>
+                            )}
                         </div>
                     )}
 
