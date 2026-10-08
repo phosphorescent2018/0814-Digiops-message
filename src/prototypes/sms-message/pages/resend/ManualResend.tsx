@@ -47,6 +47,7 @@ export type BatchActorType = 'USER' | 'SYSTEM';
 
 export type BatchEventType =
     | '创建批次'
+    | '开始执行'
     | '执行完成'
     | '执行异常'
     | '终止批次';
@@ -104,6 +105,16 @@ const BATCHES: BatchRow[] = [
                 eventType: '创建批次',
                 toStatus: '待执行',
                 remark: '提交定时补发',
+            },
+            {
+                id: '20260812002-e002',
+                happenTime: '2026-08-12 13:00:00',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '待执行',
+                toStatus: '执行中',
+                remark: '到达计划补发时间，开始执行',
             },
             {
                 id: '20260812002-e003',
@@ -167,6 +178,16 @@ const BATCHES: BatchRow[] = [
                 eventType: '创建批次',
                 toStatus: '待执行',
                 remark: '提交定时补发',
+            },
+            {
+                id: '20260811007-e002',
+                happenTime: '2026-08-11 20:15:40',
+                actorType: 'SYSTEM',
+                actorName: '系统',
+                eventType: '开始执行',
+                fromStatus: '待执行',
+                toStatus: '执行中',
+                remark: '到达计划补发时间，开始执行',
             },
             {
                 id: '20260811007-e003',

@@ -3186,10 +3186,11 @@ button {
     font-variant-numeric: tabular-nums;
 }
 
-.resend-log-event {
-    flex: 0 1 auto;
+/* 批次动态只记录「谁 + 状态怎么变」，不再展示创建批次 / 执行完成这类事件描述 */
+.resend-log-actor {
+    flex: 0 0 72px;
     min-width: 0;
-    color: var(--text-main);
+    color: var(--text-secondary);
     font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
