@@ -2698,6 +2698,24 @@ button {
     color: #f5222d;
 }
 
+/* 补发记录操作列：加大点击热区，避免点到两个按钮之间的空隙。
+   用双类选择器提高特异性，避免被后面的 .sms-action-link 规则覆盖。 */
+.sms-action-link.resend-row-action {
+    padding: 4px 8px;
+    margin-right: 4px;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sms-action-link.resend-row-action:hover {
+    background: #e6f4ff;
+    text-decoration: none;
+}
+
+.sms-action-link.resend-row-action:disabled:hover {
+    background: transparent;
+}
+
 .resend-terminate:disabled {
     color: #cbd0db;
     cursor: not-allowed;

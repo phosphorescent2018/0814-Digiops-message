@@ -900,7 +900,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                             <td>
                                                 <button
                                                     type="button"
-                                                    className="sms-action-link"
+                                                    className="sms-action-link resend-row-action"
                                                     onClick={() => setDetailBatch(b)}
                                                 >
                                                     <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
@@ -908,7 +908,7 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    className="sms-action-link resend-terminate"
+                                                    className="sms-action-link resend-terminate resend-row-action"
                                                     disabled={!canTerminate}
                                                     onClick={() => openTerminate(b)}
                                                 >
