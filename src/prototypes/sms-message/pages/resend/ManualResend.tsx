@@ -876,7 +876,18 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                 {visibleCols.includes('action') && <th style={{ width: 160 }}>操作</th>}
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody
+                            onClick={(e) => {
+                                // 兜底：点击行内任意位置（「终止」按钮除外）也可打开详情，
+                                // 避免按钮被外部注入元素遮挡时无法查看详情。
+                                const el = e.target as HTMLElement;
+                                if (el.closest('.resend-terminate')) return;
+                                const tr = el.closest('tr');
+                                const idText = tr?.querySelector('.resend-batch-id')?.textContent?.trim() ?? '';
+                                const target = filteredBatches.find((x) => x.id === idText.replace(/^B/, ''));
+                                if (target) setDetailBatch(target);
+                            }}
+                        >
                             {filteredBatches.slice((batchPage - 1) * batchPageSize, batchPage * batchPageSize).map((b) => {
                                 const status = computeStatus(b);
                                 const canTerminate = status === '待执行' || status === '执行中';
