@@ -28,7 +28,38 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
 /** 本次新增 / 增强的功能 Tab：淡紫色背景标记 */
 const PURPLE_TABS: TabKey[] = ['record', 'resend'];
 
+/**
+ * AxHub 批注运行时的悬浮层挂在 document 下（#__axhub_annotation_host__），
+ * 自身 z-index: 2147483647，内容在 Shadow DOM 里，外部 CSS 无法覆盖。
+ * 结果：原型的弹窗 / 抽屉打开时，它仍浮在 .sms-mask 之上并截走点击，
+ * 导致「详情抽屉已经打开，还能点到别的按钮」。
+ * 这里在遮罩存在期间给该宿主加 inert，让它彻底不接收指针事件（inert 会作用于
+ * 宿主及其 Shadow DOM 后代），遮罩消失后立即恢复。
+ */
+const ANNOTATION_HOST_ID = '__axhub_annotation_host__';
+
+function useAnnotationInertWhileModalOpen() {
+    React.useEffect(() => {
+        const host = () => document.getElementById(ANNOTATION_HOST_ID);
+        const sync = () => {
+            const el = host();
+            if (!el) return;
+            const modalOpen = Boolean(document.querySelector('.sms-mask'));
+            if (el.inert !== modalOpen) el.inert = modalOpen;
+        };
+        sync();
+        const observer = new MutationObserver(sync);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        return () => {
+            observer.disconnect();
+            const el = host();
+            if (el) el.inert = false;
+        };
+    }, []);
+}
+
 export default function SmsMessage() {
+    useAnnotationInertWhileModalOpen();
     // 与 UAT 一致：默认激活「发送记录」
     const [activeTab, setActiveTab] = useState<TabKey>('record');
     const [page, setPage] = useState<AppPage>(() => {
