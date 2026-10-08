@@ -293,7 +293,10 @@ const CURRENT_OPERATOR = 'bohua';
 export const computeStatus = (b: BatchRow): '待执行' | '执行中' | '已完成' | '已终止' | '失败' | '部分失败' => {
     if (b.isTerminated) return '已终止';
     if (b.isFailed) return (b.systemVerifiedCount ?? 0) > 0 ? '部分失败' : '失败';
-    if (b.mode === '定时补发' && b.scheduledTime > nowStr()) return '待执行';
+    // 定时补发且尚无实际发送记录 → 待执行。
+    // 不用「计划时间 > 当前时间」判断：mock 里的日期会随真实时间推移而过期，
+    // 导致本应待执行的批次被算成执行中。
+    if (b.mode === '定时补发' && b.systemVerifiedCount === null) return '待执行';
     if (b.endTime !== '—') return '已完成';
     return '执行中';
 };
