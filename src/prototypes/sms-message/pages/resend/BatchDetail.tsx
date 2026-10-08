@@ -129,9 +129,8 @@ export default function BatchDetail({ batch, onClose, onTerminate, onViewRecords
         status === '执行中' && batch.systemVerifiedCount !== null
             ? Math.min((batch.systemVerifiedCount / batch.userVerifiedCount) * 100, 100)
             : null;
-    const eventList = [...(batch.events ?? [])]
-        .filter((event) => event.actorType === 'USER')
-        .sort((a, b) => b.happenTime.localeCompare(a.happenTime));
+    // 批次动态记录人员操作与系统自动状态流转，按时间倒序
+    const eventList = [...(batch.events ?? [])].sort((a, b) => b.happenTime.localeCompare(a.happenTime));
 
     const canTerminate = status === '待执行' || status === '执行中';
 
