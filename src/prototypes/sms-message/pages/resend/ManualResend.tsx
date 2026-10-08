@@ -906,15 +906,16 @@ export default function ManualResend({ onSwitchTab, incomingBatchId }: ManualRes
                                                     <Eye size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
                                                     详情
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    className="sms-action-link resend-terminate resend-row-action"
-                                                    disabled={!canTerminate}
-                                                    onClick={() => openTerminate(b)}
-                                                >
-                                                    <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
-                                                    终止
-                                                </button>
+                                                {canTerminate && (
+                                                    <button
+                                                        type="button"
+                                                        className="sms-action-link resend-terminate resend-row-action"
+                                                        onClick={() => openTerminate(b)}
+                                                    >
+                                                        <Ban size={13} style={{ verticalAlign: '-2px', marginRight: 3 }} />
+                                                        终止
+                                                    </button>
+                                                )}
                                             </td>
                                         )}
                                     </tr>

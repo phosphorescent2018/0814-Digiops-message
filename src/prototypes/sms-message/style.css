@@ -2702,7 +2702,7 @@ button {
    用双类选择器提高特异性，避免被后面的 .sms-action-link 规则覆盖。 */
 .sms-action-link.resend-row-action {
     padding: 4px 8px;
-    margin-right: 4px;
+    margin-right: 12px;
     border-radius: 4px;
     transition: background 0.15s ease, color 0.15s ease;
 }
