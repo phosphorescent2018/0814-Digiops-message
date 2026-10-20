@@ -677,7 +677,7 @@ function AddModal({
         expireForever: boolean;
         expireEnd: string;
         remark: string;
-    }) => { added: number; skipped: number };
+    }) => { added: number; overwritten: number };
 }) {
     const [expireType, setExpireType] = useState<'forever' | 'expire' | 'unset'>('unset');
     const [expireStart, setExpireStart] = useState('');
@@ -709,7 +709,7 @@ function AddModal({
             expireEnd,
             remark: remark.trim(),
         });
-        if (result.added > 0) onClose();
+        if (result.added > 0 || result.overwritten > 0) onClose();
     };
 
 
@@ -725,7 +725,7 @@ function AddModal({
                         <div className="sms-form-control">
                             <textarea
                                 className="blacklist-textarea"
-                                placeholder={'每行一个手机号码\n支持批量添加'}
+                                placeholder={'每行一个手机号码\n支持批量添加\n若名单与库内重复将默认覆盖'}
                                 rows={4}
                                 value={phones}
                                 onChange={(e) => setPhones(e.target.value)}
@@ -1175,15 +1175,21 @@ export default function BlacklistPage() {
         const expireTime = payload.expireForever ? '永久' : `${payload.expireEnd} 23:59:59`;
         let nextIndex = rows.reduce((max, r) => Math.max(max, r.index), 0) + 1;
         const fresh: BlacklistRow[] = [];
-        let skipped = 0;
+        const overwrites = new Map<number, Partial<BlacklistRow>>();
+        let overwritten = 0;
         payload.phones.forEach((phone) => {
-            const exists =
-                rows.some((r) => r.phone === phone && r.businessId === payload.businessId) ||
-                fresh.some((r) => r.phone === phone);
-            if (exists) {
-                skipped += 1;
+            const existing = rows.find((r) => r.phone === phone && r.businessId === payload.businessId);
+            if (existing) {
+                overwrites.set(existing.index, {
+                    expireTime,
+                    remark: payload.remark || existing.remark,
+                    effectiveTime: now,
+                    status: 'active',
+                });
+                overwritten += 1;
                 return;
             }
+            if (fresh.some((r) => r.phone === phone)) return;
             fresh.push({
                 index: nextIndex++,
                 phone,
@@ -1195,17 +1201,24 @@ export default function BlacklistPage() {
                 remark: payload.remark,
             });
         });
-        if (fresh.length === 0) {
-            showToast('号码已存在，未新增', true);
-            return { added: 0, skipped };
+        if (fresh.length === 0 && overwritten === 0) {
+            showToast('未识别到有效手机号码', true);
+            return { added: 0, overwritten: 0 };
         }
-        setRows((prev) => [...fresh, ...prev]);
+        setRows((prev) => [
+            ...fresh,
+            ...prev.map((r) => {
+                const patch = overwrites.get(r.index);
+                return patch ? { ...r, ...patch } : r;
+            }),
+        ]);
         setDraft({ ...EMPTY_FILTER });
         setApplied(null);
-        showToast(
-            skipped > 0 ? `已添加 ${fresh.length} 条，跳过 ${skipped} 条（已存在）` : `已添加 ${fresh.length} 条`
-        );
-        return { added: fresh.length, skipped };
+        const parts: string[] = [];
+        if (fresh.length > 0) parts.push(`新增 ${fresh.length} 条`);
+        if (overwritten > 0) parts.push(`覆盖 ${overwritten} 条`);
+        showToast(parts.join('，'));
+        return { added: fresh.length, overwritten };
     };
 
     const stats = [
