@@ -326,6 +326,8 @@ function ExpireDatePicker({
 
 function BlacklistTable({
     filters, searchForm,
+    rows,
+    setRows,
     onAdd,
     onImport,
     onImportHistory,
@@ -336,6 +338,8 @@ function BlacklistTable({
 }: {
     filters: BlacklistFilter | null;
     searchForm: React.ReactNode;
+    rows: BlacklistRow[];
+    setRows: React.Dispatch<React.SetStateAction<BlacklistRow[]>>;
     onAdd: () => void;
     onImport: () => void;
     onImportHistory: () => void;
@@ -345,7 +349,6 @@ function BlacklistTable({
     onExportSelected: (count: number) => void;
 }) {
     const [page, setPage] = useState(1);
-    const [rows, setRows] = useState<BlacklistRow[]>(blacklistRows);
     const [selected, setSelected] = useState<Set<number>>(new Set());
     const [removeTarget, setRemoveTarget] = useState<BlacklistRow | null>(null);
     const [toggleTarget, setToggleTarget] = useState<BlacklistRow | null>(null);
@@ -663,17 +666,52 @@ function BlacklistTable({
     );
 }
 
-function AddModal({ onClose }: { onClose: () => void }) {
+function AddModal({
+    onClose,
+    onSubmit,
+}: {
+    onClose: () => void;
+    onSubmit: (payload: {
+        phones: string[];
+        businessId: string;
+        expireForever: boolean;
+        expireEnd: string;
+        remark: string;
+    }) => { added: number; skipped: number };
+}) {
     const [expireType, setExpireType] = useState<'forever' | 'expire' | 'unset'>('unset');
     const [expireStart, setExpireStart] = useState('');
     const [expireEnd, setExpireEnd] = useState('');
     const [phones, setPhones] = useState('');
     const [businessId, setBusinessId] = useState('');
+    const [remark, setRemark] = useState('');
 
     const canSubmit =
         phones.trim() !== '' &&
         businessId.trim() !== '' &&
         (expireType === 'forever' || (expireType === 'expire' && expireStart !== '' && expireEnd !== ''));
+
+    const handleSubmit = () => {
+        if (!canSubmit) return;
+        const phoneList = Array.from(
+            new Set(
+                phones
+                    .split(/[\n,;，；\s]+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+            )
+        );
+        if (phoneList.length === 0) return;
+        const result = onSubmit({
+            phones: phoneList,
+            businessId: businessId.trim(),
+            expireForever: expireType === 'forever',
+            expireEnd,
+            remark: remark.trim(),
+        });
+        if (result.added > 0) onClose();
+    };
+
 
     return (
         <div className="sms-mask" onClick={onClose}>
@@ -748,7 +786,12 @@ function AddModal({ onClose }: { onClose: () => void }) {
                     <div className="sms-form-item">
                         <label className="sms-form-label">备注</label>
                         <div className="sms-form-control">
-                            <input className="sms-input" placeholder="请输入备注" />
+                            <input
+                                className="sms-input"
+                                placeholder="请输入备注"
+                                value={remark}
+                                onChange={(e) => setRemark(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -756,7 +799,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
                     <button type="button" className="sms-btn" onClick={onClose}>
                         取消
                     </button>
-                    <button type="button" className="sms-btn sms-btn-primary" disabled={!canSubmit} onClick={onClose}>
+                    <button type="button" className="sms-btn sms-btn-primary" disabled={!canSubmit} onClick={handleSubmit}>
                         确定
                     </button>
                 </div>
@@ -1081,6 +1124,7 @@ export default function BlacklistPage() {
     const [importVisible, setImportVisible] = useState(false);
     const [importHistoryVisible, setImportHistoryVisible] = useState(false);
     const [detailTarget, setDetailTarget] = useState<BlacklistRow | null>(null);
+    const [rows, setRows] = useState<BlacklistRow[]>(blacklistRows);
     const [draft, setDraft] = useState<BlacklistFilter>(EMPTY_FILTER);
     const [applied, setApplied] = useState<BlacklistFilter | null>(null);
     const [toast, setToast] = useState<{ text: string; warn?: boolean } | null>(null);
@@ -1120,6 +1164,50 @@ export default function BlacklistPage() {
         showToast('筛选条件已重置');
     };
 
+    const handleAddSubmit = (payload: {
+        phones: string[];
+        businessId: string;
+        expireForever: boolean;
+        expireEnd: string;
+        remark: string;
+    }) => {
+        const now = blacklistExportTimeStr();
+        const expireTime = payload.expireForever ? '永久' : `${payload.expireEnd} 23:59:59`;
+        let nextIndex = rows.reduce((max, r) => Math.max(max, r.index), 0) + 1;
+        const fresh: BlacklistRow[] = [];
+        let skipped = 0;
+        payload.phones.forEach((phone) => {
+            const exists =
+                rows.some((r) => r.phone === phone && r.businessId === payload.businessId) ||
+                fresh.some((r) => r.phone === phone);
+            if (exists) {
+                skipped += 1;
+                return;
+            }
+            fresh.push({
+                index: nextIndex++,
+                phone,
+                businessId: payload.businessId,
+                addTime: now,
+                effectiveTime: now,
+                expireTime,
+                status: 'active',
+                remark: payload.remark,
+            });
+        });
+        if (fresh.length === 0) {
+            showToast('号码已存在，未新增', true);
+            return { added: 0, skipped };
+        }
+        setRows((prev) => [...fresh, ...prev]);
+        setDraft({ ...EMPTY_FILTER });
+        setApplied(null);
+        showToast(
+            skipped > 0 ? `已添加 ${fresh.length} 条，跳过 ${skipped} 条（已存在）` : `已添加 ${fresh.length} 条`
+        );
+        return { added: fresh.length, skipped };
+    };
+
     const stats = [
         { label: '名单总数', value: '12,847', tone: '' },
         { label: '生效中', value: '11,203', tone: 'success' },
@@ -1150,6 +1238,8 @@ export default function BlacklistPage() {
             <div className="blacklist-section">
                 <BlacklistTable
                     filters={applied}
+                    rows={rows}
+                    setRows={setRows}
                     searchForm={
                         <div className="search-form">
                             <SearchForm
@@ -1216,7 +1306,7 @@ export default function BlacklistPage() {
                     onConfirm={() => showToast('导出成功')}
                 />
             )}
-            {addVisible && <AddModal onClose={() => setAddVisible(false)} />}
+            {addVisible && <AddModal onClose={() => setAddVisible(false)} onSubmit={handleAddSubmit} />}
             {importVisible && <ImportModal onClose={() => setImportVisible(false)} />}
             {detailTarget && <DetailModal row={detailTarget} onClose={() => setDetailTarget(null)} />}
             {toast && (
