@@ -1,7 +1,8 @@
 /**
  * 发送记录：搜索表单 + 导出 + 数据表格 + 分页
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     RefreshCw,
     ListFilter,
@@ -29,12 +30,40 @@ const PLACEHOLDER_SELECT = '请选择';
 
 type RecordView = 'original' | 'resend';
 
-/** 送达状态 hover 气泡提示 */
+/** 送达状态 hover 气泡提示（portal 定位，避免被表格单元格 overflow 裁切） */
 function DeliveryTooltip({ text, children }: { text: string; children: React.ReactNode }) {
+    const ref = useRef<HTMLSpanElement>(null);
+    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+    const show = () => {
+        // 以状态标签本身为锚点（送达状态单元格的 wrap 会撑满整列，用 wrap 定位会偏）
+        const anchor = ref.current?.querySelector<HTMLElement>('.sms-status') ?? ref.current;
+        const r = anchor?.getBoundingClientRect();
+        if (!r) return;
+        const center = r.left + r.width / 2;
+        // 左右各留 180px，避免贴屏幕边缘被截断
+        const left = Math.max(180, Math.min(center, window.innerWidth - 180));
+        setPos({ top: r.top, left });
+    };
+    const hide = () => setPos(null);
+
     return (
-        <span className="sms-tooltip-wrap">
+        <span
+            ref={ref}
+            className="sms-tooltip-wrap"
+            onMouseEnter={show}
+            onMouseLeave={hide}
+            onFocus={show}
+            onBlur={hide}
+        >
             {children}
-            <span className="sms-tooltip">{text}</span>
+            {pos &&
+                createPortal(
+                    <span className="sms-tooltip sms-tooltip-portal" style={{ left: pos.left, top: pos.top }}>
+                        {text}
+                    </span>,
+                    document.body
+                )}
         </span>
     );
 }
