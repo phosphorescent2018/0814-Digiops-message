@@ -363,30 +363,21 @@ function RecordTable({
 
     const rows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
     const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
-    /** 计划内自动补发序号：按发送时间排序，用于「补发类型」列展示第 N 次 */
-    const resendSeqMap = useMemo(() => {
-        const map: Record<string, number> = {};
-        filteredRows
+    /** 补发次数：人工补发恒为 1；计划内自动补发按发送时间排序计数（原型演示值，真实口径由研发按原始短信 ID 分组计算） */
+    const resendCountMap = useMemo(() => {
+        const map: Record<number, number> = {};
+        recordRows
             .filter((r) => r.resendType === '计划内自动补发')
-            .sort((a, b) => {
-                // 待发送 / 已过期没有发送时间，排在最后，避免打乱已有序号
-                if (!a.sendTime && !b.sendTime) return a.index - b.index;
-                if (!a.sendTime) return 1;
-                if (!b.sendTime) return -1;
-                return a.sendTime.localeCompare(b.sendTime);
-            })
             .forEach((r, i) => {
-                map[`${r.index}-${r.sendTime}`] = i + 1;
+                map[r.index] = i + 1;
             });
         return map;
-    }, [filteredRows]);
+    }, []);
 
-    const renderResendType = (row: (typeof recordRows)[number]) => {
-        if (row.resendType === '计划内自动补发') {
-            const seq = resendSeqMap[`${row.index}-${row.sendTime}`];
-            return seq ? `计划内自动补发·第 ${seq} 次` : row.resendType;
-        }
-        return row.resendType;
+    const renderResendCount = (row: (typeof recordRows)[number]) => {
+        if (row.resendType === '人工补发') return 1;
+        if (row.resendType === '计划内自动补发') return resendCountMap[row.index] ?? '—';
+        return '—';
     };
 
     const renderStatus = (status: string) => {
@@ -478,6 +469,7 @@ function RecordTable({
                                 <>
                                     <th className="sms-record-col-resend-type">补发类型</th>
                                     <th className="sms-record-col-batch">补发批次 ID</th>
+                                    <th className="sms-record-col-resend-count">补发次数</th>
                                 </>
                             )}
                             <th className="sms-col-sol">路径标记</th>
@@ -520,8 +512,8 @@ function RecordTable({
                                 )}
                                 {view === 'resend' && (
                                     <>
-                                        <td className="sms-record-col-resend-type">{renderResendType(row)}</td>
-                                        <td>
+                                        <td className="sms-record-col-resend-type">{row.resendType}</td>
+                                        <td className="sms-record-col-batch">
                                             {row.batchId ? (
                                                 <button
                                                     type="button"
@@ -534,6 +526,7 @@ function RecordTable({
                                                 <span className="sms-dash">—</span>
                                             )}
                                         </td>
+                                        <td className="sms-record-col-resend-count">{renderResendCount(row)}</td>
                                     </>
                                 )}
                                 <td>

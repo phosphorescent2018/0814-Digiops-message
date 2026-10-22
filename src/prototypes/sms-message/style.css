@@ -794,7 +794,17 @@ button {
 }
 
 .sms-record-table .sms-record-col-batch {
-    width: 90px;
+    width: 104px;
+}
+
+.sms-record-table td.sms-record-col-batch {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sms-record-table .sms-record-col-resend-count {
+    width: 64px;
 }
 
 .sms-record-table .sms-record-col-resend-status {
@@ -4673,7 +4683,7 @@ button {
 }
 
 .blacklist-import-drawer {
-    width: min(760px, calc(100vw - 96px));
+    width: min(940px, calc(100vw - 96px));
     height: calc(100vh - 64px);
     margin: 32px 0;
     border-radius: 8px;
@@ -4751,30 +4761,61 @@ button {
 
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(1),
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(1) {
-    width: 26%;
+    width: 23%;
 }
 
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(2),
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(2) {
-    width: 22%;
+    width: 18%;
 }
 
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(3),
 .blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(3) {
-    width: 10%;
+    width: 9%;
 }
 
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(4),
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(4),
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(5),
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(5),
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(6),
-.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(6) {
-    width: 14%;
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table th:nth-child(n + 4),
+.blacklist-import-drawer .blacklist-import-batch-table .sms-table td:nth-child(n + 4) {
+    width: 10%;
 }
 
 .blacklist-import-drawer .blacklist-import-batch-file {
     max-width: 260px;
+}
+
+.blacklist-import-file-link {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #1677ff;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.blacklist-import-file-link:hover {
+    text-decoration: underline;
+}
+
+.blacklist-import-fail-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #1677ff;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.blacklist-import-fail-link:hover {
+    text-decoration: underline;
 }
 
 .blacklist-import-batch-modal {
@@ -4835,6 +4876,11 @@ button {
 .blacklist-import-status-completed {
     background: #f0fdf4;
     color: #16a34a;
+}
+
+.blacklist-import-status-partial {
+    background: #fff7e6;
+    color: #d46b08;
 }
 
 .blacklist-import-status-failed {

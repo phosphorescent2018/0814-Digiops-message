@@ -553,8 +553,8 @@ export const blacklistRows: BlacklistRow[] = [
     { index: 12, phone: '2567****0123', businessId: 'MTN_UG_Product_id', addTime: '2026-08-04 09:14:57', effectiveTime: '2026-08-04 09:14:57', expireTime: '永久', status: 'active', remark: 'xxxxx' },
 ];
 
-/** 黑名单导入批次：状态机 待处理 → 处理中 → 已完成 / 失败 */
-export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'failed';
+/** 黑名单导入批次：状态机 待处理 → 处理中 → 已完成 / 部分执行 / 失败 */
+export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'partial' | 'failed';
 
 /** 已有号码处理策略：跳过 / 覆盖，每个批次只使用一种 */
 export type ImportDuplicateStrategy = 'skip' | 'overwrite';
@@ -579,7 +579,7 @@ export const initialImportBatches: ImportBatch[] = [
     {
         id: 'B20260828001',
         fileName: '全量名单.xlsx',
-        total: 1284700,
+        total: 1277200,
         submittedAt: '2026-08-28 10:02:18',
         status: 'completed',
         duplicateStrategy: 'skip',
@@ -587,7 +587,7 @@ export const initialImportBatches: ImportBatch[] = [
         successCount: 1268300,
         skipCount: 8900,
         overwriteCount: 0,
-        failCount: 700,
+        failCount: 0,
     },
     {
         id: 'B20260828002',
@@ -607,14 +607,28 @@ export const initialImportBatches: ImportBatch[] = [
         fileName: 'UG_MTN_2026黑名单历史数据修复与覆盖_最终审核版本_确认后导入_20260827.xlsx',
         total: 1000000,
         submittedAt: '2026-08-27 15:40:26',
-        status: 'failed',
+        status: 'partial',
         duplicateStrategy: 'overwrite',
         completedAt: '2026-08-27 15:42:11',
         successCount: 214300,
         skipCount: 0,
         overwriteCount: 1200,
         failCount: 784500,
-        failReason: '文件第 214301 行手机号码格式异常，任务中断',
+        failReason: '784,500 行手机号码格式不合法，未导入',
+    },
+    {
+        id: 'B20260825001',
+        fileName: '黑名单_缺列样本.xlsx',
+        total: 5000,
+        submittedAt: '2026-08-25 17:05:12',
+        status: 'failed',
+        duplicateStrategy: 'overwrite',
+        completedAt: '2026-08-25 17:05:20',
+        successCount: 0,
+        skipCount: 0,
+        overwriteCount: 0,
+        failCount: 5000,
+        failReason: '文件缺少 BusinessID 列，整份未导入',
     },
     {
         id: 'B20260826001',

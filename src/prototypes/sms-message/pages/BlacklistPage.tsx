@@ -888,6 +888,7 @@ const IMPORT_STATUS_LABEL: Record<ImportBatchStatus, string> = {
     pending: '待处理',
     processing: '处理中',
     completed: '已完成',
+    partial: '部分执行',
     failed: '失败',
 };
 
@@ -895,10 +896,11 @@ const IMPORT_STATUS_CLASS: Record<ImportBatchStatus, string> = {
     pending: 'blacklist-import-status-pending',
     processing: 'blacklist-import-status-processing',
     completed: 'blacklist-import-status-completed',
+    partial: 'blacklist-import-status-partial',
     failed: 'blacklist-import-status-failed',
 };
 
-function ImportBatchPanel() {
+function ImportBatchPanel({ onToast }: { onToast: (text: string) => void }) {
     const batches = initialImportBatches;
 
     return (
@@ -915,19 +917,27 @@ function ImportBatchPanel() {
                             <th>提交时间</th>
                             <th>状态</th>
                             <th>成功</th>
+                            <th>失败</th>
                             <th>跳过</th>
                             <th>覆盖</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         {batches.map((b) => {
-                            const hasResult = b.status === 'completed' || b.status === 'failed';
+                            const hasResult =
+                                b.status === 'completed' || b.status === 'partial' || b.status === 'failed';
                             return (
                                 <tr key={b.id}>
                                     <td>
-                                        <span className="blacklist-import-batch-file" title={b.fileName}>
+                                        <button
+                                            type="button"
+                                            className="blacklist-import-file-link"
+                                            title={b.fileName}
+                                            onClick={() => onToast('文件下载中（原型演示）')}
+                                        >
                                             {b.fileName}
-                                        </span>
+                                        </button>
                                     </td>
                                     <td>{b.submittedAt}</td>
                                     <td>
@@ -936,8 +946,20 @@ function ImportBatchPanel() {
                                         </span>
                                     </td>
                                     <td>{hasResult ? b.successCount.toLocaleString() : '-'}</td>
+                                    <td>{hasResult ? b.failCount.toLocaleString() : '-'}</td>
                                     <td>{hasResult && b.duplicateStrategy === 'skip' ? b.skipCount.toLocaleString() : '-'}</td>
                                     <td>{hasResult && b.duplicateStrategy === 'overwrite' ? b.overwriteCount.toLocaleString() : '-'}</td>
+                                    <td>
+                                        {hasResult && b.failCount > 0 && (
+                                            <button
+                                                type="button"
+                                                className="blacklist-import-fail-link"
+                                                onClick={() => onToast('失败明细下载中（原型演示）')}
+                                            >
+                                                失败明细
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             );
                         })}
@@ -1302,7 +1324,7 @@ export default function BlacklistPage() {
                             </button>
                         </div>
                         <div className="blacklist-import-drawer-body">
-                            <ImportBatchPanel />
+                            <ImportBatchPanel onToast={showToast} />
                         </div>
                     </aside>
                 </div>
